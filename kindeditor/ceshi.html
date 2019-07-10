@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <!-- <link href="image/titlogo.ico" rel="SHORTCUT ICON"> -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" type="text/css" href="../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../css/loding.css">
+    <script type="text/javascript" src="../js/JR.js"></script>
+    <link rel="stylesheet" href="themes/default/default.css"/>
+    <script charset="utf-8" src="kindeditor-all.js"></script>
+    <script charset="utf-8" src="lang/zh-CN.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" >
+<!--  <textarea id="editor_id" name="content" style="width: 500px;height: 500px;background-color: pink;" ></textarea>  -->
+<textarea  style="width:400px;height:200px;"  name="sysArticle.articleContent"></textarea>
+ <div class="finsh">确认</div>
+</div>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/vue.js"></script>
+<script language="javascript" type="text/javascript">
+KindEditor.ready(function(K) {
+        var  editor1 = K.create('textarea[name="sysArticle.articleContent"]', {
+        resizeType : 1, //这里的name属性值和下面的对应，你改成你项目用的name属性值
+        allowPreviewEmoticons : false,
+        allowImageUpload : true, //打开本地上传图片功能
+        items : ['source', '|', 'undo', 'redo', '|', 'preview', 'print', 'template', 'cut', 'copy', 'paste',
+        'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', '/',
+        'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|',
+        'table', 'hr','image'],//image打开本地上传图片必须写,重要的事情说三遍
+        uploadJson:'../king/fileUpload.do',//指图片
+        afterBlur : function() {   
+            this.sync();  //焦点问题，这里不写会出问题.同步KindEditor的值到textarea文本框      
+        }
+    });   
+
+
+    //提交事件
+    $('.finsh').click(function() {
+        var content =editor1.html();//获取编辑器内容
+        alert(content);
+    });                   
+});           
+</script>
+<script>
+
+// var editor;
+// KindEditor.ready(function(K) {
+//     editor = K.create('#editor_id', {
+//             resizeType:0,
+//             items:[
+//                         'source', '|', 'undo', 'redo', '|', 'preview','cut', 'copy', 'paste',
+//                         'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+//                         'justifyfull', 'indent', 'outdent', 'subscript',
+//                         'superscript',  'quickformat', 'selectall', '|', 
+//                         'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+//                         'italic', 'underline', 'strikethrough', 'removeformat', '|', 'image', 'table', 'hr','fullscreen'
+//                 ],
+//             allowImageUpload:true,//打开本地上传图片功能
+//             uploadJson:'king/fileUpload.do',//指图片
+//     });  
+// })  
+// 
+// 
+// 
+// 
+ // kingEditorParams : {
+ //        //指定上传文件参数名称
+ //        filePostName  : "uploadFile",
+ //        //指定上传文件请求的url。
+ //        uploadJson : '/pic/upload',
+ //        //上传类型，分别为image、flash、media、file
+ //        dir : "image"
+ //    },
+ // init : function(data){
+ //        // 初始化图片上传组件
+ //        this.initPicUpload(data);
+ //    },
+ // initPicUpload : function(data){
+ //        $(".picFileUpload").each(function(i,e){
+ //            var _ele = $(e);
+ //            _ele.siblings("div.pics").remove();
+ //            _ele.after('\
+ //                <div class="pics">\
+ //                    <ul></ul>\
+ //                </div>');
+ //            // 回显图片
+ //            if(data && data.pics){
+ //                var imgs = data.pics.split(",");
+ //                for(var i in imgs){
+ //                    if($.trim(imgs[i]).length > 0){
+ //                        _ele.siblings(".pics").find("ul").append("<li><a href='"+imgs[i]+"' target='_blank'><img src='"+imgs[i]+"' width='80' height='50' /></a></li>");
+ //                    }
+ //                }
+ //            }
+ //            //给“上传图片按钮”绑定click事件
+ //            $(e).click(function(){
+ //                var form = $(this).parentsUntil("form").parent("form");
+ //                //打开图片上传窗口
+ //                KindEditor.editor(TT.kingEditorParams).loadPlugin('multiimage',function(){
+ //                    var editor = this;
+ //                    editor.plugin.multiImageDialog({
+ //                        clickFn : function(urlList) {
+ //                            var imgArray = [];
+ //                            KindEditor.each(urlList, function(i, data) {
+ //                                imgArray.push(data.url);
+ //                                form.find(".pics ul").append("<li><a href='"+data.url+"' target='_blank'><img src='"+data.url+"' width='80' height='50' /></a></li>");
+ //                            });
+ //                            form.find("[name=image]").val(imgArray.join(","));
+ //                            editor.hideDialog();
+ //                        }
+ //                    });
+ //                });
+ //            });
+ //        });
+ //    },
+</script>
+</html>

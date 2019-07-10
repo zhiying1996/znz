@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/swiper-4.2.6.min.css">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <style type="text/css">
+        .news-tit span{display: block;margin:0 auto;}
+        .news-tit a:nth-child(3){position: absolute;right:0.2rem;text-decoration: none;top: 0;font-size: 0.28rem;color: #5677FC;line-height: 0.88rem;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <div class="header">
+        <div class="news-tit">
+            <a href="###" class="returnBox"  onClick="javascript:window.location.href='project.html';return false;"></a>
+            <span>我的待办</span>
+            <a href="departmentDelay.html" v-show="admain" >公司的延期</a>
+        </div>
+        <div id="contrast" class="news-ul">
+            <div id="btn1" class="blue"><span>待办事项</span></div>
+            <div id="btn2"><span>我的延期</span><i>{{several2}}</i></div>
+        </div>
+    </div>
+    <div class="backlogBox" style="width:7.5rem;height: 100%;">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" >
+                   <div class="backlog-tit backlog-box">
+                       <span>计划时间</span>
+                       <span>项目</span>
+                       <span>事项</span>
+                   </div>
+                    <div class="backlog-main" v-for="value in data1" v-cloak>
+                        <div class="backlog-L" style="font-size: 0.2rem;padding-top: 0.28rem;">
+                            {{value.day}}
+                        </div>
+                        <div class="backlog-R"  style="font-size: 16px;line-height:30px;">
+                            <template v-for="k in value.items">
+                            <div class="backlog-Rbox" @click="stay(k.projectId)">
+                                <span style="font-size: 16px;line-height:30px;padding-top: 0.25rem">{{k.projectName}}</span>
+                                <span style="font-size: 16px;line-height:30px;padding-top: 0.25rem">{{k.scheduleName}}</span>
+                                <span></span>
+                            </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide" >
+                    <div class="backlog-tit backlog-box">
+                        <span>计划时间</span>
+                        <span>项目</span>
+                        <span>事项</span>
+                    </div>
+                    <div class="backlog-main" v-for="(value,index) in data2" v-cloak>
+                        <div class="backlog-L red" style="font-size: 0.2rem;padding-top: 0.28rem;">
+                            {{value.day}}
+                        </div>
+                        <div class="backlog-R " style="font-size: 16px;line-height:30px;">
+                            <template v-for="(k,index) in value.items">
+                                <div class="backlog-Rbox" @click="_link(k.projectId)">
+                                    <span class="red" style="font-size: 16px;line-height:30px;padding-top: 0.25rem">{{k.projectName}}</span>
+                                    <span class="red" style="font-size: 16px;line-height:30px;padding-top: 0.25rem">{{k.scheduleName}}</span>
+                                    <span></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/swiper-4.2.6.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+var  ver=localStorage.getItem('version');
+    $(function () {
+        var app = new Vue({
+            el:'#demo',
+            data: {
+                data1:[],
+                data2:[],
+                // several1:'',//这个参数是用来存待办项目数量的,页面进去请求服务器,进行遍历获取延期项目数量并给予赋值
+                several2:'',//这个参数是用来存延期项目数量的,页面进去请求服务器,进行遍历获取延期项目数量并给予赋值
+                admain:'',
+            },
+            mounted(){
+            var that = this;
+            var mySwiper = new Swiper('.swiper-container', {
+                on: {
+                    slideChangeTransitionStart: function () {
+                        $("#contrast .blue").removeClass('blue');
+                        $("#contrast div").eq(this.activeIndex).addClass('blue');
+                    }
+                }
+            })
+            $("#contrast div").on('click', function(e) {
+                e.preventDefault();
+                $("#contrast .blue").removeClass('blue');
+                $(this).addClass('blue');
+                mySwiper.slideTo($(this).index());
+            })
+            that.jump=function(event,index){
+                let that = this;
+                console.log(index);
+            }
+        },
+        beforeCreate:function(){
+            let that=this;
+            $.ajax({  //获取我的代办事项
+                        "url":"http://app.zhuangneizhu.com/user/gainProjectBacklog.do",
+                        "type":"post",
+                        data:{
+                               version:ver, 
+                              userId:userId, 
+                              organizationId:org, 
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.data1=data.data;
+                            // that.several1=data.data.length;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    }),
+           $.ajax({  //获取我的延期项目列表
+                        "url":"http://app.zhuangneizhu.com/user/gainProjectDelay.do",
+                        "type":"post",
+                        data:{
+                               version:ver, 
+                              userId:userId, 
+                              organizationId:org, 
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.data2=data.data;
+                            console.log(that.data2);
+                            that.several2=data.data.length;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+           $.ajax({  //判断用户是否为管理员
+                        "url":"http://app.zhuangneizhu.com//user/gainIsOrNotAdmin.do",
+                        "type":"post",
+                        data:{
+                               version:ver, 
+                              userId:userId, 
+                              organizationId:org, 
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.admain=data.data.isAdmin;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+        },
+            methods:{
+                stay:function(k){
+                    let that=this;
+                    window.location.href="detailed-two.html?k="+3;
+                    localStorage.setItem("pro",k);
+                },
+                _link:function (k) {
+                    let that=this;
+                    window.location.href="detailed-two.html?k="+2;
+                    localStorage.setItem("pro",k);
+                }
+            }
+        })
+    })
+</script>
+</html>

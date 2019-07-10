@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="../image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="../css/index.css ">
+    <link rel="stylesheet" type="text/css" href="../css/loding.css">
+    <script type="text/javascript" src="../js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="personnelTit">
+        <div @click="back"></div>
+        <span>选择成员</span>
+        <a href="###" class="blue header-tit-r"  @click="ok">提交</a>
+    </div>
+    <div class="main" style="top: 0.88rem;padding: 0.2rem 0;overflow-y: auto;width: 7.5rem;background-color: #f6f8ff">
+        <div class="adj-box" v-for="(value,index) in json" @click="_adjbox(index)">
+            <div class="adj-L">
+                <img src="../image/adj01.png" alt="" v-if="value.isCheck">
+                <img src="../image/adj02.png" alt="" v-else>
+            </div>
+            <div class="adj-R">
+                <span v-html="value.name"></span>
+                <span v-html="value.roleName"></span>
+                <span v-html="value.mobile"></span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/vue.js"></script>
+<script>
+var url = window.location.search;
+            var request = new Object();
+         if (url.indexOf("?") != -1) {  
+             var str = url.substr(1);
+            var strs = str.split("&"); 
+            for (var i = 0; i < strs.length; i++) {
+                 request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+             }
+        }
+let index=request["index"];
+let needid=request["myid"];
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version')
+    $(function () {
+        var app=new Vue({
+            el:'#demo',
+            data:{
+                loding:true,  
+                id:[] ,///某项进度的id号
+                json:[],
+                project:'',//项目详情
+                usidarr:[]//提醒人员的id
+            },
+            beforeCreate:function(){
+                    let that=this;
+                        $.ajax({  //获取项目进度列表
+                                "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                                "type":"post",
+                                data:{
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    that.loding=false
+                                    console.log(data);
+                                    that.id=data.data.vos[needid].projectScheduleId;
+                                    $.ajax({  //设置项目进度延期提醒人
+                                            "url":"http://app.zhuangneizhu.com/project/editProjectNotifyMember.do",
+                                            "type":"post",
+                                            data:{
+                                                  projectScheduleId:that.id,
+                                                  organizationId:org,
+                                                  userId:userId,
+                                                  version:ver,
+                                            },
+                                            "dataType":"json",
+                                            "success":function(data){
+                                                console.log(data);
+                                                that.json=data.data
+                                        for (var i = that.json.length - 1; i >= 0; i--) {
+                                            if(that.json[i].isCheck==true){
+                                                that.usidarr.push(that.json[i].userId);
+                                            }
+                                        }
+                                            },
+                                            "error":function(){
+                                                console.log("错误");
+                                            }
+                                        });
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+            },
+            methods:{
+                back:function(){
+                 window.location.href="../schedulepage.html?index="+index+"&myid="+needid;
+                },
+                _adjbox:function (index) {
+                    let that = this;
+                    that.usidarr=[];
+                    that._data.json[index].isCheck=!that._data.json[index].isCheck;
+                    for(var i=0;i<that.json.length;i++){
+                        if(that.json[i].isCheck){
+                            that.usidarr.push(that.json[i].userId)
+                        }
+                    }
+               },
+                ok:function(){
+                        let that=this;
+                        console.log(that.usidarr)
+                        console.log(that.id);
+                            $.ajax({  //设置项目进度延期提醒人
+                                    "url":"http://app.zhuangneizhu.com/project/setProjectNotifyMember.do",
+                                    "type":"post",
+                                    data:{
+                                          projectScheduleId:that.id,
+                                          notifyUserIds:that.usidarr.join(","),
+                                          organizationId:org,
+                                          userId:userId,
+                                          version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        console.log(data);
+                                        window.location.href="../schedulepage.html?index="+index+"&myid="+needid;
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                                });
+                }
+            }
+        })
+    })
+</script>
+</html>

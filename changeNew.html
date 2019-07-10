@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap"  id="demo" style="display: flex;justify-content: center;align-items: center;box-shadow: none;">
+    <div class="newBox" style="box-shadow: 0px 5px 20px 5px rgba(4,36,85,0.3);">
+        <div class="newTit">重新选择项目模板</div>
+        <div class="regBox">
+            <textarea style="color: #000;" disabled="true">{{pojname}}</textarea>
+        </div>
+        <div style="height: 0.5rem;line-height: 0.5rem;text-align: center;font-size: 0.3rem;background-color:rgba(4,36,85,0.2);color: #fff ">{{showtemplateName}}</div>
+        <div class="inforText">
+                <div class="infor-box" @click="_memberdown(0,'channel')" style="width: auto;">
+                    <span>{{personnel.channel}}</span>
+                    <span class="per-R"></span>
+                </div>
+        </div>
+       <div class="member-down" v-show="mainmu"  style="width: 6.8rem;" v-cloak>
+            <h3>{{memberdownbox.name}}</h3>
+            <div class="member-downBox">
+             <div v-for="(value,index) in memberdownbox.key" @click="_downBox(value,index)" style="color: #000">{{value}}</div>
+            </div>
+            <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+       </div>
+   
+        <div class="main-mu" v-show="mainmu" @click="mainmu=false" style="width: 6.8rem;"></div>
+        <div class="red-text" style="text-align:center">
+            <span>在"公司设置"处可新增、修改项目进度模版</span>
+        </div>
+        <div>
+            <input type="submit" value="确认"  class="logoSub" @click="ok"> 
+        </div>
+        <div class="red-text" style="padding:0,0.3rem,0,0.3rem;">
+        变更项目模板后，原有的项目节点完成时间将被重置，您需重新设置每个节点的完成时间。
+        </div>
+        <div class="newFoot">
+            <a href="###" @click="back"></a>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script>
+  var data2 =localStorage.getItem('key');
+  var userId=Number(data2);
+  var org=localStorage.getItem('orgkey');
+  var pro=localStorage.getItem('pro');
+$(function(){
+ var app = new Vue({
+            el:'#demo',
+            data:{
+                data:'',//模板数据
+                id:'',//模板类型id
+                pojname:'',
+                showtemplateName:'',//修改前的模板名称
+                mainmu:false,//下拉框和下拉框幕显示隐藏的判断值
+                memberdownbox:{name:'',key:[]},//存放下拉框的内容
+                memberdown:[
+                        {
+                            name:'请选择项目模板',
+                            key:[]
+                        },
+                    ],
+                     personnel:{
+                      channel:'请选择模板',
+                    },
+            },
+            mounted(){
+                var that=this;
+                $.ajax({     //获取项目进度模板
+                    "url":"http://app.zhuangneizhu.com/v2/set/getTemplateInfo.do",
+                    "type":"post",
+                    "anyns":true,
+                    data:{ 
+                        userId:userId,
+                        organizationId:org,
+                        version:"2.9",
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        that.data=data.data;
+                         for(var i = 0 ;i < data.data.length ; i++){
+                            that.memberdown[0].key.push(data.data[i].templateName);      
+                            };
+                    },
+                    "error":function(){
+                        console.log("输入有误");
+                    }
+                });
+                $.ajax({           //初始化项目基本信息页（含业主）
+                    "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                    "type":"post",
+                    data:{
+                    projectId:pro,
+                      organizationId:org,
+                      userId:userId,
+                      version:"2.9",
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        that.pojname=data.data.projectName;
+                        that.showtemplateName=data.data.templateName
+                    }
+                })
+            },
+            methods:{
+                back:function(){
+                    window.location.href="detailed-two.html"
+                },
+                _downBox:function(e,index){    //下拉菜单
+                    var that=this
+                    var fromName=e;
+                    var k =that._data.type;//对应的那个组
+                    console.log(k)
+                    console.log(index);
+//                   var a=that._data.personnel
+                    that._data.personnel[k]=e;
+//                    console.log(e)
+                    that._data.mainmu=false;
+                    that.id=that.data[index].templateId;
+                },
+                _memberdown:function (e,key) {//编辑页面点击   
+                    var that=this;
+                    that._data.mainmu=true;
+                    that._data.memberdownbox=that._data.memberdown[e];
+                    that._data.type=key;
+                },
+                ok:function(){
+                    var that=this;
+                     $.ajax({     //项目进度重设
+                    "url":"http://app.zhuangneizhu.com/v2/project/resetProjectScheduleTemplate.do",
+                    "type":"post",
+                    "anyns":true,
+                    data:{ 
+                    userId:userId,
+                    organizationId:org,
+                    projectId:pro,
+                    version:"2.9",
+                    templateId:that.id
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        window.location.href="detailed-two.html"
+                    },
+                    "error":function(){
+                        console.log("输入有误");
+                    }
+                });
+                },
+            },
+       })
+})
+    
+</script>
+</html>

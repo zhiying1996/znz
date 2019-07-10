@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="../image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="../css/index.css ">
+    <link rel="stylesheet" type="text/css" href="../css/loding.css">
+    <script type="text/javascript" src="../js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id='demo'>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+      <div id="loader"></div>
+      <div class="loader-section"></div>
+    </div>
+    <!-- 加载层结束 -->
+    <div class="personnelTit">
+        <div onclick="javascript:window.history.back();return false;"></div>
+        <span>完成状态</span>
+        <a @click="submit"><span style="display: inline-block;float: right;padding-right:20px;font-size:0.3rem;px;color:#5677FC">确认</span>
+        </a>
+    </div>
+    <div class="main " style="top: 0.88rem;padding-top: 0.2rem" > 
+                <div class="eng-box">
+                        <span>完成</span>
+                        <input type="radio" name="bedStatus" value="1" style="font-size: 16px" class="act">
+                </div>
+                 <div class="eng-box">
+                        <span>未完成  </span>
+                        <input type="radio" name="bedStatus" value="0" class="act" >
+                </div>
+    </div>
+    <div id="show" style="width: 7.5rem;height: 100%;background-color: rgba(0,0,0,0.3);position: relative;display: none">
+         <div style="width: 5rem;height:1.5rem;position: absolute;left: 50%;top: 50%;transform: translate(-50%,-50%);background-color: #fff;border-radius: 0.3rem; color:rgb(86, 119, 252)">
+           <h1 style="padding: 0.2rem 0.1rem 0rem 0.1rem">必须上传进度图片，才可设置为已完成。</h1>
+         </div>
+    </div>
+</div>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/vue.js"></script>
+<script>
+            var url = window.location.search;
+                var request = new Object();
+             if (url.indexOf("?") != -1) {  
+                 var str = url.substr(1);
+                var strs = str.split("&"); 
+                for (var i = 0; i < strs.length; i++) {
+                     request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+                 }
+            }
+             let index=request["index"];
+             let myid=request["myid"];
+var  data2= localStorage.getItem('key');
+var  userId=Number(data2);
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version');
+
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                data:'',
+                id:'',  //存放的projectScheduleId
+                projectId:'',
+                k:'',//开关判断
+                photolength:'',
+            },
+           beforeCreate:function(){ 
+                let that=this;
+                $.ajax({ //获取上传进度图片了开关
+                              "url":"http://app.zhuangneizhu.com/v2/set/gainProjectScheduleMustPicSocket.do",
+                              "type":"post",
+                              data:{
+                              userId:userId,
+                              organizationId:org,
+                              version:ver,    
+                              },
+                              "dataType":"json",
+                              "success":function(data){
+                                  that.k=data.data;
+                               },
+                              "error":function(){
+                               console.log("输入有误");
+                              }
+                  });
+                $.ajax({  //获取项目进度列表
+                        "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                        "type":"post",
+                        data:{
+                              projectId:pro,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                          that.loding=false;
+                            console.log(data);
+                            var length=data.data.vos[myid].photo;
+                            that.data=data.data.vos[myid];
+                            that.id=data.data.vos[myid].projectScheduleId;
+                            console.log();
+                            if (length=="") {
+                              that.photolength=true;
+                            }
+
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+            },
+            methods:{ 
+                submit:function(){          
+                     let that=this;
+                     let b=$('input:radio:checked').val();
+                     console.log(b);
+                     if(that.k&&that.photolength){
+                      $("#show").css("display","block")  
+                     }else{
+                      $.ajax({  //设置项目进度状态
+                            "url":"http://app.zhuangneizhu.com/project/setProjectScheduleState.do",
+                            "type":"post",
+                            data:{
+                                 projectScheduleId:that.id,
+                                  projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                                  status:b,//完成是1;未完成是0
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code==10000){
+                                  window.location.href="../schedulepage.html?index="+index+"&myid="+myid;
+                                }
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                         });
+                     }
+                }
+            },
+           
+         })
+    })
+</script>
+</html> 

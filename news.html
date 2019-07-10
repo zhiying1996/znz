@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/swiper-4.2.6.min.css">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <style type="text/css">
+        .show{background-color: rgba(246,206,60,0.16);width: 7.5rem;height:0.8rem;font-size: 0.25rem;line-height: 0.8rem;}
+        .show img{width: 0.4rem;height: 0.4rem;display: block;float: left;margin-top: 0.2rem;margin-left: 0.5rem;margin-right: 0.2rem;}
+        .moreselect{width: 6.9rem;height: 2.2rem;background-color: #F6F8FF;display: flex;flex-wrap: wrap;justify-content:space-between;padding: 0.2rem 0.3rem;align-content: space-between}
+        .moreselectbtn{width: 2rem;height: 0.6rem;background-color: #fff;color:#5677FC;font-size: 0.25rem;text-align: center;line-height: 0.6rem}
+        .changemoreselectbtn{width: 2rem;height: 0.6rem;background-color: #5677FC;color:#fff ;font-size: 0.25rem;text-align: center;line-height: 0.6rem}
+        .moreinputbox{width: 4.45rem;height: 0.6rem;background-color: #fff;}
+        .moreinputbox img{width:20px;height: 20px;margin:0.12rem 0.2rem 0 0.2rem;float: left;}
+        .moreinputbox input{width: 3.5rem;height: 0.6rem;border: none;outline: medium;line-height:0.6rem;font-size: 0.25rem;}
+        .News-fot img{width: 0.45rem;height: 0.45rem;margin: 0 0.2rem 0 0;float: left;}
+        .datashow{width: 7.5rem;height: 10.5rem;background-color: rgba(0,0,0,0.2);position: relative;}
+        .datashow div{width: 4rem;height: 3rem;background-color: #fff;position:absolute; top: 50%;left: 50%;transform: translate(-50%,-50%);border-radius: 0.2rem;font-size: 0.35rem;color: #5677FC;text-align: center;}
+        .datashow img{margin: 0.1rem auto;display: block;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo" style="overflow: hidden" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="header">
+        <div class="news-tit"  v-cloak>
+            {{tit}}
+            <a  @click="link" class="blue news-tit-r">项目统计</a>
+        </div>
+        <div class="news-ul" id="contrast">
+            <div class="blue" id="btn1"><span>公司消息</span></div>
+            <div id="btn2"><span>官方消息</span></div>
+            <div id="btn3" @click="init" style="width: 2rem;padding-left: 0.5rem"><img src="image/yi.png" style="width:0.5rem;height: 0.5rem;margin-top: 0.1rem;float: left;"><span>装企品牌易</span></div>
+        </div>
+    </div>
+    <div class="newsBox" style="width: 7.8rem">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" >
+                    <div class="show" v-show=bolen>
+                        <img src="assets/提示小图标@2x.png">
+                        <a href="http://admin.zhuangneizhu.com/admin/showArticle.do?aid=329" style="color:#808083;">绑定微信账号，在微信端随时接收项目消息</a>
+                    </div>
+                    <div class="newsUnit" :data-url="value.url" v-for="(value,index) in data1"  @click="jump0(value.projectId,index)" v-cloak>
+                        <h3 v-html="value.operContent"></h3>
+                        <p>
+                            <span>操作时间：{{value.createTime}}</span>
+                            <span>操作人：{{value.operName}}</span>
+                        </p>
+                        <div class="News-fot">
+                            查看详情
+                            <span>&gt;</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="show" v-show=bolen>
+                        <img src="assets/提示小图标@2x.png">
+                        <a href="http://admin.zhuangneizhu.com/admin/showArticle.do?aid=329" style="color:#808083;">绑定微信账号，在微信端随时接收项目消息</a>
+                    </div>
+                    <div class="newsUnit" v-for="(value,index) in data2"  @click="jump1(value.messageId,index)" :data-url="value.url" v-cloak>
+                    <a href="###">
+                        <h3 v-html="value.content"></h3>
+                        <p>
+                            <span>发布时间</span>
+                            <span>{{value.createTime}}</span>
+                        </p>
+                        <img :src="value.photo" alt="">
+                        <div class="News-fot">
+                            查看详情
+                            <span>&gt;</span>
+                        </div>
+                    </a>    
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="show" v-show=bolen>
+                        <img src="assets/提示小图标@2x.png">
+                        <a href="http://admin.zhuangneizhu.com/admin/showArticle.do?aid=329" style="color:#808083;">绑定微信账号，在微信端随时接收项目消息</a>
+                    </div>
+                    <div class="moreselect" >
+                        <a href="###" v-for="(val,i) in selecttit" @click="selectjump(i)" class='moreselectbtn' :class="{changemoreselectbtn:i==ins}" >{{val}}</a>
+                        <div class="moreinputbox">
+                            <img src="assets/搜索-灰色@2x.png" >
+                            <input type="text" name=""  v-model="selectname">
+                        </div>
+                    </div>
+                    <div class="newsUnit"  v-for="(value,index) in data3"  :data-url="value.url" v-show="contentbox" v-cloak>
+                        <a href="###">
+                            <h3 @click="jump2(value.messageId,index)">{{tit}}: {{value.content}}</h3>
+                            <p  @click="jump2(value.messageId,index)">
+                                <span>发布时间 {{value.createTime}}</span>
+                            </p>
+                            <img @click="jump2(value.messageId,index)" :src="value.photo" >
+                            <h4>{{value.h4}}</h4>
+                            <div class="News-fot" style="display: flex;justify-content:space-between;">
+                                <a href="###" @click="collection(value.messageId)" style="width: 2rem;height: 0.45rem;line-height: 0.45rem;color:#2C2D2E;border-right: 1px solid #E6E7EC;font-size: 0.25rem">
+                                    <img v-if="value.collect" src="assets/收藏2@2x.png">
+                                    <img v-else src="assets/收藏1@2x.png">
+                                    收藏
+                                </a>
+                                <a href="###" style="width: 2rem;height: 0.45rem;line-height: 0.45rem;color:#2C2D2E;border-right: 1px solid #E6E7EC;font-size: 0.25rem" @click="share(value.messageId)">
+                                    <img  src="assets/新闻转发@2x.png">
+                                    转发
+                                </a>
+                                <a href="###" @click="jump2(value.messageId,index)" style="width: 2rem;height: 0.45rem;line-height: 0.45rem;color:#2C2D2E;font-size: 0.25rem">
+                                    <img src="assets/详情@2x.png">
+                                    查看详情
+                                </a>
+                            </div>
+                        </a>
+                    </div>
+                    <div  class="datashow" v-show="datashow">
+                        <div>
+                            <img src="image/暂无数据 .png">
+                            暂无数据
+                        </div>
+                    </div>
+                    <div id="box" style="width: 100%;height: 10.5rem;background-color:rgba(0,0,0,0.2);" v-show="shareshow" >
+                        <div style="position: absolute;top:50%;left: 50%;transform: translate(-50%,-50%);background-color: #fff;width: 3.6rem;height:3.4rem;border-radius: 0.3rem;padding: 0.6rem 0.2rem 0 0.2rem">
+                            <a href="###" @click="shareshow=false,contentbox=true"><span style="position: absolute;font-size:0.3rem;right: 0.25rem;color: #000;top:0;right:0.3rem;">×</span></a>
+                            <img id="qrCodeIco" :src="logoimg" style="position: absolute;width:60px; height:60px;left: 45px;" />
+                            <div id="qrCodeDiv" style="width: 150px;height:150px;margin:0 auto;">
+                            </div>
+                            <p style="line-height: 0.35rem;font-size: 0.25rem;color: #5677Fc;margin-top: 0.15rem;">您可以用微信扫码，获取该文章并用来分享。</p>
+                        </div> 
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--底部-->
+    <div class="appFot">
+        <a href="project.html"><img src="image/fot1-1.jpg" alt=""><span>项目</span></a>
+        <a href="news.html"><img src="image/fot2-2.jpg" alt=""><span>消息</span></a>
+        <a href="new.html"><img src="image/fot3-2.jpg" alt="" style="width: 0.64rem;height: 0.64rem;margin-top: 0.2rem;"></a>
+        <a href="member.html"><img src="image/fot4-1.jpg" alt=""><span>成员</span></a>
+        <a href="personal.html"><img src="image/fot5-1.jpg" alt=""><span>我的</span></a>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.qrcode.min.js"></script>
+<script src="js/swiper-4.2.6.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  userId=localStorage.getItem('key');
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+let  ver=localStorage.getItem('version');
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                data1:'',
+                data2:'',
+                data3:'',
+                tit:'',
+                bolen:'',
+                selecttit:["品牌理念","服务细节","行业知识","设计案例","建材推荐","节日问候","我的收藏"],
+                selectname:'',
+                myindex:'',
+                datashow:false,
+                contentbox:true, 
+                shareshow:false,     
+                ins:'',
+                logoimg:'',//公司logo
+            },
+            beforeCreate:function(){
+                let that=this;
+                    $.ajax({    //获取公司名称
+                        "url":"http://app.zhuangneizhu.com/set/gainCompanyName.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data); 
+                            that.tit=data.data.organizationName;
+                            localStorage.setItem('organizationName',that.tit);
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    $.ajax({  //获取官方消息
+                        "url":"http://app.zhuangneizhu.com/user/gainOrganizationMessage.do",
+                        "type":"post",
+                        "anyns":true,
+                        data:{
+                              pageNum:1,
+                              pageSize:100,
+                              userId:userId,
+                              organizationId:org,
+                              version:ver, 
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.loding=false;
+                            console.log(data);
+                            that.data1=data.data.items;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    $.ajax({  //获取官方消息和装修知识
+                        "url":"http://app.zhuangneizhu.com/user/gainOfficialAndArticleMessage.do",
+                        "type":"post",
+                        "anyns":true,
+                        data:{
+                              pageNum:1,
+                              pageSize:100,
+                              userId:userId,
+                              organizationId:org,
+                              version:ver,
+                              type:1,//1是官方消息2是装修知识    
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.data2=data.data.items;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    $.ajax({  //获取装企易文章列表接口
+                        'url':'http://app.zhuangneizhu.com/v2/user/gainBrandArticleMessage.do',
+                        'type':'POST',
+                        data:{
+                            pageNum:1,
+                            pageSize:100,
+                            userId:userId,
+                            organizationId:org,
+                            version:ver,     
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data)
+                            that.data3=data.data.items;
+                        }
+                    });
+                    $.ajax({  //获取是否绑定微信
+                        "url":"http://app.zhuangneizhu.com/third/isBindWechat.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            if(data.data.isBinding){
+                                that.bolen=false;
+                            }else{
+                                that.bolen=true;
+                            } 
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            if(data.data.companyLogo==""){
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/photo/DATE2019-02-25DATE/edb3b6eb-2fa8-43ad-8e93-9bcc6a5deabd.png";
+                            }else {
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+data.data.companyLogo;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    }); 
+            },
+            watch:{
+                selectname:function(val){
+                    var that=this;
+                    $.ajax({  //获取装企易文章列表接口
+                        'url':'http://app.zhuangneizhu.com/v2/user/gainBrandArticleMessage.do',
+                        'type':'POST',
+                        data:{
+                            pageNum:1,
+                            pageSize:50,
+                            userId:userId,
+                            organizationId:org,
+                            version:ver,
+                            keyWord:val      
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data)
+                            that.data3=data.data.items;
+                        }
+                    })
+                }
+            },
+            mounted(){
+                var that = this;
+                var mySwiper = new Swiper('.swiper-container', {
+                    on: {
+                        slideChangeTransitionStart: function () {
+                            $("#contrast .blue").removeClass('blue');
+                            $("#contrast div").eq(this.activeIndex).addClass('blue');
+                        }
+                    }
+                })
+                $("#contrast div").on('click', function(e) {
+                    e.preventDefault();
+                    $("#contrast .blue").removeClass('blue');
+                    $(this).addClass('blue');
+                    mySwiper.slideTo($(this).index());
+                }),
+                that.jump0=function(event){
+                     let that = this;
+                     if (event==0) {
+                        window.location.href="member.html";
+                     }else{
+                        window.location.href="detailed-two.html?k="+1;
+                        localStorage.setItem("pro",event);
+                     }  
+                },
+                that.jump1=function(event,index){
+                    let that = this;
+                    console.log(event,index);
+                    let id=event;
+                    window.open("http://admin.zhuangneizhu.com/admin/showArticle.do?aid="+id);
+                },
+                that.jump2=function(event,index){
+                    let that = this;
+                    let id=event;
+                    window.open("ArticleContent.html?aid="+id+"&orgid="+org+"&ver="+ver);
+                }
+            },
+            methods:{
+                link:function(){
+                    window.location.href="mystatistics.html?index="+1;
+                },
+                init:function(){
+                   $(".moreselect a").siblings().removeClass("changemoreselectbtn")
+                   var that=this;
+                   $.ajax({  //获取装企易文章列表接口
+                        'url':'http://app.zhuangneizhu.com/v2/user/gainBrandArticleMessage.do',
+                        'type':'POST',
+                        data:{
+                            pageNum:1,
+                            pageSize:100,
+                            userId:userId,
+                            organizationId:org,
+                            version:ver,     
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data)
+                            that.data3=data.data.items;
+                            that.myindex=''
+                        }
+                    }) 
+                },
+                selectjump:function(i){
+                    if(i==0){
+                        $(".moreselect a:first").addClass("changemoreselectbtn")
+                    }
+                    var that=this;
+                    var index=i+1;
+                    that.myindex=index;
+                    that.ins=i;
+                    that.shareshow=false;
+                    if(index==1||index==2||index==3||index==4||index==5||index==6){
+                        $.ajax({  //获取装企易文章列表接口
+                            'url':'http://app.zhuangneizhu.com/v2/user/gainBrandArticleMessage.do',
+                            'type':'POST',
+                            data:{
+                                pageNum:1,
+                                pageSize:100,
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,
+                                category:index,
+                                keyWord:''      
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data)
+                                if(data.code==10030){
+                                    that.datashow=true;
+                                    that.contentbox=false;
+                                }else{
+                                    that.data3=data.data.items
+                                    that.datashow=false;
+                                    that.contentbox=true;
+                                }
+                            }
+                        })
+                    }else{
+                        $.ajax({  //我的收藏
+                            'url':'http://app.zhuangneizhu.com/v2/user/gainMyCollectArticle.do',
+                            'type':'POST',
+                            data:{
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,
+                                pageNum:0,
+                                pageSize:20     
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.data!=undefined&&data.code==10000){
+                                    that.data3=data.data.items;
+                                    that.datashow=false;
+                                    that.contentbox=true;
+                                }else{
+                                    that.datashow=true;
+                                    that.contentbox=false;
+                                }
+                            }
+                        })
+                    }
+                },
+                collection:function(id){
+                    var that=this;
+                    $.ajax({  //收藏/取消收藏我的文章
+                        "url":"http://app.zhuangneizhu.com/v2/user/collectMyArticle.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          version:ver,
+                          messageId:id
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            if(that.myindex==''){
+                                    $.ajax({  //获取装企易文章列表接口
+                                        'url':'http://app.zhuangneizhu.com/v2/user/gainBrandArticleMessage.do',
+                                        'type':'POST',
+                                        data:{
+                                            pageNum:1,
+                                            pageSize:100,
+                                            userId:userId,
+                                            organizationId:org,
+                                            version:ver
+                                        },
+                                        "dataType":"json",
+                                        "success":function(data){
+                                            console.log(data)
+                                            if(data.code==10030){
+                                                that.datashow=true;
+                                                that.contentbox=false;
+                                            }else{
+                                                that.data3=data.data.items;
+                                                that.datashow=false;
+                                                that.contentbox=true;
+                                            }
+                                        }
+                                    })
+                            }else if(that.myindex==1||that.myindex==2||that.myindex==3||that.myindex==4||that.myindex==5||that.myindex==6){
+                                    $.ajax({  //获取装企易文章列表接口
+                                        'url':'http://app.zhuangneizhu.com/v2/user/gainBrandArticleMessage.do',
+                                        'type':'POST',
+                                        data:{
+                                            pageNum:1,
+                                            pageSize:100,
+                                            userId:userId,
+                                            organizationId:org,
+                                            version:ver,
+                                            category:that.myindex
+                                        },
+                                        "dataType":"json",
+                                        "success":function(data){
+                                            console.log(data)
+                                            if(data.code==10030){
+                                                that.datashow=true;
+                                                that.contentbox=false;
+                                            }else{
+                                                that.data3=data.data.items;
+                                                that.datashow=false;
+                                                that.contentbox=true;
+                                            }
+                                        }
+                                    })
+                            }else if(that.myindex==7){
+                                    $.ajax({  //我的收藏
+                                        'url':'http://app.zhuangneizhu.com/v2/user/gainMyCollectArticle.do',
+                                        'type':'POST',
+                                        data:{
+                                            userId:userId,
+                                            organizationId:org,
+                                            version:ver,
+                                            pageNum:0,
+                                            pageSize:20     
+                                        },
+                                        "dataType":"json",
+                                        "success":function(data){
+                                            if(data.data!=undefined&&data.code==10000){
+                                                that.data3=data.data.items;
+                                                that.datashow=false;
+                                                that.contentbox=true;
+                                            }else{
+                                                that.datashow=true;
+                                                that.contentbox=false;
+                                            }
+                                        }
+                                    })
+                            } 
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    })
+                },
+                share:function(id){
+                    let that=this;
+                    $("#qrCodeDiv").empty()
+                    $("#qrCodeDiv").qrcode({
+                        render: "canvas", // 渲染方式有table方式（IE兼容）和canvas方式
+                        width:150, //宽度
+                        height:150, //高度
+                        text:"http://web.zhuangneizhu.com/ArticleContent.html?aid="+id+"&orgid="+org+"&ver="+ver+"&uid="+userId,
+                        typeNumber: -1,//计算模式
+                        correctLevel: 2,//二维码纠错级别
+                        background: "#ffffff",//背景颜色
+                        foreground: "#000000", //二维码颜色
+                    });
+                    var margin = ($("#qrCodeDiv").height()-$("#qrCodeIco").height()) / 2; //控制Logo图标的位置
+                    $("#qrCodeIco").css("margin", margin);
+                    that.contentbox=false;
+                    that.shareshow=true;
+                }
+            }
+        })
+})
+</script>
+<style>
+    .swiper-slide{
+        -webkit-overflow-scrolling: touch;
+        overflow-y:scroll;
+    }
+</style>
+</html>

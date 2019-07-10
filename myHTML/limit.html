@@ -1,0 +1,124 @@
+    <!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="../image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <div class="personnelTit">
+        <span onclick="javascript:window.history.back();return false;" style="color:red;font-size:0.6rem;font-weight:500;float: left;margin-left: 20px;">×</span>
+        <span>领用建材限额</span>
+        <span style="color: green;font-size:0.6rem;font-weight:500;float: right;margin-right:20px;" @click="over">✓</span>
+    </div>
+    <div class="main " style="top: 0.88rem;padding-top: 0.2rem;width:7.5rem;">
+            <div style="width:7.2rem;height: 0.88rem;border-bottom: 1px solid  #f6f8ff;background-color: #fff;line-height:0.88rem;font-size:0.3rem;padding-left:0.3rem;"  v-for="(val,index) in arr">
+                <span style="display: block;float:left;width: 2rem;height: 0.88rem;color:#808083 ">{{val.limitName}}</span>
+                <input style="height: 0.88rem;line-height: 0.8rem;font-size: 0.3rem;" type="text" name="" placeholder="0"   @change="handlechange(index)" :ref="index" :value="val.limitMoney==0.0? 0:val.limitMoney"><!-- v-model.lazy="arr[index].limitMoney"  -->
+                <span style="display: block;float: right;padding-right: 0.2rem">元</span>
+            </div>
+    </div>
+</div>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/vue.js"></script>
+<script>
+    var url = window.location.search;
+    var request = new Object();
+    if (url.indexOf("?") != -1) {  
+        var str = url.substr(1);
+    var strs = str.split("&"); 
+    for (var i = 0; i < strs.length; i++) {
+            request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+        }
+    }
+      var  data2= localStorage.getItem('key');
+      var  userId=Number(data2);
+      var  org=localStorage.getItem('orgkey');
+      var  pro=localStorage.getItem('pro');
+      var  ver=localStorage.getItem('version')
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+               money:'',
+               arr:[],
+               limitArr:[],
+            },
+        beforeCreate:function(){
+                var that=this;
+                $.ajax({
+                    "url":"http://app.zhuangneizhu.com/v2/project/getProjectMaterialTypeLimit.do",
+                    "type":"post",
+                    "anyns":true,
+                    data:{ 
+                    projectId:pro,
+                    userId:userId,
+                    organizationId:org,
+                    version:ver,
+                    appType:"znz",
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                    console.log(data);
+                    that.arr=data.data;
+                    console.log(that.arr)
+                },
+                "error":function(){
+                  console.log("输入有误");
+                }     
+                })
+        },
+        methods:{
+            handlechange:function(index){
+                this.arr[index].limitMoney=this.$refs[index][0].value
+                console.log(index);
+                console.log(this.$refs[index][0].value);
+                var expenseid=this.arr[index].expenseTypeId;
+                var changeMoney=this.arr[index].limitMoney;
+                var limit=expenseid+":"+changeMoney;
+                console.log(limit);
+                this.limitArr.push(limit)
+            },
+            over:function(){
+                var that=this;
+                console.log(that.limitArr);
+                var changeLT=that.limitArr.splice(",");
+                $.ajax({     //设置建材支出限额
+                                        "url":"http://app.zhuangneizhu.com/v2/project/setProjectMaterialTypeLimit.do",
+                                        "type":"post",
+                                        "anyns":true,
+                                        data:{ 
+                                        materialsLimit:changeLT.join(",") ,
+                                        projectId:pro,
+                                        userId:userId,
+                                        organizationId:org,
+                                        version:ver,
+                                        },
+                                        "dataType":"json",
+                                        "success":function(data){
+                                            console.log(data);
+                                            window.location.href="../record.html";
+                                        },
+                                        "error":function(){
+                                            console.log("输入有误");
+                                        }
+                });
+            }
+        }
+    })
+})                     
+</script>
+</html> 

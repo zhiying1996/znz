@@ -1,0 +1,104 @@
+ <!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id='demo'>
+    <div class="personnelTit">
+        <div onclick="javascript:window.history.back();return false;"></div>
+        <span>当前操作历史</span>
+        <a class="blue header-tit-r" style="width: 0.6rem"></i></a> 
+    </div>
+
+    <div class="main " style="top: 0.88rem;padding-top: 0.2rem;width:7.8rem;overflow-y:auto;">
+       <div class="newsUnit" v-for="value in dataarr" v-cloak>
+                <h3 v-html="value.operContent"></h3>
+                <p>
+                    <span>操作时间：{{value.createTime}}</span>
+                    <span>操作人：{{value.userName}}</span>
+                </p>
+        </div>
+    </div>
+</div> 
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+let  ver=localStorage.getItem('version');
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+               dataarr:[],
+            },
+           beforeCreate:function(){
+            let that=this;
+             $.ajax({    //获取项目操作历史
+                        "url":"http://app.zhuangneizhu.com/user/gainProjectHistory.do",
+                        "type":"post",
+                        data:{
+                          pageNum:1,
+                          pageSize:30,
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                          projectId:pro,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.dataarr=data.data;
+                        },
+                        "error":function(){
+                           console.log("错误"); 
+                        }
+                    })
+           },
+           methods:{
+               projectdelet:function(){ //删除项目
+                    let that=this;
+                    if(confirm("确认删除该项目？")){
+                        $.ajax({    //删除项目
+                                "url":"http://app.zhuangneizhu.com/project/delProject.do",
+                                "type":"post",
+                                data:{
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                                  projectId:pro,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                    window.location.href="project.html";
+                                },
+                                "error":function(){
+                                   console.log("错误"); 
+                                }   
+                        })
+                    }else{
+                        return;
+                    }
+                },
+           }
+    })
+})
+</script>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="head-min">
+        <div class="personnelTit">
+            <div id="back"></div>
+            <span>关于我的项目</span>
+            <a class="blue header-tit-r" id="all">公司总项目</a><!--@click="all" href="coystatistics.html"  -->
+        </div>
+    </div>
+    <div class="mainBox" style="height:94%;padding:0.15rem 0 0.3rem;top: 0.88rem;">
+        <div class="staBox">
+            <div class="ste-box" v-cloak>
+                <span id="time"></span><!-- {{datefrom}}-{{dateto}} -->
+                <span class="blue" id="select">选择时间段</span>
+            </div>
+        </div>
+        <div class="sta-h3">项目总数</div>
+        <div class="staBox">
+            <div class="ste-box">
+                <span>新增项目数<i>(以你加入项目时间为准)</i></span>
+                <span id="num"></span>
+            </div>
+            <div class="ste-box">
+                <span>新增签约数<i>(以签约时间为准)</i></span>
+                <span id="sign"></span>
+            </div>
+        </div>
+        <div class="sta-h3">合同金额</div>
+
+        <div class="staBox">
+            <div class="ste-box">
+                <span>总合同金额</span>
+                <span id="company"></span>
+            </div>
+            <div class="staBox" id="box">
+            </div>
+        </div>
+        <div class="sta-h3">已签约合同收款状态(以签约时间为准)</div>
+        <div class="staBox">
+            <div class="ste-box">
+                <span>总应收款</span>
+                <span id="total"></span>
+            </div>
+            <div class="ste-box">
+                <span>已收款</span>
+                <span id="already"></span>
+            </div>
+            <div class="ste-box">
+                <span>待收款</span>
+                <span id="wait"></span>
+            </div>
+        </div>
+
+    </div>
+    <!--日历选择-->
+    <div class="rili-mu" style="display: none;"></div>
+    <div class="rilimain"  style="display: none;">
+        <div class="rili-tit">修改时间</div>
+        <div class="riliBox" >
+            <input type="text" id="from"  placeholder="开始时间">
+            <input type="text" id="to"    placeholder="结束时间">
+        </div>
+        <div class="riliBtn">
+            <div class="rili-ok rili-btn" id="ok">确定</div>
+            <div class="rili-close rili-btn" id="close" >取消</div>
+        </div>
+    </div>
+    <!--日历结束-->
+</div>
+</body>
+<script src="js/jquery-1.8.3.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var data2=localStorage.getItem('key');
+var userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+var pro=localStorage.getItem('pro');
+var k=window.location.href.split("=")[1];
+var ver=localStorage.getItem('version');
+$.ajax({  //获取项目个人统计
+      "url":"http://app.zhuangneizhu.com/project/gainPrivateProjectStatistics.do",
+      "type":"post",
+      data:{
+            userId:userId,
+            organizationId:org,
+            version:ver, 
+      },
+      "dataType":"json",
+      "success":function(data){
+          console.log(data);
+          var addpronum=data.data.joinProject;
+          $("#num").html(addpronum+'个')
+          var addsign=data.data.newSigned
+          $("#sign").html(addsign+'个')
+          var mony=data.data.totalContractsMoney
+          $("#company").html(mony);
+          var massage=data.data.contracts;
+          $.each(massage,function(index,item){
+            var costname="<div class='ste-box';><span>"+item.name+"</span><span>"+item.money+"</span></div>";
+            $("#box").append(costname);
+          });
+          var total=data.data.statistics.totalRecive;
+          $("#total").html(total);
+          var already=data.data.statistics.alreadyMoney;
+          $("#already").html(already);
+          var wait=data.data.statistics.waitMoney;
+          $("#wait").html(wait);
+      },
+      "error":function(){
+          console.log("错误");
+      }
+  });
+var a=[0,0];
+$( "#from" ).datepicker({
+     dateFormat: 'yy/mm/dd',
+     defaultDate: "+1w",
+     changeMonth: true,
+     numberOfMonths: 1,
+     onClose: function(selectedDate) {
+         $( "#to" ).datepicker( "option", "minDate", selectedDate );
+          var key = '/';
+          // datefrom01= selectedDate.replace(new RegExp(key,'g'),'-');
+          a[0]= selectedDate.replace(new RegExp(key,'g'),'-');
+          console.log(a[0]);
+     }
+});
+$( "#to" ).datepicker({
+   dateFormat: 'yy/mm/dd',
+     defaultDate: "+1w",
+     changeMonth: true,
+     numberOfMonths: 1,
+     onClose: function( selectedDate ) {
+         $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+         var key='/';
+         a[1]= selectedDate.replace(new RegExp(key,'g'),'-');
+         console.log(a[1]);
+     }
+}); 
+$("#select").on("click",function(){
+  $(".rili-mu").toggle();
+  $(".rilimain").toggle();
+});
+$("#ok").on("click",function(){
+   $.ajax({  //获取项目个人统计
+                        "url":"http://app.zhuangneizhu.com/project/gainPrivateProjectStatistics.do",
+                        "type":"post",
+                        data:{
+                              startTime:a[0],
+                              endTime:a[1],
+                              userId:userId,
+                              organizationId:org,
+                              version:ver, 
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            $("#num").empty();
+                            var addpronum=data.data.joinProject;
+                            $("#num").html(addpronum+'个')
+                            $("#sign").empty();
+                            var addsign=data.data.newSigned
+                            $("#sign").html(addsign+'个')
+                            $("#company").empty();
+                            var mony=data.data.totalContractsMoney;
+                            $("#company").html(mony);
+                            $("#box").empty();
+                              var massage=data.data.contracts;
+                              $.each(massage,function(index,item){
+                                var costname="<div class='ste-box'; id='cost'><span>"+item.name+"</span><span>"+item.money+"</span></div>";
+                                $("#box").append(costname);
+                              });
+                            $("#total").empty();
+                            var total=data.data.statistics.totalRecive;
+                            $("#total").html(total);
+                            $("#already").empty();
+                            var already=data.data.statistics.alreadyMoney;
+                            $("#already").html(already);
+                            $("#wait").empty();
+                            var wait=data.data.statistics.waitMoney;
+                            $("#wait").html(wait);
+                            var key = '-';
+                            var from= a[0].replace(new RegExp(key,'g'),'.');
+                            var to=a[1].replace( new RegExp(key,'g'),'.');
+                            $("#time").html(from+'-'+to);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+  $(".rili-mu").toggle();
+  $(".rilimain").toggle();
+});
+$("#close").on("click",function(){
+ $(".rili-mu").toggle();
+  $(".rilimain").toggle();
+}); 
+$("#back").on("click",function(){
+  if (k==1) {
+    window.location.href="news.html";
+  }else if (k==2){
+   window.location.href="personal.html";
+  }
+});
+$("#all").on("click",function(){
+    $.ajax({  //获取公司统计信息
+        "url":"http://app.zhuangneizhu.com/project/gainOrganizationProjectStatistics.do",
+        "type":"post",
+        data:{
+              userId:userId,
+              organizationId:org,
+              version:ver, 
+        },
+        "dataType":"json",
+        "success":function(data){
+            console.log(data);
+            var walk=data.message;
+            if (walk=="权限不足,非管理员不能查看公司的统计信息") {
+                alert("权限不足，请联系管理员。")
+            }else{
+                window.location.href="coystatistics.html?index="+k;
+            }
+        },
+        "error":function(){
+            console.log("错误");
+        }
+    });
+}); 
+</script>
+</html>

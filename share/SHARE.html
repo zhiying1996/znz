@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="#" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no">
+    <!--ipone手机下的a标签下的手机号码不被显示为拨号链接-->
+    <link rel="stylesheet" href="./css-share/common.css">
+    <link rel="stylesheet" href="./css-share/swiper.min.css">
+    <link rel="stylesheet" href="./css-share/loaders.css">
+    <script src="./js-share/rem.js"></script>
+    <title></title>
+</head>
+
+<body>
+    <!-- 页面访问数统计 -->
+    <span style="display:none">
+        <script src="https://s22.cnzz.com/z_stat.php?id=1275035232&web_id=1275035232" language="JavaScript"></script>
+    </span>
+    <div class="share">
+        <nav>
+            <p>
+                <a href="http://app.zhuangneizhu.com/guide/index.html"><img src="./img/logo_w.png" alt=""></a>    
+            </p>
+            <p>项目详情</p>
+            <P></P>
+            
+        </nav>
+        <header>
+            <div class="left">
+                <div class="top">
+                    <div class="title">项目地址：</div>
+                    <p class="projectName"></p>
+                </div>
+                <div class="bottom">
+                    <div class="title">装修公司：</div>
+                    <p class="organizationName"></p>
+                </div>
+            </div>
+            <div class="right"></div>
+        </header>
+
+        <div id="banner">
+            <!--banner-->
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+
+                </div>
+            </div>
+        </div>
+        <div class="tabs">
+            <div class="left">
+                <i></i>
+                <p class="active">项目进度</p>
+                <span class='overAvg'></span>
+            </div>
+            <div class="right">
+                <i></i>
+                <p>项目信息</p>
+            </div>
+        </div>
+
+        <ul class="head">
+            <li></li>
+            <li>节点</li>
+            <li>操作人</li>
+            <li>计划完成时间</li>
+            <li>状态</li>
+        </ul>
+        <div class="main"></div>
+        <div class="right-body">
+            <div class="message">
+                <h2>基本信息</h2>
+                <div class="c-main">
+                    <div class="c-left con">
+                        <p>装修面积：<span class="area">未填写</span></p>
+                        <p>签约时间：<span class="signedTime">未签约</span></p>
+                    </div>
+                    <div class="c-right con">
+                        <p>装修类型：<span class="decorationType">未填写</span></p>
+                        <p>完工状态：<span class="completeTime">未完工</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="list-img">
+                <h3 class="pic-1">
+                    <div class="p-left"><i><img src="./img/xcxz.png" alt=""></i>现场写真<br>照片留档</div>
+                </h3>
+                <h3 class="pic-2">
+                    <div class="p-left"><i><img src="./img/sjt.png" alt=""></i>设计图<br>照片留档</div>
+                </h3>
+                <h3 class="pic-3">
+                    <div class="p-left"><i><img src="./img/sd.png" alt=""></i>水电<br>照片留档</div>
+                </h3>
+
+            </div>
+            <div class="bottom">
+                更多项目信息及云存储资料，需登录装内助app查看。请联系您的装修公司，为您开通装内助账号权限。
+            </div>
+            <div class="link">
+                <a href="http://app.zhuangneizhu.com/guide/index.html">
+                    <img src="./img/logo_b.png" alt="">
+                    <p>—— 最专业的装修管理系统，点击下载 ——</p>
+                </a>
+                
+            </div>
+        </div>
+
+        <div class="mask">
+            <div class="back">返回</div>
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- css3做的loading加载 -->
+    <div class="loading">
+        <div class="loader">
+            <div class="loader-inner line-spin-fade-loader">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="./js-share/jquery v3.1.1.js"></script>
+<script src="./js-share/swiper.min.js"></script>
+<script>
+    $(function () {
+        //获取url中的参数
+        var url = window.location.href;
+        var obj = {};
+        if (url.indexOf('?') != -1) {
+            var str = url.substring(url.indexOf('?') + 1);
+            var arr = str.split('&');
+            for (var i = 0; i < arr.length; i++) {
+                obj[arr[i].split('=')[0]] = decodeURI(arr[i].split('=')[1]);
+            }
+        }
+        var userId = obj.uid;
+        var organizationId = obj.orgid;
+        var projectId = obj.projectid;
+        var version = 3.5;
+        var projectSchedule; //项目进度列表的请求数据
+        var companyName;    //公司的名称
+        var projectDetail;  //项目基本信息
+        var photoArr = [];
+
+
+        if (sessionStorage.getItem("projectDetail") & sessionStorage.getItem("companyName")) {
+            projectDetail = JSON.parse(sessionStorage.getItem("projectDetail"))
+            companyName = sessionStorage.getItem("companyName")
+            $('.projectName').html(projectDetail.projectName)       //项目地址
+            $('.organizationName').html(companyName)                 //装修公司
+            $('title').html(companyName + '-' + projectDetail.projectName + '施工进度')
+
+            if (projectDetail.area != null) {
+                $('.area').html(projectDetail.area + '㎡');
+            }
+            if (projectDetail.decorationType != null) {
+                $('.decorationType').html(projectDetail.decorationType);
+            }
+            if (projectDetail.completeTime != '') {
+                $('.completeTime').html('已完工');
+            }
+            if (projectDetail.signedTime != '') {
+                $('.signedTime').html(projectDetail.signedTime);
+            }
+        } else {
+            //项目基本信息
+            $.ajax({
+                url: "http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                type: "post",
+                data: {
+                    projectId: projectId,
+                    organizationId: organizationId,
+                    userId: userId,
+                    version: version,
+                },
+                dataType: "json",
+                success: function (res) {
+                    if (res) {
+                        projectDetail = res.data;
+                        sessionStorage.setItem('projectDetail', JSON.stringify(projectDetail));
+                        $('.projectName').html(projectDetail.projectName)       //项目地址
+                        if (projectDetail.area != null) {
+                            $('.area').html(projectDetail.area + '㎡');
+                        }
+                        if (projectDetail.decorationType != null) {
+                            $('.decorationType').html(projectDetail.decorationType);
+                        }
+                        if (projectDetail.completeTime != '') {
+                            $('.completeTime').html('已完工');
+                        }
+                        if (projectDetail.signedTime != '') {
+                            $('.signedTime').html(projectDetail.signedTime);
+                        }
+
+                    }
+                }
+            }).done(function () {
+                //获取公司名称
+                $.ajax({
+                    url: "http://app.zhuangneizhu.com/set/gainCompanyName.do",
+                    type: "post",
+                    data: {
+                        userId: userId,
+                        organizationId: organizationId,
+                        version: version,
+                    },
+                    dataType: "json",
+                    async: false,
+                    success: function (res) {
+                        if (res) {
+                            companyName = res.data.organizationName;
+                            $('.organizationName').html(companyName)             //装修公司
+                            sessionStorage.setItem('companyName', companyName)
+                            $('title').html(companyName + '-' + projectDetail.projectName + '施工进度')
+                        }
+                    }
+                });
+            })
+        }
+
+        if (sessionStorage.getItem("projectSchedule")) {
+            $('.loading').fadeOut(200);
+            projectSchedule = JSON.parse(sessionStorage.getItem("projectSchedule"));
+            ban();
+        } else {
+            $.ajax({  //获取项目进度列表
+                url: "http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                type: "post",
+                data: {
+                    projectId: projectId,
+                    organizationId: organizationId,
+                    userId: userId,
+                    version: version,
+                },
+                dataType: "json",
+                success: function (res) { 
+                    if (res) {
+                        console.log(res)
+                        $('.loading').fadeOut(200);
+                        projectSchedule = res.data;
+                        ban();
+                        sessionStorage.setItem('projectSchedule', JSON.stringify(projectSchedule))
+                    }
+                },
+            })
+        }
+
+
+        function ban() {
+            $.each(projectSchedule.vos, function (index, item) {
+                if (item.photo) {
+                    photoArr.push(item.photo.split(',').reverse().join(','));
+                };
+                if (!item.userName) {
+                    item.userName = '';
+                }
+                if (!item.scheduleTime) {
+                    item.scheduleTime = "未设置"
+                }
+                var html = `
+                <ul>
+                    <li><div class="container"></div></li>
+                    <li>${item.organizationScheduleName}</li>
+                    <li>${item.userName}</li>
+                    <li>${item.scheduleTime}</li>
+                    <li><i></i></li>
+                    <li></li>
+                </ul>`
+                $('.share .main').append(html);
+                if (item.isNew && item.state) {
+                    $('.share .main ul').eq(index).find('li').css('color', 'blue');
+                }
+                if (item.state) {
+                    $('.share .main ul').eq(index).find('li i').css({ 'background': 'url("./img/over.png") no-repeat', "backgroundSize": "contain" })
+                } else {
+                    $('.share .main ul').eq(index).find('li i').css({ 'background': 'url("./img/noover.png") no-repeat', "backgroundSize": "contain" })
+                }
+
+                if (item.photo) {
+                    photoArr.push(item.photo.split(',').reverse().join(','))
+                    var myImg = `<img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item.photo.split(',')[0]}">`;
+                    $('.share .main ul').eq(index).find('li .container').append(myImg)
+                } else {
+                    var arr = item.organizationScheduleName.split('');
+                    var reg = new RegExp("[\\u4E00-\\u9FFF]+");
+                    for (var i = 0; i < arr.length; i++) {
+                        if (reg.test(arr[i])) {
+                            str = arr[i];
+                            break;
+                        }
+                    }
+                    span = '<span>' + str + '</span>'
+                    $('.share .main ul').eq(index).find('li .container').append(span)
+                }
+            })
+            var bannerArr = photoArr.join(',').split(',');
+            if (bannerArr.length < 5) {
+                $("#banner").hide();
+            } else {
+                var bannerArr20 = bannerArr.slice(-20).reverse();//banner中放入20张图片
+                var swiperImg = bannerArr20.map(function (item, index) {
+                    return `<div class="swiper-slide"><img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}" title="${index}"/></div>`
+                })
+                $('.swiper-wrapper').append(swiperImg.join(''))
+                //引用swiper插件做轮播
+                new Swiper('#banner .swiper-container', {
+                    watchSlidesProgress: true,
+                    slidesPerView: 'auto',
+                    centeredSlides: true,
+                    loop: true,
+                    loopedSlides: 10,
+                    autoplay: true,
+                    on: {
+                        progress: function (progress) {
+                            for (i = 0; i < this.slides.length; i++) {
+                                var slide = this.slides.eq(i);
+                                var slideProgress = this.slides[i].progress;
+                                modify = 1;
+                                if (Math.abs(slideProgress) > 1) {
+                                    modify = (Math.abs(slideProgress) - 1) * 0.2 + 1;
+                                }
+                                translate = slideProgress * modify * 65 + 'px';
+                                scale = 1 - Math.abs(slideProgress) / 5;
+                                zIndex = 999 - Math.abs(Math.round(10 * slideProgress));
+                                slide.transform('translateX(' + translate + ') scale(' + scale + ')');
+                                slide.css('zIndex', zIndex);
+                                slide.css('opacity', 1);
+                                if (Math.abs(slideProgress) > 3) {
+                                    slide.css('opacity', 0);
+                                }
+                            }
+                        },
+                        setTransition: function (transition) {
+                            for (var i = 0; i < this.slides.length; i++) {
+                                var slide = this.slides.eq(i)
+                                slide.transition(transition);
+                            }
+                        }
+                    }
+                });
+                $('.swiper-wrapper').on('click', '.swiper-slide img', function () {     //轮播图图片预览
+                    var initialSlide = ($(this).attr('title'));
+                    $('.mask').show();
+                    new Swiper('.mask .swiper-container', {
+                        initialSlide: initialSlide,
+                    });
+                })
+                $('.mask .back').on('click', function () {
+                    $('.mask').hide()
+                })
+            }
+
+        }
+
+        $('.tabs .left').on('click', function () {
+            $('.head').show();
+            $('.main').show();
+            $('.right-body').hide();
+
+            $('.tabs .right p').attr('class', '');
+            $('.tabs .left p').addClass('active');
+            sessionStorage.setItem('myindex', "1");
+        })
+        $('.tabs .right').on('click', function () {
+            $('.head').hide();
+            $('.main').hide();
+            $('.right-body').show();
+            $('.tabs .left p').attr('class', '');
+            $('.tabs .right p').addClass('active');
+            sessionStorage.setItem('myindex', "2")
+        })
+
+        if (sessionStorage.getItem('myindex') == "2") {
+            $('.loading').css('display', 'none')
+            $('.head').hide();
+            $('.main').hide();
+            $('.right-body').show();
+            $('.tabs .left p').attr('class', '');
+            $('.tabs .right p').addClass('active');
+        }
+
+        $(".pic-1").on('click', function () {
+            window.location.href = `pic.html?index=1&userId=${userId}&organizationId=${organizationId}&projectId=${projectId}`;
+        })
+        $(".pic-2").on('click', function () {
+            window.location.href = `pic.html?index=2&userId=${userId}&organizationId=${organizationId}&projectId=${projectId}`;
+        })
+        $(".pic-3").on('click', function () {
+            window.location.href = `pic.html?index=3&userId=${userId}&organizationId=${organizationId}&projectId=${projectId}`;
+        });
+
+        //调转到装介绍页面
+        $('header .right').on('click', function () {
+            window.location.href = `consultation.html?userId=${userId}&organizationId=${organizationId}&projectId=${projectId}`
+        });
+        //跳转详情页
+        $('.share .main ').on('click', 'ul', function () {
+            window.location.href = `detail.html?index= ${$(this).index()}&userId=${userId}&organizationId=${organizationId}&projectId=${projectId}`;
+        })
+    })
+
+
+</script>
+
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="personnelTit">
+        <div @click="back"></div>
+        <span>原始合同金额和构成</span>
+        <span @click="note" style="color:#5677FC;float:right;font-size:0.3rem;padding-right: 20px" >说明</span>
+    </div>
+    <div v-show="noteshow" style="position: absolute; width:6.5rem; height: 50px;left: 0.5rem; border-radius: 5px; background-color: rgba(0, 0, 0, 0.6); z-index: 1000; color: #fff;font-size: 0.24rem;" >
+        <p style="line-height: 20px;padding:6px 6px 3px 9px;" >录入签合同时候的金额，不用考虑后期增减项，增减项是独立记录的。</p>
+    </div>
+    <div class="main" style="top: 0.88rem;">
+        <div class="inforBox">
+            <h3>
+                <span class="blue" style="display: block;float: right;">总金额：{{money}}元</span>
+            </h3>
+            <div style="width: 100%;padding:0,0.3rem,0,0.3rem;font-size: 0.27rem;display: flex;justify-content:space-around;"> 
+                <span style="width: 27%;">款项构成</span>
+                <span style="width: 27%;">金额</span>
+                <span style="width: 27%;">操作人</span>
+            </div>
+                
+            <div class="inforText">
+                <div class="orig-box" v-for="(ite,index) in item" @click="engineering(index)">
+                    <span style="width: 30%;">{{ite.projectContractName}}</span>
+                    <span style="width: 30%;">{{ite.money}}</span>
+                    <span style="width: 30%;" v-if="ite.userName!=''">{{ite.userName}}</span>
+                    <span style="width: 30%;" v-else>无操作人</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let org=localStorage.getItem('orgkey');
+let pro=localStorage.getItem('pro');
+var ver=localStorage.getItem('version')
+var myid=window.location.href.split('=')[1];
+    $(function(){  
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                item:[],
+                money:'',
+                noteshow:false,
+            },
+            beforeCreate:function () {
+                    let that=this;     
+                    $.ajax({   //获取项目合同款项明细
+                                "url":"http://app.zhuangneizhu.com/v2/set/gainProjectContract.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    projectId:pro,
+                                    version:ver,
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                     that.loding=false
+                                     console.log(data);
+                                     that.item=data.data.vos;
+                                     that.money=data.data.contractTotal;
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                    })
+ },
+            methods:{
+                engineering:function (myid) {
+                     window.location.href="engineering.html?myid="+myid;
+                },
+                back:function(){
+                    window.location.href="detailed-two.html?index="+myid;
+                },
+                note:function(){
+                    let that=this
+                    that.noteshow=!that.noteshow;
+                }
+            }
+        })
+    })
+</script>
+</html>

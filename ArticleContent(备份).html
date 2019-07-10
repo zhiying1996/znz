@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link href="image/titlogo.ico" rel="SHORTCUT ICON">
+	<script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+	<style type="text/css">
+		*{margin: 0;padding: 0;}
+		.box{width: 1200px;height: auto;margin: 0 auto;}
+		.tit{font-size: 45px;font-weight: 700;line-height: 100px;padding: 0 35px;}
+			@media screen and (max-width: 1200px) {
+			    div.box p.tit{
+			       font-size: 60px;font-weight: 700;line-height: 100px;padding: 0 35px;
+			    }
+			}
+		.textbox{padding: 0 35px;}
+		@media screen and (max-width: 1200px) {
+			    .textbox .western img{
+			       width: 1130px;
+			    }
+			}
+		.consultation{
+		    width:1200px;
+		    height:auto;
+		    display:flex;
+		    flex-direction: column;
+		    overflow-y: auto;
+		};
+		.consultation .main{
+		    width:100%;
+		    height:auto;
+		    background:yellow;
+		    flex:1;
+		}
+		@media screen and (max-width: 1200px) {
+			.consultation .main{width:1130px;padding: 0 35px;height:auto;};
+		}
+		.consultation .main .content{
+		    width:680px;
+		    margin:0 auto;
+		    background: #fff;
+		    border-radius: 10px;
+		    margin-top:24px;
+		    display:flex;
+		    flex-direction: column;
+		    padding:40px 0;
+		    background-color:#f2f2f2;
+		}
+		@media screen and (max-width:1200px) {
+			.consultation .main .content{width:1130px;background: #fff;border-radius: 10px;margin-top:24px;display:flex;flex-direction: column;padding:40px 0;background-color:#f2f2f2;};
+		}
+		.consultation .main .content .top{
+		    width:100%;
+		    height:120px;
+		    border-bottom:1px  dashed #ccc;
+		}
+		@media screen and (max-width:1200px) {
+			.consultation .main .content .top{
+			    width:100%;
+			    height:auto;
+			    border-bottom:1px  dashed #ccc;
+			}
+		}
+		.consultation .main .content .top h2{
+			width: 100%;
+		    font-size:30px;
+		    color:#4d4d4d;
+		    text-align: center;
+		}
+		@media screen and (max-width:1200px){
+			.consultation .main .content .top h2{
+				width: 100%;
+			    font-size:50px;
+			    color:#4d4d4d;
+			    text-align: center;
+			    margin-bottom:20px;
+		    }
+		}
+		.consultation .main .content .top p{
+			width: 100%;
+		    font-size:24px;
+		    color:#ff8402;
+		    text-align: center;
+		    line-height:60px;  
+		}
+		@media screen and (max-width:1200px){
+			.consultation .main .content .top p{
+				width: 100%;
+			    font-size:45px;
+			    color:#ff8402;
+			    text-align: center;
+			    line-height:60px; 
+		    }
+		}
+		.consultation .main .content .form section:nth-child(1){
+		    margin-top:40px;
+		}
+		.consultation .main .content .form section{
+		    height:64px;
+		    display:flex;
+		    margin-bottom:20px;
+		    align-items: center;
+		}
+		@media screen and (max-width:1200px){
+			.consultation .main .content .form section{
+			    height:auto;
+			    display:flex;
+			    margin-bottom:20px;
+
+			    align-items: center;
+			}
+		}
+		.consultation .main .content .form label{
+		    width:180px;
+		    text-align:right;
+		    font-size:26px;
+		    color:#666;
+		    font-weight: 600 
+		}
+		@media screen and (max-width:1200px){
+			.consultation .main .content .form label{ width:200px;font-size:40px;}
+		}
+		.consultation .main .content .form input{
+		    border:1px solid #ccc;
+		    width:400px;
+		    height:64px;
+		    margin-left:22px;
+		    border-radius:8px;
+		    padding-left:20px;
+		    color:#444;
+		    font-size:25px;
+		    font-weight: 600;
+		}
+		@media screen and (max-width:1200px) {
+			.consultation .main .content .form input{ border:1px solid #ccc;width:700px;height:110px;margin-left:22px;border-radius:8px;padding-left:20px;color:#444;font-size:45px;font-weight: 600;};
+		}
+		.consultation .main .content .form section:nth-child(5){
+		    height:164px;
+		}
+		.consultation .main .content .form button{
+		    background: #5d76f4;
+		    width:580px;
+		    height:68px;
+		    border-radius:8px;
+		    display:block;
+		    border:0;
+		    margin:0 auto;
+		    margin-top:46px;
+		    font-size:30px;
+		    color:#fff;
+		    font-weight: 600;
+		}
+		@media screen and (max-width:1200px) {
+			.consultation .main .content .form button{
+			    background: #5d76f4;
+			    width:720px;
+			    height:100px;
+			    border-radius:8px;
+			    display:block;
+			    border:0;
+			    margin-left: 220px;
+			    margin-top:46px;
+			    font-size:40px;
+			    color:#fff;
+			    font-weight: 600;
+		   }
+		}
+		.sharepeople{width:1200px;height: 80px;position: relative; background-color:#f1f1f1;}
+		@media screen and (max-width: 1200px) {
+		    div.box div.sharepeople{
+		       position: relative; width:1130px;height:175px;padding: 25px 35px 0;margin: 20px 0;
+		    }
+		}
+		.sharepeople img{display: block;float: left;width: 65px;height: 65px;color: #fff;border-radius: 50%;border: 3px solid #fff;margin: 4px 0 0 10px;}
+		@media screen and (max-width: 1200px) {
+		    div.box div.sharepeople img{
+		        display: block;float: left;width:130px;height:130px;color: #fff;border-radius: 50%;border: 10px solid #fff;;
+		    }
+		}
+		.sharepeople p{line-height: 40px;font-size: 18px;padding-left: 100px;color: #000;}
+		@media screen and (max-width: 1200px) {
+		 div.sharepeople p{
+		        line-height:50px;font-size:50px;padding-left: 170px;color: #000;margin-top:5px
+		    }
+		    div.sharepeople p:nth-child(3){
+		        line-height:50px;font-size: 45px;padding-left: 170px;color:#999;margin-top:30px;
+		    }
+		}
+		.sharepeople a{position:absolute;right:10px;top:25px;width: 100px;height: 30px;text-align:center;display: block;color:#ec6a6a;line-height: 30px;font-size: 20px;text-decoration: none;border: 1px solid #fff;border-radius: 3px;}
+		@media screen and (max-width: 1200px) {
+		    div.box div.sharepeople a{
+		        position:absolute;right:30px;top:60px;width: 250px;height:60px;text-align:center;display: block;color:#ec6a6a;line-height:60px;font-size:45px;text-decoration: none;border: 1px solid #fff;border-radius: 3px;
+		    }
+		}
+		.open{text-decoration: none;line-height:35px;font-size:20px;margin-top: 30px;color: #5d73f4}
+		@media screen and (max-width: 1200px) {
+		    .open{
+		        text-decoration: none;line-height:60px;font-size:35px;margin-top: 60px;color: #5d73f4
+		    }
+		}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<p class="tit"></p>
+		<div class="sharepeople" style="display: none">
+
+		</div>
+		<div class="textbox" >
+			
+		</div>
+		<div class="consultation" style="display: none">
+	        <div class="main">
+	            <div class="content">
+	                <div class="top">
+	                    <h2>想装修？请找我们</h2>
+	                    <p>补充您的联系方式，获取您的专属报价</p>
+	                </div>
+	                <div class="form">
+	                    <section>
+	                        <label>您的姓名</label>
+	                        <input type="text" placeholder="必填" id="in1" maxlength="10">
+	                    </section>
+	                    <section>
+	                        <label>您的号码</label>
+	                        <input type="text" placeholder="必填" id="in2" maxlength="11">
+	                    </section>
+	                    <section>
+	                        <label>您的地址</label >
+	                        <input type="text" placeholder="必填" id="in3" maxlength="20" >
+	                    </section>
+	                    <section>
+	                        <label>房屋面积㎡</label>
+	                        <input type="text" placeholder="必填" id="in4" maxlength="4">
+	                    </section>
+	                    <button class="mysure">提交</button>
+	                </div>
+	                <a class="open" href="http://app.zhuangneizhu.com/guide/index.html">
+				    	<p style="text-align: center;">—申请开通“装企品牌易”—</p>
+			            <p style="text-align: center;color: #999;">技术支持：装内助</p>
+				    </a>
+	            </div>          
+	        </div>
+	    </div>
+	</div>
+</body>
+<script type="text/javascript">
+var url = window.location.search;
+    var request = new Object();
+ if (url.indexOf("?") != -1) {  
+     var str = url.substr(1);
+    var strs = str.split("&"); 
+    for (var i = 0; i < strs.length; i++) {
+        request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+    }
+}
+	var  id=request["aid"];
+	if(request["uid"]!=undefined){
+		var  userId=request["uid"];
+	}else if(request["userId"]!=undefined){
+		var  userId=request["userId"];
+	}
+	
+	var  org=request["orgid"];
+	var  ver=request["ver"];
+	$.ajax({  //获取文章内容
+            'url':'http://app.zhuangneizhu.com/advert/showArticle.do',
+            'type':'POST',
+            data:{
+                aid:id,    
+                userId:userId 
+            },
+            "dataType":"json",
+            "success":function(data){
+            }
+	}).done(function(data){
+		var tittext=data.data.title
+	    $(".tit").append(tittext);
+		var text=data.data.content;
+		var y = text.replace(/16px/g,'32px');
+		$(".textbox").append(y);
+	});
+	if(userId!=undefined){
+		$.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+				"url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+	            "type":"post",
+	            data:{
+	              organizationId:org,
+	              userId:userId,
+	              version:ver,
+	            },
+	            "dataType":"json",
+	            "success":function(data){
+	            }
+		}).done(function(data){
+			if(data.data.companyLogo==""){
+	            var img="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/photo/DATE2019-02-25DATE/edb3b6eb-2fa8-43ad-8e93-9bcc6a5deabd.png";
+	        }else {
+	            var img="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+data.data.companyLogo;
+	        }
+			var peoplename=data.data.name
+					$.ajax({    //获取公司名称
+                        "url":"http://app.zhuangneizhu.com/set/gainCompanyName.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    }).done(function(data){
+                    	var tit=data.data.organizationName;
+                		$.ajax({  //获取文章内容
+				            'url':'http://app.zhuangneizhu.com/advert/showArticle.do',
+				            'type':'POST',
+				            data:{
+				                aid:id,    
+				            },
+				            "dataType":"json",
+				            "success":function(data){
+				            	var computername=localStorage.getItem('organizationName') 
+				            	$("title").html(tit+"："+data.data.title);
+				            }
+						})
+
+			        	var text=
+						`
+						<img src=${img}>
+						<p><b>${tit}</b>的${peoplename}</p>
+						<p style="color:#999">发布了这篇文章</p>
+						<a href="javascript:void(0)" class="link" style="margin-right:35px;">联系我们</a>
+						`
+						$(".sharepeople").append(text);
+						$(".link").on("click",function(){
+							console.log("ssss");
+							window.location.href="consultation.html?userId="+userId+"&organizationId="+org+"&projectId="+11291;
+						})
+                    })
+					$(document).scroll(function() {
+				        var scroH=$(document).scrollTop();  //滚动高度
+				        if(scroH>180){
+				        	$(".sharepeople").css({"position":"fixed","top":"0","background-color":"#03a9f5","margin-top":'0'});
+				        	$(".sharepeople p").css({"color":"#fff"});
+				        	$(".sharepeople a").css({"color":"#fff","right":"10px"});
+				        	$(".box").css("margin-top","105px");
+				        }else{
+				        	$(".sharepeople").css({"position":"relative","background-color":"#fff","margin-top":'10px',"background-color":"#f1f1f1"});
+				        	$(".sharepeople p").css({"color":"#000"});
+				        	$(".sharepeople p:nth-child(3)").css({"color":"#999"});
+				        	$(".sharepeople a").css({"color":"#ec6a6a"});
+				        	$(".box").css("margin-top","0px");
+				        }
+					});	
+		});
+	}else{
+			$.ajax({  //获取文章内容
+	            'url':'http://app.zhuangneizhu.com/advert/showArticle.do',
+	            'type':'POST',
+	            data:{
+	                aid:id,    
+	            },
+	            "dataType":"json",
+	            "success":function(data){
+	            	var computername=localStorage.getItem('organizationName') 
+	                $("title").html(computername+"："+data.data.title);
+	            }
+			})
+	}
+
+if(userId!=undefined){
+	$('.consultation').css("display","block");
+	$('.sharepeople').css("display","block");
+   
+}else{
+	$('.consultation').css("display","none");
+	$('.sharepeople').css("display","none");
+}
+
+$('.mysure').on('click',function(){
+    var in1 =$('#in1').val();
+    var in2 =$('#in2').val();
+    var in3 =$('#in3').val();
+    var in4 =$('#in4').val();
+    console.log(in1,in2,in3,in4)
+    $.ajax({
+        url:"http://app.zhuangneizhu.com/third/addOrganizationCustomer.do",
+        type:"post",
+        data:{
+            customerName:in1,
+            mobile:in2,
+            address:in3,
+            houseArea:in4,
+            organizationId:org,
+            sourceProjectId:11291,
+            sourceUserId:userId,
+            version:ver,
+        },
+        dataType:"json",
+        success:function(data){
+            console.log(data); 
+            if(data.code==10000){
+                alert("您已提交成功。");
+            }else{
+                alert("请将数据填写完整。")
+            }
+        }
+    })
+});
+</script>
+</html>

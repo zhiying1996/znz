@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="personnelBox"  >
+        <div class="personnelTit">
+            <div onclick="javascript:window.history.back();return false;"></div>
+            <span>添加成员</span>
+        </div>
+        <div class="personnelMain" v-cloak>
+            <div><input type="text" placeholder="请输入手机号码"  maxlength="11" v-model="tel" class="mobile"></div>
+            <div><input type="text" placeholder="请输入成员姓名" v-model="name" class="name"></div>
+            <div @click="_memberdown(0,'department02')"><span v-html="department02"></span></div>
+            <div @click="_memberdown(1,'department01')"><span v-html="department01"></span></div>
+             <div @click="_memberdown(2,'department03')"><span v-html="department03"></span></div>
+            <h5>*新建成员完毕后，该用户可以用手机直接通过验证码登录</h5>
+            <h4 @click="_confirm()">确定</h4>
+        </div>
+        <div class="promptshow" style="width:6.9rem;height: 0.8rem;background-color: rgba(0,0,0,0.5);border-radius: 0.1rem;margin: 0 auto;color: #fff;line-height: 0.8rem;text-align: center;font-size: 0.3rem;" v-show="promptshow"  v-cloak>
+             <p>{{message}}</p>
+        </div>
+    </div>
+    <!--下拉弹窗-->
+    <div class="member-down"  v-show="mainmu"  v-cloak>
+        <h3>{{memberdownbox.name}}</h3>
+        <div class="member-downBox">
+            <div id="huoqu" v-for="(value,index) in memberdownbox.key" @click="_downBox(value,index)">{{value}}</div>
+        </div>
+        <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+    </div>
+    <!--弹窗幕-->
+    <div class="main-mu" v-show="mainmu" @click="mainmu=false"></div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var  data2= localStorage.getItem('key');
+var  userId=Number(data2);
+var  org=localStorage.getItem('orgkey');
+var  ver=localStorage.getItem('version')
+    $(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                message:'',
+                promptshow:false,
+                admain:'',//判断是否是管理员的依据
+                datas:'',
+                roleId:'',
+                roleName:'',
+                department01:'请选择部门',
+                department02:'请选择角色',
+                department03:'是否设置成管理员',
+                memberdownbox:{name:'',key:[]},//存放下拉框的内容
+                mainmu:false,
+                personnelId:'',//判断是点击那个下拉框
+                memberdown:[
+                    {
+                        name:'选择成员角色',
+                         key:[],
+                    },
+                    {
+                        name:'选择部门',
+                        key:[],
+                    },
+                    {
+                        name:'是否设置成管理',
+                        key:['管理员','非管理员']
+                    }
+                ],
+                name:'',//暂存名字
+                tel:'',//暂存手机号
+            },
+          beforeCreate:function(){
+                  let that=this;
+                         $.ajax({    //获取员工角色
+                        "url":"http://app.zhuangneizhu.com/set/gainEmployeeType.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data.data);
+                            that.datas=data.data;
+                            for(var i = 0 ;i < data.data.length ; i++){
+                            that.memberdown[0].key.push(data.data[i].roleName);      
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                         $.ajax({    //获取部门信息
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainDepartInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data.data);
+                            for(var i = 0 ;i < data.data.length ; i++){
+                            that.memberdown[1].key.push(data.data[i].departName);      
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+            },
+            methods:{
+                //编辑页面点击
+                _memberdown:function (e,key) {
+                    console.log(e); //第0组或者第1组 
+                     console.log(key);   //判断选择的是部门还是角色
+                    let that=this;
+                    that._data.mainmu=true;
+                    that._data.memberdownbox=that._data.memberdown[e];
+                    that._data.personnelId=e;
+                },
+                //下拉弹窗点击
+                _downBox:function(e,index){
+                    console.log(e,index);
+                    let that=this;
+                    let k =that._data.personnelId;//对应的那个组
+                    if(k==0){
+                     that._data.department02=e;
+                    let roleName=that.datas[index].roleName;
+                    that.roleName=roleName;
+                    let roleId=that.datas[index].organizationRoleId;
+                    console.log(roleId);
+                    that.roleId=roleId;
+                    }else if(k==1){
+                        that._data.department01=e;
+                    }else if(k==2){
+                        that._data.department03=e;
+                        console.log(index);
+                        if(index==0){
+                            that.admain=true;
+                        }else{
+                            that.admain=false;
+                        }
+                    }
+                    that._data.mainmu=false;
+                  return e;
+                },
+                _confirm:function(){
+                    let that=this;
+                    $.ajax({   //添加公司联系人
+                                    url:"http://app.zhuangneizhu.com/user/addContactsInfo.do",
+                                    type:"post",
+                                    anyns:true,
+                                    data:{
+                                        mobile:that.tel,
+                                        name:that.name,
+                                        roleId:that.roleId,
+                                        roleName:that.roleName,
+                                        isAdmin:that.admain,
+                                        organizationId:org,
+                                        userId:userId,
+                                        version:ver,
+                                        appType:"znz"
+                                    },
+                                    dataType:"json",
+                                    "success":function(data){
+                                        console.log(data);
+                                        if(data.code!=10000){
+                                            that.promptshow=true;
+                                            that.message=data.message
+                                            setInterval(function(){
+                                                that.promptshow=false;
+                                            },1500)
+                                        }else{
+                                            window.location.href="member.html"; 
+                                        }
+                                        
+                                    },
+                                    "error":function(){
+                                        console.log("程序出错");
+                                    }
+                           })       
+                }
+            }
+        })
+    });
+</script>
+</html>

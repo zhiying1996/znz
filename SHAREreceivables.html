@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助业主透明浏览模式</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="receMain">
+    <div class="personnelTit">
+        <div onclick="javascript:history.back(-1);return false;"></div>
+        <span>收款状态</span>
+        <span class="blue header-tit-r" id="shuo">说明</span>
+    </div>
+    <div class="main" style="top: 0.88rem;padding-top: 0.2rem;overflow-y: auto;">
+     <span style="display: block;width: 100%;height: 50px;background: rgba(0,0,0,0.7);font-size: 15px;color: #fff;position: absolute;"></span>
+            <div class="receTit">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <h3>
+                <span>款项名称</span>
+                <span>已收</span>
+                <span>需收</span>
+            </h3>
+            <div class="receBox"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let org=localStorage.getItem('orgkey');
+let pro=localStorage.getItem('pro');
+     $.ajax({    //获取项目收款状态明细
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainProjectFund.do",
+                        "type":"post",
+                        "anyns":true,
+                        data:{
+                            projectId:pro,
+                            userId:userId,
+                            version:"2.9",
+                            organizationId:org,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            $(".receTit span").eq(0).html('总已收：'+data.data.totalReceivablesMoney+'元');
+                            $(".receTit span").eq(1).html('总待收：'+data.data.residueFundMoney+'元');
+                            $(".receTit span").eq(2).html('总应收：'+data.data.totalFundMoney+'元');
+                            var massage=data.data.vos;
+                            $.each(massage,function(index,item){
+                                 var html='<div class="rece-box" style="display: flex;"><div  style="display:flex;justify-Content:space-between;width:7rem;height:0.88rem;"><span style="display:block;line-height: 0.88rem">'+item.projectFundName+'</span><span style="display:block;line-height: 0.88rem;background-position: 1rem 0.3rem;">'+item.aleadyMoney+'</span><span style="display:block;line-height: 0.88rem;background-position: 1rem 0.3rem;">'+item.needMoney+'</span></div></div>';
+                                     $(".receBox").append(html);
+                                     if(item.receiveState=="待审核"){
+                                        $(".rece-box").eq(index).find("span").eq(1).addClass("on");
+                                        if(item.needState=="待审核"){
+                                            $(".rece-box").eq(index).find("span").eq(2).addClass("on");
+                                        }
+                                     }else if(item.needState=="待审核"){
+                                        $(".rece-box").eq(index).find("span").eq(2).addClass("on");
+                                        if(item.receiveState=="待审核"){
+                                            $(".rece-box").eq(index).find("span").eq(1).addClass("on");
+                                        }
+                                     };
+                                     var a=document.querySelectorAll(".rece-box")
+                                     for(var i=0;i<a.length;i++){
+                                        a[i].index=i;
+                                        a[i].onclick=function(){
+                                            var myid=this.index;
+                                            console.log(myid);
+                                        window.location.href="SHAREdesignfee.html?myid="+myid;
+                                        }
+                                     }
+                            })
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+            });
+            $(".main span").eq(0).html('最后一笔收款（或相关收款），可参考实际发生的增减项进行二次调整，保证数据的准确性。');
+            $(".main span").eq(0).css("display","none");
+            $("#shuo").on('click',function(){
+                $(".main span").eq(0).toggle();
+             });
+</script>
+</html>

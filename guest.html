@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助业主透明浏览模式</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script src="js/JR.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/swiper-4.2.6.min.js"></script>
+    <link rel="stylesheet" href="css/swiper-4.2.6.min.css">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/swiper-4.2.6.min.js"></script>
+    <link rel="stylesheet"  href="css/swiper-4.2.6.min.css">
+</head>
+<style type="text/css">
+    .content{
+        width:7rem;height: 0.88rem;background-color: #fff;padding-left: 0.2rem;margin:0.2rem auto 0.2rem auto;position: relative;
+    }
+    .span{
+        color: red;font-size: 0.28rem;position: absolute;right: 0.2rem;margin-top: 0.2rem
+    }
+    .tit{
+        font-size: 0.3rem;line-height: 0.88rem
+    }
+    .input{
+       width:4rem;height: 0.6rem;font-size: 0.3rem;
+    }
+    .bottom{
+        width: 7.5rem; height: 1.2rem; background-color: rgb(255, 255, 255); position: fixed; bottom: 0px;border-bottom-right-radius:0.2rem;border-bottom-left-radius:0.2rem; 
+    }
+</style>
+<body>
+<div class="wap-wrap" id="demo" style="overflow: hidden">
+    <div class="personnelTit" style="height: 1rem;text-align: center;line-height: 1rem;">
+        <div onclick="javascript:window.history.go(-1);return false;"></div>
+    </div>
+    <div class="main" style="width:7.5rem;top: 1rem; padding-top: 0.2rem; overflow-x: hidden; overflow-y: auto; margin-bottom: 1.2rem;">
+        <div style="width:100%;height: 2.1rem;">
+            <img src="image/qqm.png" style="display: block;margin:auto;width: 100%">
+        </div>
+        <div id="content">
+             <p style="font-size: 0.4rem;text-align: center;font-weight: 100;color: #808083">留言咨询</p>
+             <p style="font-size: 0.3rem;text-align: center;color: orange">补充您的联系方式，我们将与您取得联系。</p>
+             <div class="content">
+                 <span class="tit">您的姓名:</span>
+                 <input id="name" class="input" maxlength="8" type="text" name="">
+                 <span class="span">*必填</span>
+             </div>
+             <div class="content">
+                 <span class="tit">您的手机号:</span>
+                 <input id="number" class="input" maxlength="11" type="text" name="">
+                 <span class="span">*必填</span>
+             </div>
+             <div class="content">
+                 <span class="tit">您的地址:</span>
+                 <input id="adress" class="input" maxlength="11" type="text" name="">
+                 <span class="span">*必填</span>
+             </div>
+             <div class="content">
+                 <span class="tit">您的房屋面积:</span>
+                 <input id="arer" class="input" placeholder="㎡" type="text" name="">
+                 <span class="span">必填</span>
+             </div>
+             <div class="content" style="height: 4rem;">
+                 <span class="tit">您的留言</span>
+                 <span class="span">选填</span>
+                 <textarea id="txt" style="width:6.7rem;height: 3rem;font-size: 0.3rem"></textarea>
+             </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <input type="submit" name="提交" class="photodeleat">
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+var pro=localStorage.getItem("pro");
+var uid=localStorage.getItem("key");
+var org=localStorage.getItem("orgkey");
+$.ajax({    //获取公司名称
+                        "url":"http://app.zhuangneizhu.com/set/gainCompanyName.do",
+                        "type":"post",
+                        data:{
+                          userId:uid,
+                          organizationId:org,
+                          version:"2.9",
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data); 
+                            var name=data.data.organizationName;
+                            var html='<span>'+name+'</span>'
+                            $(".personnelTit").append(html);
+                         }
+       }); 
+$('.photodeleat').on('click',function(){
+var phone=$('#number').val();
+var area=$('#arer').val();
+var adress=$("#adress").val();
+var uname=$("#name").val();
+var text=$("#txt").val();
+console.log(phone,area,adress,uname,text)
+$.ajax({
+    "url":"http://app.zhuangneizhu.com/third/addOrganizationCustomer.do",
+                        "type":"post",
+                        data:{
+                          mobile:phone,
+                          houseArea:area,
+                          address:adress,
+                          message:text,
+                          customerName:uname,
+                          organizationId:org,
+                          sourceProjectId:pro,
+                          sourceUserId:uid,
+                          version:'3.0',
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data); 
+                            if(data.code==10000){
+                                alert("您已提交成功。");
+                            }else{
+                                alert("请将数据填写完整。")
+                            }
+                            window.history.go(-1);return false;
+                         }
+})
+})
+</script>
+</html>

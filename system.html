@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div onclick="javascript:window.history.back();return false;"></div>
+            <span>调整公司设置</span>
+        </div>
+    </div>
+    <div class="main" style="top: 0.88rem;">
+        <div class="setBox">
+            <a href="###">
+                <span>消息通知</span>
+                <i></i>
+            </a>
+        </div>
+        <div class="setBox">
+            <a href="###">
+                <span>关于</span>
+                <i style="display: inline-block;width: 0.94rem;background-position-x:0.8rem ;line-height: 0.58rem">{{guan}}</i>
+            </a>
+            <a href="contactus.html">
+                <span>联系我们</span>
+                <i></i>
+            </a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="./js/vue.js"></script>
+<script type="text/javascript">
+    $(function(){
+         var app = new Vue({
+            el:'#demo',
+            data:{
+                guan:'',
+            },
+            beforeCreate:function(){
+                let that=this;
+                $.ajax({    //获取当前版本号
+                            "url":"http://app.zhuangneizhu.com/user/gainlatestVersion.do",
+                            "type":"post",
+                            data:{
+                              type:'android',
+                              appType:"znz",  
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data)
+                                that.guan=data.data.version;
+                            },
+                            "error":function(){
+                                console.log("错误")
+                            }
+                        })
+            },
+    })
+})
+</script>
+</body>
+</html>

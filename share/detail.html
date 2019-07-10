@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>装内助透明浏览模式</title>
+    <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Pragma" content="no-cache">  <!-- 是用于设定禁止浏览器从本地机的缓存中调阅页面内容，设定后一旦离开网页就无法从Cache中再调出 -->
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script src="rem.js"></script>
+    <link rel="stylesheet" href="common.css">
+</head>
+<style type="text/css">
+     .maskImg{
+            position:absolute;
+            left:0;top:0;right:0;bottom:0;
+            background: rgba(0,0,0,0.8);
+            width:100%;
+            height:100%;
+            z-index:100000000000;
+            display:none;
+           
+        }
+        .maskImg .image{
+            width:100%;
+            height:100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .maskImg .image img{
+            width:100%;
+        }
+</style>
+<body>
+<div class="detail">
+    <div class="header">
+        <div class="left"><img src="./img/return1.png" alt=""></div>
+        <div class="title"></div>
+        <div class="right"></div>
+    </div>  
+    <div class="pic-list">
+        <h3 class="sec1">
+            <img src="./img/step.png" alt="">
+            <p class="s1"></p>
+            <span class="s2"></span>
+            <div class="s3"></div>
+        </h3>
+        <h3 class="sec2">
+            <img src="./img/over1.png" alt="">
+            <p>计划完成时间</p>
+            <span class="s2"></span>
+        </h3>
+        <h3 class="sec3">
+            <img src="./img/clock.png" alt="">
+            <p>到时未完成提醒人</p>
+            <span class="s2"></span>
+        </h3>
+        <h3>
+            <img src="./img/my-pic.png" alt="">
+            <p>已上传照片</p>
+        </h3>
+        <div class="myphoto"></div>
+        <h3 class="standard ">
+            <div><img src="./img/stand.png" alt=""></div>
+            <p>进度标准</p>
+        </h3>
+        <div class="standard-content standard">
+                
+        </div>
+    </div>  
+</div>
+<div class="maskImg">
+    <div class="image"></div>
+</div>
+</body>
+
+<script src="jquery-3.3.1.min.js"></script>
+<script>
+    $('.header .left').on('click',function(){
+        window.history.go(-1);
+    })
+    var url = window.location.search;
+    var request = new Object();
+    if (url.indexOf("?") != -1) {  
+        var str = url.substr(1);
+        var strs = str.split("&"); 
+        for (var i = 0; i < strs.length; i++) {
+            request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+        }
+    }
+    var index=request["index"];
+    var  projectId= sessionStorage.getItem('projectId');
+    var  userId=sessionStorage.getItem('userId');
+    var  organizationId=sessionStorage.getItem('organizationId');
+    var vos=JSON.parse(sessionStorage.getItem('vos'));
+    $('.sec1 .s1').html(vos[index].organizationScheduleName)
+    $('.title').html(vos[index].organizationScheduleName)
+    vos[index].overTime?$('.sec1 .s2').html(vos[index].overTime):$('.sec1 .s2').html('')
+    var img1='<img src="./img/over.png">';
+    var img2='<img src="./img/noover.png">';
+    vos[index].state?$('.sec1 .s3').append(img1):$('.sec1 .s3').append(img2);
+    vos[index].scheduleTime?$('.sec2 .s2').html(vos[index].scheduleTime):$('.sec2 .s2').html('未设置')
+    vos[index].notifyUsers?$('.sec3 .s2').html(vos[index].notifyUsers):$('.sec3 .s2').html("未设置")
+    vos[index].scheduleText?$('.standard-content').html(vos[index].scheduleText):$('.standard-content').html('未设置')
+
+    var photo=vos[index].photo.split(",");
+    $.each(photo,function(index,item){
+        if(item!=''){
+            var reg1=/2017/;
+            var reg2=/2018/;
+            var reg3=/2019/;
+            var reg4=/2020/;
+            var reg5=/2021/;
+            if(reg1.test(item)){
+                var time=item.substr(item.indexOf("2017"),10);
+            }
+            if(reg2.test(item)){
+                var time=item.substr(item.indexOf("2018"),10);
+            }
+            if(reg3.test(item)){
+                var time=item.substr(item.indexOf("2019"),10);
+            }
+            if(reg4.test(item)){
+                var time=item.substr(item.indexOf("2020"),10);
+            }
+            if(reg5.test(item)){
+                var time=item.substr(item.indexOf("2021"),10);
+            }
+           
+            var html='<div class="img-wrap"><div class="time">'+time+'</div><img src='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+'></div>'
+            $(".myphoto").append(html);
+        }  
+    })
+        $('.myphoto').on('click','.img-wrap',function(){
+            var item=photo[$(this).index()];
+            var pic=`<img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}">`
+            $('.maskImg .image').html('');
+            $('.maskImg').show();
+            $('.maskImg .image').append(pic)
+
+        })
+        $('.maskImg').on('click',function(){
+            $(this).hide()
+        })
+    $.ajax({    
+        url:"http://app.zhuangneizhu.com/v2/set/gainCustomerScheduleStandardSocket.do",
+        type:"post",
+        data:{
+        userId:userId,
+        organizationId:organizationId,
+        version:"3.0",    
+        },
+        dataType:"json",
+        success:function(data){
+            if(data.data==true){
+                $('.standard').css('display','flex')
+            }else{
+                $('.standard').css('display','none')
+            }
+        },
+    })
+</script>
+</html>

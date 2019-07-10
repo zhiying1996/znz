@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/swiper-4.2.6.min.css">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<style type="text/css">
+    .base{width:7.5rem;height:1rem;display: flex;flex-wrap: wrap;justify-content:space-around;border-top:1px solid #f6f8ff;}
+    .base span{width:40%;font-size: 0.27rem;}
+    .swiper-slide{-webkit-overflow-scrolling: touch;overflow-y:auto;}
+    .flexbox{width:7.1rem;background-color:#F6F8FF;padding:0.2rem;}
+    .flexrow{width: 100%;display: flex;flex-wrap: wrap;}
+    .flexrow div{width:2.2rem;height:2rem;background-color:#fff;float: left;margin-bottom: 0.2rem;margin-right: 0.08rem;margin-left: 0.08rem;}
+    .flexColumn img{display: block;width:1rem;width: 1rem;padding-top:0.2rem;margin: 0 auto;}
+    .flexColumn p{text-align: center;padding-top: 0.1rem}
+    .flexColumn span{display: block;text-align: center;}
+    .shadowBox{position: absolute;width: 120px;height:140px;border-radius: 10px;background-color: rgba(0,0,0,0.6);z-index: 1000;right:0.3rem}
+    .shadowBox div{position:relative;width: auto;height: auto;}
+    .shadowBox img{position: absolute;display:block;width: 20px;height: 20px;left:5px;top:10px;}
+    .test{border:0;outline: medium;height:0.88rem;line-height: 0.88rem;font-size: 0.23rem;text-align: center;display:block;float: left;}
+    .text{font-size: 0.3rem;color:#4c94ff;font-weight:600;text-align:center;}
+    .textbottom{color: #808080;font-size: 0.2rem;line-height: 0.4rem;padding-left: 0.2rem;}
+    .signbox{background-color:rgba(86, 119, 252,0.8);width:1rem;height: 1rem;position:fixed;bottom: 0.5rem;right: 0.5rem;border-radius: 50%;}
+    .signbox img{display: block;width:0.4rem;height: 0.4rem;position: absolute;top:0.2rem;left: 0.3rem}
+    .signbox p{color: #fff;font-size: 0.2rem;bottom: 0;position: absolute;bottom: 0.1rem;right: 0.2rem}
+</style>
+<body>
+<div class="wap-wrap" id="demo" style="overflow: hidden" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 分享主体框开始  -->
+    <div id="box" style="width:7.5rem;height:100%;background-color:rgba(0,0,0,0.3);position:absolute;z-index:2" v-show="show" >
+            <div style="position: absolute;top:50%;left: 50%;transform: translate(-50%,-50%);background-color: #fff;width: 4rem;height:auto;border-radius: 0.3rem;">
+                <a href="###" @click="show=false"><span style="position: absolute;font-size:0.3rem;right: 0.25rem;color: #000;">×</span></a>
+                <p class="text">业主可透明浏览工地</p>
+                <p class="text">并可转介绍客户</p>
+                <p class="text">扫描以下二维码即可分享</p>
+                <div id="qrCodeDiv" style="width: 150px;height:150px;margin:0 auto;"></div>
+                <div style="width:3.2rem;height:0.7rem;padding-left: 0.8rem;">
+                    <img src="image/下载.png" style="width:50px; height:42px;float: left;">
+                    <a href="javascripet:void(0)" @click="download" style="font-size: 0.28rem;color: #3164af;font-weight: 600;line-height:0.7rem;">下载二维码</a>
+                </div>
+                <p class="textbottom">1、二维码可用于线上/线下宣传；</p>
+                <p class="textbottom">2、业主可通过扫码体验本公司的装修服务。</p>
+            </div> 
+    </div>
+    <!-- 加载结束 -->
+    <div class="header">
+        <div class="personnelTit">
+            <div @click="back"></div>
+            <span>{{projectName}}</span>
+            <img src="assets/收藏2@2x.png" style="width: 0.45rem;height: 0.45rem;display: block;position: absolute;right:1.1rem;top: 0.2rem;"
+            v-if='collectionStaty'  @click="collectionChange">
+            <img src="assets/收藏1@2x.png" style="width: 0.45rem;height: 0.45rem;display: block;position: absolute;right:1.1rem;top: 0.2rem;"
+            v-else  @click="collectionChange">
+            <a href="###" class="blue header-tit-r" @click="deleat"><i></i></a>
+        </div>
+        <div class="shadowBox" v-show="deleatshow">
+                <div>
+                    <img src="image/微信（白）.png">
+                    <span class="ston" @click="share">转发分享</span>
+                </div>
+                <div>
+                    <img src="image/历史.png">
+                    <span class="ston" @click="projecthistory">项目历史</span>
+                </div>
+                <div>
+                    <img src="image/删除.png">
+                    <span class="ston" @click="projectdelet">删除项目</span>
+                </div>
+                <div>
+                    <img src="image/退出.png" >
+                    <span class="ston">退出项目</span>
+                </div> 
+        </div>
+        <div class="news-ul" id="contrast">
+            <div class="blue" id="btn1"><img src="image/进度.png" style="width: 0.5rem;height: 0.5rem;display: block;float: left;padding-left:0.8rem;margin-top: 0.15rem;"><span>项目进度&nbsp{{ove}}%</span></div>
+            <div id="btn2"><img src="image/详情.png" style="width: 0.5rem;height: 0.5rem;display: block;float: left;padding-left: 0.5rem;margin-top: 0.15rem;"><span>项目信息</span></div>
+        </div>
+    </div>
+    <div class="newsBox" style="bottom:0;width: 7.8rem;">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" style="overflow-x: hidden;overflow-y:auto;">
+                    <div class="sched-tit">
+                        <span>照片</span>
+                        <span>类目</span>
+                        <span>状态</span>
+                        <span>操作人</span>
+                        <span>计划完成时间</span>
+                    </div>
+                    <div class="sched-box" >
+                        <h3 v-for="(value,index) in data"  @click="_link(index)" style="font-weight:500">
+                            <div v-if="value.isBold" style="font-weight:550;width: 100%;display: flex;justify-content: space-between;">
+                                <img style="width:0.6rem;height: 0.6rem;" :src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+img[index]">
+                                <span v-if="value.isDelay" style="color:red;">{{value.organizationScheduleName}}</span>
+                                <span v-else-if="value.isNew" style="color:blue;">{{value.organizationScheduleName}}</span>
+                                <span v-else >{{value.organizationScheduleName}}</span>
+                                <img style="width:0.35rem;height: 0.35rem;" v-if="value.state&&value.isNew" src="image/已完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else-if="value.state" src="image/已完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else-if="((value.state==false)&&value.isDelay)" src="image/未完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else src="image/未完成@2x.png">
+                                <span v-if="value.isDelay" style="color:red;text-align: center;">{{value.userName}}</span>
+                                <span v-else-if="value.isNew" style="color:blue;text-align: center;">{{value.userName}}</span>
+                                <span v-else style="text-align: center;">{{value.userName}}</span>
+                                <span v-if="value.isDelay" style="color:red">{{value.scheduleTime}}</span>
+                                <span v-else-if="value.isNew" style="color:blue">{{value.scheduleTime}}</span>
+                                <span v-else-if="value.scheduleTime!=null">{{value.scheduleTime}}</span>
+                                <span v-else>未设置</span>
+                            </div>
+                            <div v-else style="font-weight:500;width: 100%;display: flex;justify-content: space-between;">
+                                <img style="width:0.6rem;height: 0.6rem;" :src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+img[index]">
+                                <span v-if="value.isDelay" style="color:red;">{{value.organizationScheduleName}}</span>
+                                <span v-else-if="value.isNew" style="color:blue;">{{value.organizationScheduleName}}</span>
+                                <span v-else >{{value.organizationScheduleName}}</span>
+                                <img style="width:0.35rem;height: 0.35rem;" v-if="value.state&&value.isNew" src="image/已完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else-if="value.state" src="image/已完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else-if="((value.state==false)&&value.isDelay)" src="image/未完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else src="image/未完成@2x.png">
+                                <span v-if="value.isDelay" style="color:red;text-align: center;">{{value.userName}}</span>
+                                <span v-else-if="value.isNew" style="color:blue;text-align: center;">{{value.userName}}</span>
+                                <span v-else style="text-align: center;">{{value.userName}}</span>
+                                <span v-if="value.isDelay" style="color:red">{{value.scheduleTime}}</span>
+                                <span v-else-if="value.isNew" style="color:blue">{{value.scheduleTime}}</span>
+                                <span v-else-if="value.scheduleTime!=null">{{value.scheduleTime}}</span>
+                                <span v-else>未设置</span>
+                            </div>
+                        </h3>
+                        <!-- 签到图标 -->
+                        <a href="###" class="signbox" @click="signclick">
+                            <img :src="signimg" >
+                            <p>{{signtext}}</p>
+                        </a>
+                    </div>
+                </div>
+<!-- =================================================================================================== -->
+                <div class="swiper-slide">
+                            <div class="perBox">
+                                <a class="per-a" @click="conten">
+                                    <span class="per-img"><img src="image/detailed/detailed01.png" alt=""></span>
+                                    <span class="per-text">基本信息</span>
+                                    <span class="per-R"></span> 
+                                    <span class="per-textR">{{content.projectName}}</span>
+                                </a>
+                                <div class="base">
+                                    <span>装修面积：<a>{{area}}㎡</a></span>
+                                    <span v-if="protype!=null">装修类型：<a>{{protype}}</a></span>
+                                    <span v-else>装修类型：<a>未选择类型</a></span>
+                                    <span v-if="sign!=''">签约时间：<a style="color:green">{{sign}}</a></span>
+                                    <span v-else>签约时间：<a style="color:red">未签约</a></span>
+                                    <span v-if='over==""'>完工状态：<a style="color: red">未完工</a></span>
+                                    <span v-else>完工状态：<a style="color:green">已完工</a></span>
+                                </div>
+                            </div>
+                            <div class="flexbox" style="overflow-y:auto;"> 
+                                <div class="flexrow">
+                                    <div class="flexColumn" @click="people">
+                                        <img src="assets/项目成员@2x.png">
+                                        <p>项目成员</p>
+                                        <span>({{content.memberNum}})</span>
+                                    </div>
+                                    <div class="flexColumn" id="time01" @click="Schedule" >
+                                        <img src="assets/初始自动 排期@2x.png">
+                                        <p>初始自动</br>排期</p>
+                                    </div>
+                                    <div class="flexColumn" @click="Thememo">
+                                        <img src="assets/备忘@2x.png">
+                                        <p>内部沟通</br>备忘录</p>
+                                    </div>
+                                    <div class="flexColumn" @click="signselect">
+                                        <img src="assets/工地签到@2x.png">
+                                        <p>工地签到</br>（{{signtext}}）</p>
+                                    </div>
+                                    <div class="flexColumn" @click="origination">
+                                        <img src="assets/合同@2x.png">
+                                        <p>合同金额和构成</p>
+                                        <span>{{content.contract}}</span>
+                                    </div>
+                                    <div class="flexColumn" @click="have">
+                                        <img src="assets/收款状态@2x.png">
+                                        <p>收款状态</p>
+                                        <span>{{content.totalAlreadyFundMoney}}/{{content.totalNeedFundMoney}}</span>
+                                    </div>
+                                    <div class="flexColumn" @click="zengjian">
+                                        <img src="assets/增减项@2x.png">
+                                        <p>增减项</p>
+                                        <span>{{content.moreOrLess}}</span>
+                                    </div>
+                                
+                                    <div class="flexColumn" @click="jiancai">
+                                        <img src="assets/建材支出@2x.png">
+                                        <p>建材支出记录（内控）</p>
+                                        <span v-if="k||visible||control">{{content.supplyMaterialTotal}}/{{content.supplyMaterialLimit}}</span>
+                                        <span v-else>仅管理员可见</span>
+                                    </div>
+                                    <div class="flexColumn" @click="human(1)">
+                                        <img src="assets/工人支出@2x.png">
+                                        <p>人工支出记录（内控）</p>
+                                        <span v-if="k||visible||control">{{peopleToal}}/{{peopleLimit}}</span>
+                                        <span v-else>仅管理员可见</span>
+                                    </div>
+                                    <div class="flexColumn" @click="human(2)">
+                                        <img src="assets/其他支出@2x.png">
+                                        <p>其他支出记录（内控）</p>
+                                        <span v-if="k||visible||control">{{content.otherTotal}}/{{content.otherLimit}}</span>
+                                        <span v-else>仅管理员可见</span>
+                                    </div>
+                               
+                                    <div class="flexColumn" @click="photo(5)">
+                                        <img src="assets/现场写真@2x.png">
+                                        <p>现场写真</br>照片留档</p>
+                                    </div>
+                                    <div class="flexColumn" @click="photo(0)">
+                                        <img src="assets/装修合同@2x.png">
+                                        <p>装修合同</br>照片留档</p>
+                                    </div>
+                                    <div class="flexColumn" @click="photo(1)">
+                                        <img src="assets/设计图@2x.png">
+                                        <p>设计图</br>照片留档</p>
+                                    </div>
+                                
+                                    <div class="flexColumn" @click="photo(2)">
+                                        <img src="assets/预算清单@2x.png">
+                                        <p>预算清单</br>照片留档</p>
+                                    </div>
+                                    <div class="flexColumn" @click="photo(3)">
+                                        <img src="assets/材料清单@2x.png">
+                                        <p>材料清单</br>照片留档</p>
+                                    </div>
+                                    <div class="flexColumn" @click="photo(4)">
+                                        <img src="assets/水电@2x.png">
+                                        <p>水电</br>照片留档</p>
+                                    </div>
+                                
+                                    <div class="flexColumn" @click="hestiry">
+                                        <img src="assets/项目日志@2x.png">
+                                        <p>项目日志</p>
+                                    </div>
+                                     <div class="flexColumn" @click="reset">
+                                        <img src="assets/重设模板@2x.png">
+                                        <p>重设项目模板</p>
+                                    </div>
+                               </div> 
+                            </div>
+                </div>
+<!-- =============================================================================================================== -->
+            </div>
+        </div>
+    </div>
+    <div id="prompt" style="width:3rem;height: 1rem;background-color:rgba(0,0,0,0.4);color: #fff;font-size: 0.3rem;border-radius: 0.15rem;position: absolute;z-index: 3;left: 50%;top: 50%;transform: translate(-50%,-50%);line-height: 1rem;text-align: center;display: none">
+        设置成功！
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/swiper-4.2.6.min.js"></script>
+<script src="js/datePicker.js"></script>
+<script src="js/myqrcode.js"></script>
+<script src="js/myutf.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var url = window.location.search;
+    var request = new Object();
+ if (url.indexOf("?") != -1) {  
+     var str = url.substr(1);
+    var strs = str.split("&"); 
+    for (var i = 0; i < strs.length; i++) {
+         request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+     }
+}
+var  getInfo=request["index"];
+var  key=request["k"];
+var  userId= localStorage.getItem('key');
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version')
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                deleatshow:false,//删除操作框
+                collectionStaty:'',//收藏显示判断
+                data:'',//模板内容
+                schshow:true,//修改弹窗显示隐藏判断
+                ove:'',//进度百分比
+                k:'',//判断谁否为管理员
+                visible:'',//内控权限判断
+                content:'',
+                peopleLimit:'',//人工总限额
+                peopleToal:'',//人工总支出
+                area:'',
+                protype:'',
+                sign:'',//签约时间
+                over:'',//完工时间
+                projectName:'',//工程名称
+                control:'',//内控开关
+                show:false,
+                img:[],
+                logoimg:'',
+                signimg:'',
+                signtext:'',
+                dataURL:'',//二维码图片
+                aboutnamearr:[],//与项目相关人数组
+                aboutname:''//与项目相关人
+            },
+            beforeCreate:function(){ 
+                    let that=this;
+                    $.ajax({   //初始化项目基本信息页（含业主）
+                                "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                                "type":"post",
+                                data:{
+                                projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                    that.area=data.data.area;
+                                    that.protype=data.data.decorationType;
+                                    that.sign=data.data.signedTime;
+                                    that.over=data.data.completeTime;
+                                    that.projectName=data.data.projectName;
+                                }
+                    });
+                    $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                         }
+                    }).done(function(data){
+                        console.log(data);
+                        that.aboutname=data.data.name;
+                        $.ajax({  //获取项目进度列表
+                            "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                            "type":"post",
+                            data:{
+                                  projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                that.loding=false;
+                                console.log(data);
+                                that.data=data.data.vos;
+                                that.ove=data.data.overAvg;
+                                that.notifyUsers=data.data
+                                var massage=data.data.vos
+                                    $.each(massage, function(index,item){
+                                        if(item.photo.split(',')[0]!=''){
+                                            that.img.push(item.photo.split(',')[0]);
+                                        }else{
+                                            that.img.push("photo/DATE2019-02-13DATE/74a3edab-6fa1-4063-a9a0-e50a8b6b9d2b.png");
+                                        }
+                                    });
+
+                                    for(var i=0;i<massage.length;i++){
+                                        that.aboutnamearr.push(massage[i].notifyUsers);
+                                    }
+                                    for(var j=0;j<that.aboutnamearr.length;j++){
+                                        if(that.aboutnamearr[j]==that.aboutname){
+                                            that.data[j].isBold=true;
+                                        }
+                                    }
+                            },
+                            "error":function(){
+                                that.loding=true;
+                                console.log("错误");
+                            }
+                        });
+                    })  
+                    $.ajax({ //获取项目首页信息数据
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainProjectIndexData.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                          projectId:pro,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.content=data.data;
+                            that.visible=data.data.isVisible;
+                            that.peopleLimit=data.data.waterElectricityLimit+data.data.mudLimit+data.data.woodLimit+data.data.paintLimit;
+                            that.peopleToal=data.data.waterElectricityTotal+data.data.mudTotal+data.data.woodTotal+data.data.paintTotal;
+
+                        },
+                        "error":function(){
+                           console.log("错误"); 
+                        }
+                    })
+                    $.ajax({  //判断用户是否管理员
+                        "url":"http://app.zhuangneizhu.com/user/gainIsOrNotAdmin.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.k=data.data.isAdmin;
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    $.ajax({  //内控权限开关  
+                                "url":"http://app.zhuangneizhu.com/set/gainOrganizatioProjectVisual.do",
+                                "type":"post",
+                                data:{
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,    
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                    that.control=data.data;
+                                 },
+                                "error":function(){
+                                 console.log("输入有误");
+                                }
+                    });
+                    $.ajax({ //获取个人收藏状态
+                            "url":"http://app.zhuangneizhu.com/user/gainMyCollectStatus.do",
+                            "type":"post",
+                            data:{
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,
+                                projectId:pro
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                that.collectionStaty=data.data;
+                            }
+                    });
+                    $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            if(data.data.companyLogo==""){
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/photo/DATE2019-02-25DATE/edb3b6eb-2fa8-43ad-8e93-9bcc6a5deabd.png";
+                            }else {
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+data.data.companyLogo;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    }); 
+                    $.ajax({    //获取签到状态
+                        "url":"http://app.zhuangneizhu.com/sign/gainSignState.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                          projectId:pro
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data)
+                            if(data.data.isSigned==0){
+                                that.signtext="未签到"
+                                that.signimg="assets/漂浮-未签到@2x.png"
+                            }else if(data.data.isSigned==1){
+                                that.signtext="以签到";
+                                that.signimg="assets/漂浮-已经签到@2x.png" 
+                            }else{
+                                that.signtext="以签退";
+                                that.signimg="assets/漂浮-已离岗@2x.png" 
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+            },
+            methods:{
+                back:function(){
+                        if (key=='1') {
+                            window.history.back();
+                        }else if (key=='2') {
+                            window.history.back();
+                        }else if(key=='3'){
+                            window.history.back();
+                        }else if(key=='4'){
+                            window.location.href="departmentDelay.html";
+                        }else{
+                         window.location.href="project.html";
+                        }
+                 },
+                _link:function (myid) {
+                    window.location.href="schedulepage.html?index="+getInfo+"&myid="+myid;
+                },
+                hestiry:function(){  //项目历史
+                    let that=this;
+                     window.location.href="hestirypage.html";
+                },
+                share:function(){
+                    let that=this;
+                    $("#qrCodeDiv").empty()
+                    $("#qrCodeDiv").qrcode({
+                        render: "canvas", // 渲染方式有table方式（IE兼容）和canvas方式
+                        width:150, //宽度
+                        height:150, //高度
+                        text:"http://web.zhuangneizhu.com/SHARE.html?projectid="+pro+"&uid="+userId+"&orgid="+org,
+                        typeNumber: -1,//计算模式
+                        correctLevel: 2,//二维码纠错级别
+                        background: "#ffffff",//背景颜色
+                        foreground: "#000000", //二维码颜色
+                        src:that.logoimg
+                    });
+                     that.show=true;
+                    var canvas = document.getElementsByTagName('canvas')[0];
+                    that.dataURL=canvas.toDataURL("image/png");
+                },
+                download:function(){
+                    var that=this;
+                    var alink=document.createElement("a");
+                    alink.href=that.dataURL
+                    alink.download="分享.png";
+                    alink.click();
+                },
+                collectionChange:function(){ //收藏状态改变
+                    let that=this;
+                     $.ajax({ //添加&取消个人收藏
+                            "url":"http://app.zhuangneizhu.com/user/switchMyCollect.do",
+                            "type":"post",
+                            data:{
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,
+                                projectId:pro
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                that.collectionStaty=!that.collectionStaty;
+                            }
+                    })
+                },
+                conten:function(){
+                 window.location.href="information.html"
+                },
+                people:function(){
+                window.location.href="teamber.html?index="+getInfo;
+                },
+                Schedule:function(){
+                alert("设置项目初始时间，后续进度将自动排期。系统会从“项目模板”中获得每个节点的计划完成天数，自动设置所有节点的计划完成时间和默认负责角色，确认后会覆盖现有的排期设置。")
+                },
+                origination:function(){
+                window.location.href="original.html?index="+getInfo;
+                },
+                have:function(){
+                 window.location.href="receivables.html?index="+getInfo;
+                },
+                zengjian:function(){
+                    window.location.href="reduce.html?index="+getInfo;
+                },
+                jiancai:function(){
+                    let that=this;
+                    if (that.k||that.visible) {
+                         window.location.href="record.html?index="+getInfo;
+                    }else{
+                         alert("你的权限不足，请联系管理员释放权限。");
+                    }
+                },
+                human:function(i){
+                    if (this.k||this.visible) { 
+                        if (i==1) {
+                            window.location.href="myHTML/human.html"
+                        }else {
+                             window.location.href="myHTML/otherhuman.html"
+                        }
+                     }else{
+                        alert("你的权限不足，请联系管理员释放权限。");
+                     } 
+                },
+                Thememo:function(){
+                    window.location.href="memorandum.html?index="+getInfo; 
+                },
+                photo:function(i){
+                    if(i==0){
+                        window.location.href="./Modular/img.html?index="+getInfo+"&photoid="+i;
+                    }else if(i==1){
+                        window.location.href="./Modular/img.html?index="+getInfo+"&photoid="+i;
+                    }else if (i==2) {
+                        window.location.href="./Modular/img.html?index="+getInfo+"&photoid="+i;
+                    }else if(i==3) {
+                        window.location.href="./Modular/img.html?index="+getInfo+"&photoid="+i;
+                    }else if(i==4){
+                        window.location.href="./Modular/img.html?index="+getInfo+"&photoid="+i;
+                    }else if(i==5){
+                        window.location.href="./Modular/img.html?index="+getInfo+"&photoid="+i;
+                    }
+                },
+                reset:function(){
+                    window.location.href="changeNew.html";
+                },
+                deleat:function(){
+                    this.deleatshow=!this.deleatshow;
+                },
+                projectdelet:function(){ //删除项目
+                    let that=this;
+                    if(confirm("确认删除该项目？")){
+                        $.ajax({    //删除项目
+                                "url":"http://app.zhuangneizhu.com/project/delProject.do",
+                                "type":"post",
+                                data:{
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                                  projectId:pro,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                    window.location.href="project.html";
+                                },
+                                "error":function(){
+                                   console.log("错误"); 
+                                }   
+                        })
+                    }else{
+                        return;
+                    }
+                },
+                projecthistory:function(){
+                    window.location.href="hestirypage.html"
+                },
+                signclick:function () {
+                    alert("PC端不支持签到，请登陆APP进行签到。")
+                },
+                signselect:function(){
+                    window.location.href="sign.html"
+                }
+            },
+            mounted(){
+                    var that = this;
+                    var mySwiper = new Swiper('.swiper-container', {
+                        on: {
+                            slideChangeTransitionStart: function () {
+                                $("#contrast .blue").removeClass('blue');
+                                $("#contrast div").eq(this.activeIndex).addClass('blue');
+                            }
+                        }
+                    });
+                    $("#contrast div").on('click', function(e) {
+                        e.preventDefault();
+                        $("#contrast .blue").removeClass('blue');
+                        $(this).addClass('blue');
+                        mySwiper.slideTo($(this).index());
+                    });
+                    var calendar = new datePicker();
+                    calendar.init({
+                        'trigger': '#time01',
+                        'type': 'date',
+                        'minDate':'1900-1-1',
+                        'maxDate':'2100-12-31',
+                        'onSubmit':function(){ 
+                            var theSelectData=calendar.value;
+                            that.plantime=theSelectData.replace(/-/g,'.');
+                            // console.log(theSelectData);
+                            $.ajax({  //设置项目进度自动排期
+                                "url":"http://app.zhuangneizhu.com/v4/project/projectAutoSchedule.do",
+                                "type":"post",
+                                data:{
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                      startTime:theSelectData,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                         $("#prompt").css("display","block");
+                                    var show=setTimeout(function(){
+                                        $("#prompt").css("display","none");
+                                    },1000);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                        },
+                        'onClose':function(){
+                        }
+                    });
+            }
+    })
+})
+</script>
+</html>

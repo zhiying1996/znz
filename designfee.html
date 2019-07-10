@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+            <!-- 加载开始 -->
+            <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+                <div id="loader"></div>
+                <div class="loader-section"></div>
+            </div>
+            <!-- 加载结束 -->
+            <div v-show="payshow" id="pay">
+                <div class="personnelTit">
+                    <span style="color:red;font-size:0.5rem;float: left;margin-left: 20px;" @click="close">×</span>
+                    <span>{{projectFundName}}</span>
+                    <span style="color: green;font-size:0.4rem;float: right;margin-right:20px;"
+                    @click="addmoney">✓</span>
+                </div>
+                <div class="main" style="top: 0.88rem;padding-top: 0.2rem;width: 7.5rem;">
+                    <input  style="height:60px;width:7rem;font-size:0.35rem;padding-left: 30px;" placeholder="合同金额" v-model="alead" >
+                </div>
+            </div>
+
+            <div v-show="twopayshow" id="twopay">
+                <div class="personnelTit">
+                    <span style="color:red;font-size: 0.5rem;font-weight:500;float: left;margin-left: 20px;" @click="twoclose">×</span>
+                    <span>{{projectFundName}}</span>
+                    <span style="color: green;font-size:0.4rem;font-weight:500;float: right;margin-right:20px;"
+                    @click="twoaddmoney">✓</span>
+                </div>
+                <div class="main" style="top: 0.88rem;padding-top: 0.2rem;">
+                    <input  style="height:60px;width:7rem;font-size:0.35rem;padding-left: 30px;" placeholder="合同金额" v-model="need" >
+                </div>
+            </div>
+
+
+    <div v-show="parentshow" id="parent">
+        <div class="personnelTit">
+                <div @click="back" v-cloak></div>
+                <span >{{projectFundName}}</span>
+        </div>
+        <div class="main" style="top: 0.88rem;padding-top: 0.2rem;overflow-y: auto;overflow-x: hidden;">
+            <div class="inforText">
+                    <div class="inforTit">
+                        <span>已收费用</span>
+                        <span v-if="receiveState=='审核通过'" >{{receiveState}}</span> 
+                        <span v-else style="color: red">{{receiveState}}</span>
+                        <span>操作人:{{receivedUserName}}</span>
+                    </div>
+                    <div class="infor-box" @click="yimony">
+                            <span>已收费用</span>
+                            <span>{{alead}}</span>
+                    </div>
+                    <div class="inforBox">
+                            <div class="eng-box">
+                                <span>已收照片</span>
+                                <a @click="oneeditor">编辑</a>
+                            </div>
+                    </div>
+                    <div  class="myengMain"  style="position: relative" v-show="oneshow">
+                        <div class="eng-img" v-for="(value,index) in needsr" v-if="value!=''">
+                           <a :href="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" target="view_window"><img v-bind:src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" ></a>
+                           <p v-html='needtime'></p>
+                        </div>
+                    </div>
+            </div>
+            <div class="inforText">
+                    <div class="inforTit">
+                        <span>应收费用</span>
+                        <span v-if="needState=='待审核'" style="color: red">{{needState}}</span>
+                        <span v-else>{{needState}}</span>
+                        <span>操作人:{{needUserName}}</span>
+                    </div>
+                    <div class="infor-box" @click="twoyimony">
+                            <span>应收费用</span>
+                            <span>{{need}}</span>
+                    </div> 
+                    <div class="inforBox" >
+                            <div class="eng-box">
+                                <span>应收照片</span>
+                                <a @click="twoeditor" v-show="needshow">编辑 </a>
+                            </div>
+                    </div>
+                    <div  class="myengMain"  style="position: relative" v-show="twoshow">
+                        <div class="eng-img" v-for="(value,index) in resivesr" v-if="value!=''">
+                           <a :href="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" target="view_window"><img v-bind:src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" ></a>
+                           <p v-html='resivetime'></p>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var url = window.location.search;
+var request = new Object();
+if (url.indexOf("?") != -1) {  
+   var str = url.substr(1);
+  var strs = str.split("&"); 
+  for (var i = 0; i < strs.length; i++) {
+       request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+   }
+}
+let index=request["index"];
+let myid=request["myid"];
+console.log(index)
+let bd=Number(myid)
+
+let  data2= localStorage.getItem('key')
+let  userId=Number(data2)
+let org=localStorage.getItem('orgkey');
+let pro=localStorage.getItem('pro');
+var ver=localStorage.getItem('version')
+    $(function () {
+        var app=new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                needsr:[],//以收照片路径
+                needtime:'',//以收照片上传时间
+                resivesr:[],//应收照片路径
+                resivetime:'',//应收照片上传时间
+                oneshow:true,
+                twoshow:true,
+                needshow:true,//增减项应收显示
+
+                payshow:false,
+                twopayshow:false,
+                parentshow:true,
+                objid:'',
+                projectFundId:'',
+
+                projectFundName:'',//tit
+                need:'',  //应收费用
+                alead:'', //已收费用
+                needState:'',//应收费用状态
+                needUserName:'',//应收费用操作人
+                receiveState:'',//已收费用状态
+                receivedUserName:'',//已收费用操作人
+                
+                mainmu:false,//下拉框和下拉框幕显示隐藏的判断值
+                image:[],
+                img:{
+                    src:'',
+                    time:''
+                }
+            },
+            beforeCreate:function(){
+                    let that=this;
+                    $.ajax({    //获取项目款项信息
+                    "url":"http://app.zhuangneizhu.com/project/gainProjectFundDetail.do",
+                        "type":"post",
+                        "anyns":true,
+                        data:{
+                            projectId:pro,
+                            userId:userId,
+                            version:ver,
+                            organizationId:org,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.projectFundId=data.data.funds[myid].projectFundId;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                   });
+                               $.ajax({    //获取项目收款状态明细
+                    "url":"http://app.zhuangneizhu.com/v2/set/gainProjectFund.do",
+                        "type":"post",
+                        "anyns":true,
+                        data:{
+                            projectId:pro,
+                            userId:userId,
+                            version:ver,
+                            organizationId:org,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.loding=false;
+                            console.log(data);
+                            that.need=data.data.vos[myid].needMoney;
+                            that.alead=data.data.vos[myid].aleadyMoney;
+                            that.needState=data.data.vos[myid].needState;
+                            that.needUserName=data.data.vos[myid].needUserName;
+                            that.receiveState=data.data.vos[myid].receiveState;
+                            that.receivedUserName=data.data.vos[myid].receivedUserName;
+                            that.projectFundName=data.data.vos[myid].projectFundName;
+                            for (var i = data.data.vos.length - 1; i >= 0; i--) {
+                                if (i==myid) {
+                                    let m=data.data.vos[myid].needPhoto.split(",");
+                                    let n=data.data.vos[myid].receivePhoto.split(",");
+                                    if (m=='0') {
+                                        that.twoshow=false
+                                      }else{
+                                        that.resivesr=data.data.vos[myid].needPhoto.split(",");
+                                       for (var i =that.resivesr.length - 1; i >= 0; i--) {
+                                            let a=that.resivesr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.resivetime=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.resivetime=a.substring(6, 16);
+                                           }
+                                         }
+                                      };
+                                    if(n=='0'){
+                                         that.oneshow=false;
+                                     }else{
+                                        that.needsr=data.data.vos[myid].receivePhoto.split(",");
+                                        for (var i =that.needsr.length - 1; i >= 0; i--) {
+                                                        let a= that.needsr[i];
+                                                       if(a.substring(0, 1)=="p"){
+                                                            that.needtime=a.substring(10, 20);
+                                                       }else if(a.substring(0, 1)=="i"){
+                                                             that.needtime=a.substring(6, 16);
+                                                       }
+                                                     }
+                                      }
+                                };
+                                if (myid==data.data.vos.length - 1&&"增减项"==data.data.vos[myid].projectFundName) {
+                                    that.needshow=false;
+                                }
+                            }
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                   });
+            },
+            mounted(){
+                var that = this;
+                $("input[type='file']").change(function(){   
+                   var file = this.files[0];
+                   let  img={name:'',time:''};
+                     var formdata= new FormData($("#from")[0]);
+                    console.log(formdata);
+                    $.ajax({
+                        url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                        data:formdata,
+                        type:'post',
+                         cache: false,        // 不缓存
+                        processData: false,   // 告诉jQuery不要去处理发送的数据
+                        contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                        dataType:"json",
+                        success:function(data){
+                          var photo=data.split(",");
+                          for (var i = photo.length - 1; i >= 0; i--) {
+                                   console.log(photo[i]);
+                                   that.sr.unshift(photo[i]);
+                          }
+                          that.lu.unshift(data);
+                          console.log(that.lu);
+                           for (var i = that.lu.length - 1; i >= 0; i--) {
+                                            let a=that.lu[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                }
+                        }
+                    })
+                })
+            },
+            methods:{
+                back:function(){
+                   window.location.href="receivables.html?index="+index;
+                },
+                yimony:function() {
+                    let that=this;
+                    that.parentshow=false;
+                    that.payshow=true;
+                },
+                close:function(){
+                    let that=this;
+                    that.parentshow=true;
+                    that.payshow=false;
+                },
+                addmoney:function(){
+                    let that=this;
+                     $.ajax({    //设置项目已收金额
+                            "url":"http://app.zhuangneizhu.com/v2/set/setProjectGatheringReceivablesMoney.do",
+                                "type":"post",
+                                "anyns":true,
+                                data:{
+                                     receivables:that.alead,//已收
+                                     userId:userId,
+                                     projectGatherId:that.projectFundId,
+                                     projectId:pro,
+                                     organizationId:org,
+                                     version:ver,   
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                     window.location.href="designfee.html?index="+index+"&myid="+myid;
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                   });       
+                },
+                twoyimony:function(){
+                    let that=this;
+                    if (that.projectFundName!="增减项"){
+                        that.parentshow=false;
+                        that.twopayshow=true;
+                    }
+                },
+                twoclose:function(){
+                     let that=this;
+                    that.parentshow=true;
+                    that.twopayshow=false;
+                },
+                twoaddmoney:function(){
+                    let that=this;
+                  $.ajax({    //设置项目应收金额
+                                            "url":"http://app.zhuangneizhu.com/v2/set/setProjectGatheringNeedMoney.do",
+                                                "type":"post",
+                                                "anyns":true,
+                                                data:{
+                                                     totalMoney:that.need,//应收
+                                                     userId:userId,
+                                                     projectGatherId:that.projectFundId,
+                                                     projectId:pro,
+                                                     organizationId:org,
+                                                     version:ver,   
+                                                },
+                                                "dataType":"json",
+                                                "success":function(data){
+                                                    console.log(data);
+                                                    window.location.href="designfee.html?index="+index+"&myid="+myid;
+                                                },
+                                                "error":function(){
+                                                    console.log("错误");
+                                                }
+                     });
+                },
+                oneeditor:function(){
+                    window.location.href="moneystate.html?index="+index+"&myid="+myid+"&sele="+1;
+                },
+                twoeditor:function(){
+                    window.location.href="moneystate.html?index="+index+"&myid="+myid+"&sele="+2;
+                }
+        }
+    })
+})
+</script>
+</html> 

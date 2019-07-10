@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <style>
+        .inforTime{width: 6.9rem;height: 0.88rem;color: #ccc;font-size: 0.28rem;}
+        .infor-name{position: absolute;top:0;width: 7.5rem;bottom: 0;left: 0;z-index: 500;background-color: #f6f8ff;}
+        .test{border:0;outline: medium;height:0.88rem;line-height: 0.88rem;font-size: 0.23rem;text-align: center;display:block;float: left;}
+        .text{font-size: 0.3rem;color:#4c94ff;font-weight:600;text-align:center;}
+        .textbottom{color: #808080;font-size: 0.2rem;line-height: 0.4rem;padding-left: 0.2rem;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="personnelTit" >
+        <div @click="back()"></div>
+        <span>基本信息</span>
+        <span @click="share" style="font-size: 0.3rem;color: rgb(86, 119, 252);position: absolute;right:0.2rem">业主模式分享</span>
+    </div>
+    <!-- 分享主体开始 -->
+    <div id="box" style="width:7.5rem;height:100%;background-color:rgba(0,0,0,0.3);position:absolute;z-index:2" v-show="show" >
+            <div style="position: absolute;top:50%;left: 50%;transform: translate(-50%,-50%);background-color: #fff;width: 4rem;height:auto;border-radius: 0.3rem;">
+                <a href="###" @click="show=false"><span style="position: absolute;font-size:0.3rem;right: 0.25rem;color: #000;">×</span></a>
+                <p class="text">业主可透明浏览工地</p>
+                <p class="text">并可转介绍客户</p>
+                <p class="text">扫描以下二维码即可分享</p>
+                <div id="qrCodeDiv" style="width: 150px;height:150px;margin:0 auto;"></div>
+                <div style="width:3.2rem;height:0.7rem;padding-left: 0.8rem;">
+                    <img src="image/下载.png" style="width:50px; height:42px;float: left;">
+                    <a href="javascripet:void(0)" @click="download" style="font-size: 0.28rem;color: #3164af;font-weight: 600;line-height:0.7rem;">下载二维码</a>
+                </div>
+                <p class="textbottom">1、二维码可用于线上/线下宣传；</p>
+                <p class="textbottom">2、业主可通过扫码体验本公司的装修服务。</p>
+            </div> 
+    </div>
+    <!-- 分享主体结束 -->
+    <div class="main" style="top: 0.88rem;overflow-y:auto">
+        <div class="inforBox">
+            <h3>
+                <span>项目地址</span>
+                <span>{{titdata.projectCreateTime}}{{titdata.projectCreateName}}创建</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" @click="_nameopen">
+                    <p v-html="name"></p>
+                </div>
+            </div>
+             <h3>
+                <span>装修面积</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" @click="roomopen">
+                    <p>{{room}}㎡</p>
+                </div>
+            </div>
+            <h3>
+                <span>业主信息(被添加业主可登录并查看此项目进度）</span>
+                <div>
+                    <a @click="_new()" >新建业主</a>
+                </div>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" v-for="(value,index) in masters" @click="_rewrite(index)">
+                   <span >{{value.masterName}}</span>
+                   <span>{{value.mobile}}</span>
+                </div> 
+            </div>
+            <h3>
+                <span>渠道来源</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" @click="_memberdown(0,'channel')">
+                    <span>{{personnel.channel}}</span>
+                </div>
+            </div>
+            <h3>
+                <span>装修类型</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" @click="_memberdown(1,'type')">
+                    <span>{{personnel.type}}</span>
+                </div>
+            </div>
+            <h3>
+                <span>签约时间</span>
+                <span style="display: inline-block;font-size:0.3rem;float: right;color: #5677FC;" @click="reamark">签约状态重设</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box">
+                    <input style="color: #000;width: 85%;" type="text" id="time01" class="inforTime" placeholder="请选择签约时间" v-model="signedTime" >
+                    <span>{{signedUserName}}</span>
+                </div>
+            </div>
+            <h3>
+                <span>完工时间</span>
+                <span style="display: inline-block;font-size:0.3rem;float: right;color: #5677FC;" @click="overReamark">完工状态重设</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" @click="setOverTime">
+                    <input style="color: #000;width: 85%;" type="text" class="inforTime" placeholder="请选择完工时间" disabled="true" v-model="overTime">
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--下拉弹窗-->
+    <div class="member-down"  v-show="mainmu"  v-cloak>
+        <h3>{{memberdownbox.name}}</h3>
+        <div class="member-downBox">
+            <div v-for="(value,index) in memberdownbox.key" @click="_downBox(value,index)">{{value}}</div>
+        </div>
+        <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+    </div>
+    <!--弹窗幕-->
+    <div class="main-mu" v-show="mainmu" @click="mainmu=false"></div>
+    <!--名字修改-->
+    <div class="infor-name" v-show="nameshow">
+        <div class="personnelTit">
+            <div @click="_namecolse"></div>
+            <span>地址修改</span>
+        </div>
+        <div class="main " style="top: 0.88rem;padding-top: 0.2rem">
+            <div class="nameBox">
+                <div class="name-box">
+                    <input  id="needname" type="text" v-model="name">
+                </div>
+            </div>
+            <div class="name-btn" @click="_nameok">确定</div>
+        </div>
+    </div>
+    <!--面积修改-->
+    <div class="infor-name" v-show="areashow">
+        <div class="personnelTit">
+            <div @click="roomcolse"></div>
+            <span>面积修改</span>
+        </div>
+        <div class="main " style="top: 0.88rem;padding-top: 0.2rem">
+            <div class="nameBox">
+                <div class="name-box">
+                    <span style="width:25%;color: #999">面积（㎡）</span>
+                    <input  id="mianji" type="text" v-model="room">
+                </div>
+            </div>
+            <div class="name-btn" @click="roomok">确定</div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+<script src="js/datePicker.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/myqrcode.js"></script>
+<script src="js/myutf.js"></script>
+<script>
+var  userId= localStorage.getItem('key');
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version')
+    $(function () {
+        var app=new Vue({
+                el:'#demo',
+                data:{
+                    loding:true,
+                    room:'',//房屋面积
+                    masters:'',  //业主信息
+                    titdata:'',  //头部数据
+                    datas:'',//装修类型
+                    signedTime:'',//签约时间
+                    overTime:'',//完工时间
+                    signedUserName:'',//签约人
+                    overName:'',//完工人
+
+                    nameshow:false,//地址修改弹窗显示隐藏
+                    areashow:false,//面积修改弹窗显示隐藏
+                    namekey:'',//修改前临时存放name
+                    name:'',//项目
+                    mainmu:false,//下拉框和下拉框幕显示隐藏的判断值
+                    memberdownbox:{name:'',key:[]},//存放下拉框的内容
+                    memberdown:[
+                        {
+                            name:'渠道来源',
+                            key:[]
+                        },
+                        {
+                            name:'装修类型',
+                            key:[]
+                        }
+                    ],
+                    personnel:{
+                        channel:'渠道来源',
+                        type:'装修类型'
+                    },//存放需要修改的成员信息
+                    logoimg:'',
+                    show:false,
+                    dataURL:''//二维码图片
+                },
+                beforeCreate:function(){
+                 let that=this;
+                 $.ajax({           //初始化项目基本信息页（含业主）
+                                "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                                "type":"post",
+                                data:{
+                                projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    that.loding=false;
+                                   console.log(data);
+                                   let a=data.data.channelSourceName;
+                                   let b=data.data.decorationType;
+                                   if (a!=null) {
+                                    that.personnel.channel=data.data.channelSourceName;
+                                   };
+                                   if (b!=null) {
+                                     that.personnel.type=data.data.decorationType;
+                                   }
+                                   that.titdata=data.data;
+                                   that.masters=data.data.masters;
+                                   that.name=data.data.projectName;
+                                   that.signedTime=data.data.signedTime;
+                                   that.overTime=data.data.completeTime;
+                                   that.signedUserName=data.data.signedUserName;
+                                   that.room=data.data.area;
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                    });
+                 $.ajax({    //获取项目渠道来源
+                        "url":"http://app.zhuangneizhu.com/set/gainChannelSource.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.datas=data.data;
+                            for(var i = 0 ;i < data.data.length ; i++){
+                            that.memberdown[0].key.push(data.data[i].channelsourceName);      
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                 $.ajax({    //获取公司装修类型
+                        "url":"http://app.zhuangneizhu.com/set/gainDecorateType.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data.data);
+                            that.datas=data.data;
+                            for(var i = 0 ;i < data.data.length ; i++){
+                               that.memberdown[1].key.push(data.data[i].organizationDecorationTypeName);      
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                 $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            if(data.data.companyLogo==""){
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/photo/DATE2019-02-25DATE/edb3b6eb-2fa8-43ad-8e93-9bcc6a5deabd.png";
+                            }else {
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+data.data.companyLogo;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });  
+                },
+            methods:{
+                _downBox:function(e,index){    //下拉菜单
+                    let that=this;
+                    let fromName=e;
+                    let k =that._data.type;//对应的那个组
+                    console.log(k);
+                    that._data.personnel[k]=e;
+                    that._data.mainmu=false;
+                    if (k=="channel") {
+                        $.ajax({    //设置项目渠道来源信息
+                                "url":"http://app.zhuangneizhu.com/project/setChannelSource.do",
+                                "type":"post",
+                                data:{
+                                  projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                                  channelSourceName:fromName
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                    }else{
+                        let id=that.datas[index].organizationDecorationTypeId;
+                        console.log(id);
+                        $.ajax({    //设置项目装修类型
+                                "url":"http://app.zhuangneizhu.com/project/setProjectDecorateType.do",
+                                "type":"post",
+                                data:{
+                                  decorationId:id,
+                                  projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                    }
+                },
+                _memberdown:function (e,key) {//编辑页面点击   
+                    let that=this;
+                    that._data.mainmu=true;
+                    that._data.memberdownbox=that._data.memberdown[e];
+                    that._data.type=key;
+                },
+                _namecolse:function () {//左上角取消
+                    let that = this;
+                    that._data.name = that._data.namekey;
+                    that._data.nameshow=false;
+                },
+                _nameopen:function () {//点击编辑地址
+                    let that = this;
+                    that._data.namekey=that._data.name;
+                    that._data.nameshow=true;
+                },
+                _nameok:function () {//确定按钮,项目名称
+                    let that = this;
+                    that._data.nameshow=false;
+                    let needname=$("#needname").val();
+                    $.ajax({ //编辑项目名称
+                        "url":"http://app.zhuangneizhu.com/project/editProject.do",
+                        "type":"post",
+                        data:{  
+                          projectId:pro,
+                          organizationId:org,
+                          projectName:needname,
+                          userId:userId,
+                          version:ver
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });  
+                },
+                roomcolse:function () {//左上角取消
+                    let that = this;
+                    that._data.name = that._data.namekey;
+                    that._data.areashow=false;
+                },
+                roomopen:function () {//点击编辑地址
+                    let that = this;
+                    that._data.namekey=that._data.name;
+                    that._data.areashow=true;
+                },
+                roomok:function () {//确定按钮,项目名称
+                    let that = this;
+                    that._data.areashow=false;
+                    let mian=$("#mianji").val();
+                    $.ajax({ //编辑项目面积信息
+                        "url":"http://app.zhuangneizhu.com/project/editArea.do",
+                        "type":"post",
+                        data:{  
+                          projectId:pro,
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                          area:mian,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    }); 
+                },
+                reamark:function(){
+                    let that=this;
+                   let k=confirm("确定重设为未签约？");
+                   if (k==true) {
+                    $.ajax({    //重置项目签约时间
+                                    "url":"http://app.zhuangneizhu.com/project/resetSignedTime.do",
+                                    "type":"post",
+                                    data:{
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        console.log(data);
+                                        that.signedTime="请选择签约时间";
+                                        that.signedUserName="";
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                          });
+                    }
+                },
+                overReamark:function(){
+                   let that=this;
+                   let k=confirm("确定重置完工时间？");
+                   if (k==true) {
+                    $.ajax({    //重置项目签约时间
+                                    "url":"http://app.zhuangneizhu.com/project/resetCompleteTime.do",
+                                    "type":"post",
+                                    data:{
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        console.log(data);
+                                        that.overTime="请选择完工时间";
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                          });
+                    }
+                },
+                setOverTime:function(){
+                    window.location.href="setOverTime.html";
+                },
+                _new:function(){
+                    window.location.href="cread.html";
+                },
+                _rewrite:function(myid){
+                    window.location.href="./myHTML/rewiter.html?index="+myid;
+                },
+                back:function(){
+                    window.location.href="detailed-two.html";
+                },
+                share:function(){
+                    let that=this;
+                    $("#qrCodeDiv").empty()
+                    $("#qrCodeDiv").qrcode({
+                        render: "canvas", // 渲染方式有table方式（IE兼容）和canvas方式
+                        width:150, //宽度
+                        height:150, //高度
+                        text:"http://web.zhuangneizhu.com/SHARE.html?projectid="+pro+"&uid="+userId+"&orgid="+org,
+                        typeNumber: -1,//计算模式
+                        correctLevel: 2,//二维码纠错级别
+                        background: "#ffffff",//背景颜色
+                        foreground: "#000000", //二维码颜色
+                        src:that.logoimg
+                    });
+                    that.show=true;
+                    var canvas = document.getElementsByTagName('canvas')[0];
+                    that.dataURL=canvas.toDataURL("image/png");
+                },
+                download:function(){
+                    var that=this;
+                    var alink=document.createElement("a");
+                    alink.href=that.dataURL
+                    alink.download="分享.png";
+                    alink.click();
+                }
+            },
+            mounted: function() { 
+                //签约时间设置
+                var that=this;
+                var calendar = new datePicker();
+                calendar.init({
+                    'trigger': '#time01',
+                    'type': 'date',
+                    'minDate':'1900-1-1',
+                    'maxDate':'2100-12-31',
+                    'onSubmit':function(){
+                        var theSelectData=calendar.value;
+                        console.log(theSelectData)
+                    $.ajax({    //设置项目签约时间
+                            "url":"http://app.zhuangneizhu.com/project/setSignedTime.do",
+                            "type":"post",
+                             data:{
+                              projectId:pro,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                              signedTime:theSelectData,
+                              appType:"znz"
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                that.signedUserName=data.data.signedName;
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                        });
+                    },
+                    'onClose':function(){
+                    }
+                });
+            }
+        })
+    })
+</script>
+</html>

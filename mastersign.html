@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <style type="text/css">
+    	.projectName{width: 6.9rem;background-color: #fff;height: auto;margin-top: 0.2rem;padding: 0 0.3rem;line-height: 0.8rem;font-size: 0.3rem;}
+    	.signimg{width:6.9rem;padding: 0 0.3rem;height: 2rem;background-color: #fff;margin-top: 0.2rem;display:flex;justify-content:space-between;}
+    	.signimg a{width: 2rem;height: 1.8rem;padding-top: 0.2rem}
+		.signimg a>img{display: block;width: 1rem;height: 1rem;margin: 0 auto;}
+		.signimg a>p:nth-child(2){text-align: center;color: #808083;font-size: 0.25rem;margin-bottom: 0.05rem}
+		.signimg a>p:nth-child(3){text-align: center;color: #A8A9AC}
+		.contenttit{width:6.9rem;height: 0.8rem;line-height: 0.8rem;font-size: 0.3rem;background-color: #fff;color: #808083;padding:0 0.3rem;}
+		.contentsel{width:6.9rem;padding: 0 0.3rem;display: flex;justify-content: space-around;color: #A8A9AC;background-color:#F6F8FF;line-height: 0.5rem;font-size: 0.25rem;}
+		.contentsel span{width: 2.3rem;height: 0.5rem;}
+		.contenttext{width:6.9rem;padding: 0 0.3rem;display: flex;justify-content: space-around;background-color:#fff;line-height: 0.8rem;font-size: 0.28rem;border-bottom: 1px solid #F6F8FF;}
+		.contenttext span{width: 2.3rem;height: 0.8rem;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="personnelTit">
+        <div @click="back()"></div>
+        <span>工地签到</span>
+        <span style="color: #5677fc;font-size: 0.3rem;float: right;margin-right: 0.3rem;"@click="textbox" >说明</span><!--  -->
+    </div>
+    <div style="width:6.4rem;height: 2.6rem;background-color: rgba(0,0,0,0.5);z-index: 3;position: absolute;left: 0.35rem;border-radius: 0.3rem;color: #fff;font-size: 0.25rem;padding:0.2rem;line-height: 1.5" v-show="textboxshow"> 
+        <p>1、请先设置工地位置，才可签到。（初次设置位置不限身份，如需修改，需管理员权限）</p>
+        <p>2、签到与签退，需在项目工地位置周围200米半径范围内。</p>
+        <p>3、每天首次进入查看项目，如在签到范围内，会自动签到。如自动签到未成功，请手动点击签到。</p>
+        <p>4、签退需手动点击。</p>
+    </div>
+    <div class="main" style="top: 0.88rem;height: auto;overflow-y: auto;width: 7.5rem;">
+        <div class="projectName">
+        	<p>项目地址：{{projectName}}</p>
+        </div>
+         <!-- <div  class="signimg">
+        	<a href="###">
+        		<img :src="signoneimg">
+        		<p>签到</p>
+               {{signonetext}}
+        		<p>{{signonetext}}</p>
+        	</a>
+        	<a href="###" >
+        		<img :src="signtwoimg">
+        		<p>签退</p>
+                {{signtwotext}} 
+        		<p>{{signtwotext}}</p>
+        	</a>
+        	<a href="###" >
+        		<img src="assets/工地位置@2x.png">
+        		<p>请到装内助app设置工地位置</p>
+        	</a>
+        </div>-->
+        <div style="width: 7.5rem;margin-top: 0.2rem">
+        	<div class="contenttit">签到详情</div>
+        	<div class="contentsel">
+        		<span>人员</span>
+        		<span>签到</span>
+        		<span>时间</span>
+        	</div>
+        	<div class="contenttext"  v-for="value in signarr">
+        		<span>{{value.userName}}</span>
+        		<span>{{value.signState}}</span>
+        		<span>{{value.signTime}}</span>
+        	</div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var  userId= localStorage.getItem('key');
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version')
+    $(function () {
+        var app=new Vue({
+            el: '#demo',
+            data:{
+                loding:false,
+                projectName:'',
+                signarr:'',
+                signpeople:'',
+                signstate:'',
+                signtime:'',
+                signonetext:'',
+                signoneimg:'',
+
+                // signtwotext:'',
+                // signtwoimg:'',
+
+                textboxshow:false
+            },
+            beforeCreate:function(){
+                var that=this;
+                $.ajax({   //初始化项目基本信息页（含业主）
+                            "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                            "type":"post",
+                            data:{
+                              projectId:pro,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                that.projectName=data.data.projectName;
+                            }
+                });
+                $.ajax({   //获取项目打卡信息（倒叙）
+                            "url":"http://app.zhuangneizhu.com/sign/gainProjectSigned.do",
+                            "type":"post",
+                            data:{
+                              projectId:pro,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                              pageNum:0,
+                              pageSize:20,
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data)
+                                that.signarr=data.data.items
+                            }
+                });
+                // $.ajax({    //获取签到状态
+                //         "url":"http://app.zhuangneizhu.com/sign/gainSignState.do",
+                //         "type":"post",
+                //         data:{
+                //           organizationId:org,
+                //           userId:userId,
+                //           version:ver,
+                //           projectId:pro
+                //         },
+                //         "dataType":"json",
+                //         "success":function(data){
+                //             console.log(data);
+                //             if(data.data.gps==''){
+                //                 that.signoneimg="assets/今日已签到@2x.png"; 
+                //                 that.signonetext="请先设置工地位置";
+                //                 that.signtwoimg="assets/不可点击@2x.png";
+                //                 that.signtwotext="请先设置工地位置";
+                //             }else{
+                //                 if(data.data.SIGN_IN!=''){
+                //                     that.signonetext="今日已签到";
+                //                     that.signoneimg="assets/今日已签到@2x.png"; 
+                //                 }else{
+                //                     that.signoneimg="assets/今日未签到@2x.png"
+                //                 }
+                //                 if(data.data.SIGN_OUT!=''){
+                //                     that.signtwotext="今日已签退";
+                //                     that.signtwoimg="assets/已离岗@2x.png";
+                //                 }else{
+                //                     that.signtwoimg="assets/未离岗@2x.png";
+                //                 }
+                //             }
+                //         },
+                //         "error":function(){
+                //          console.log("输入有误");
+                //         }
+                // });
+            },
+            methods:{
+            	back:function(){window.history.back()},
+                textbox:function(){
+                    var that=this;
+                    that.textboxshow=!that.textboxshow;
+                }
+            }
+        })
+    })
+</script>
+</html>

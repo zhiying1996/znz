@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>生命周期</title>
+</head>
+<body>
+	<div id="app"> 
+		<p>{{massage}}</p>
+	</div>
+</body>
+<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="../js/vue.js"></script>
+<script type="text/javascript">
+$(function(){
+	var app=new Vue({
+		el:"#app",
+		data:{
+			massage:"",
+
+		},
+		beforeCreate:function(){
+			var that=this
+            console.log(this.massage)
+            that.massage="我垫付货款收到"
+		},
+		created:function(){
+			console.log(this.$el);
+			console.log(this.massage)
+		},
+		beforeMount: function(){
+			console.log(this.$el);
+			console.log(this.massage)
+		},
+		mounted:function(){
+			console.log(this.$el);
+			console.log(this.massage)
+		},
+		beforeUpdate:function(){
+
+		},
+		updated:function(){
+
+		},
+		beforeDestroy:function(){
+			console.log(this.$el)
+
+		},
+		destroyed:function(){
+			console.log(this.$el)
+
+		}
+	})
+})
+</script>
+</html>

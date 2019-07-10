@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>装内助透明浏览模式</title>
+    <link rel="shortcut icon" href="#" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no">
+    <!--ipone手机下的a标签下的手机号码不被显示为拨号链接-->
+    <link rel="stylesheet" href="./css-share/common.css">
+    <link rel="stylesheet" href="./css-share/swiper.min.css">
+    <script src="./js-share/rem.js"></script>
+</head>
+
+<body>
+    <div class="pic">
+        <div class="header">
+            <div class="left"><img src="./img/return1.png" alt=""></div>
+            <div class="title"></div>
+            <div class="right">说明</div>
+        </div>
+        <div class="line"></div>
+        <div class="pic-list">
+            <h3>
+                <img src="./img/pic-list.png" alt="">
+                <span>已上传照片</span>
+            </h3>
+            <div class="myphoto">
+
+            </div>
+        </div>
+    </div>
+    <div class="mask">
+        <div class="back">返回</div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="./js-share/jquery v3.1.1.js"></script>
+<script src="./js-share/swiper.min.js"></script>
+
+<script>
+    $('.header .left').on('click', function () {
+        window.history.go(-1);
+    })
+
+    //获取url中的参数
+    var url = window.location.href;
+    var obj = {};
+    if (url.indexOf('?') != -1) {
+        var str = url.substring(url.indexOf('?') + 1);
+        var arr = str.split('&');
+        for (var i = 0; i < arr.length; i++) {
+            obj[arr[i].split('=')[0]] = decodeURI(arr[i].split('=')[1]);
+        }
+    }
+    var userId = obj.userId;
+    var organizationId = obj.organizationId;
+    var projectId = obj.projectId;
+    var index = obj.index;
+
+    switch (index) {
+        case "2":
+        $('.header .title').html('设计图')
+            $.ajax({    //获取项目设计图片
+                url: "http://app.zhuangneizhu.com/v2/set/gainProjectDesignPhoto.do",
+                type: "post",
+                data: {
+                    projectId: projectId,
+                    organizationId: organizationId,
+                    userId: userId,
+                    version: "3.0",
+                },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data)
+                    message = data.data.designPhoto;
+                }
+            }).done(function () {
+                console.log(message)
+                if (message == null) {
+
+                } else {
+                    var photo = message.split(",");
+                    $.each(photo, function (index, item) {
+                        if (item != '') {
+                            var reg1 = /2017/;
+                            var reg2 = /2018/;
+                            var reg3 = /2019/;
+                            var reg4 = /2020/;
+                            var reg5 = /2021/;
+                            if (reg1.test(item)) {
+                                var time = item.substr(item.indexOf("2017"), 10);
+                            }
+                            if (reg2.test(item)) {
+                                var time = item.substr(item.indexOf("2018"), 10);
+                            }
+                            if (reg3.test(item)) {
+                                var time = item.substr(item.indexOf("2019"), 10);
+                            }
+                            if (reg4.test(item)) {
+                                var time = item.substr(item.indexOf("2020"), 10);
+                            }
+                            if (reg5.test(item)) {
+                                var time = item.substr(item.indexOf("2021"), 10);
+                            }
+
+                            var html = '<div class="img-wrap"><div class="time">' + time + '</div><img src=' + "https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/" + item + '></div>'
+                            $(".myphoto").append(html);
+
+
+                            $('.myphoto').on('click', '.img-wrap', function () {
+                                var swiperImg = photo.map(function (item, index) {
+                                    return `<div class="swiper-slide"><img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}" title="${index}"/></div>`
+                                });
+                                $('.mask').show();
+                                $('.swiper-wrapper').append(swiperImg.join(''))
+
+                                var initialSlide = $(this).index()
+                                new Swiper('.swiper-container', {
+                                    initialSlide: initialSlide,
+                                    loop: true,
+                                })
+                            })
+                            $('.mask .back').on('click', function () {
+                                $('.mask').hide()
+                            })
+                        }
+                    })
+                }
+            })
+            $('.header .right').on('click', function () {
+                alert('手机拍照上传设计图照片后，跑工地再也不用带纸质设计图了，有设计图更新也立马能查阅，无纸化办公。')
+            })
+            break;
+        case "3":
+        $('.header .title').html('水电照片')
+            $.ajax({   //获取项目水电留档照片
+                url: "http://app.zhuangneizhu.com/v2/set/gainWaterElectricityPhoto.do",
+                type: "post",
+                data: {
+                    projectId: projectId,
+                    organizationId: organizationId,
+                    userId: userId,
+                    version: "3.0",
+                },
+                dataType: "json",
+                success: function (data) {
+                    message = data.data.waterElectricityPhoto;
+                }
+            }).done(function () {
+                console.log(message)
+                if (message == null) {
+
+                } else {
+                    var photo = message.split(",");
+                    $.each(photo, function (index, item) {
+                        var reg1 = /2017/;
+                        var reg2 = /2018/;
+                        var reg3 = /2019/;
+                        var reg4 = /2020/;
+                        var reg5 = /2021/;
+                        if (reg1.test(item)) {
+                            var time = item.substr(item.indexOf("2017"), 10);
+                        }
+                        if (reg2.test(item)) {
+                            var time = item.substr(item.indexOf("2018"), 10);
+                        }
+                        if (reg3.test(item)) {
+                            var time = item.substr(item.indexOf("2019"), 10);
+                        }
+                        if (reg4.test(item)) {
+                            var time = item.substr(item.indexOf("2020"), 10);
+                        }
+                        if (reg5.test(item)) {
+                            var time = item.substr(item.indexOf("2021"), 10);
+                        }
+
+                        if (item != '') {
+                            var html = '<div class="img-wrap"><div class="time">' + time + '</div><img src=' + "https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/" + item + '></div>'
+                            $(".myphoto").append(html);
+                        }
+                        $('.myphoto').on('click', '.img-wrap', function () {
+                            var swiperImg = photo.map(function (item, index) {
+                                return `<div class="swiper-slide"><img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}" title="${index}"/></div>`
+                            });
+                            $('.mask').show();
+                            $('.swiper-wrapper').append(swiperImg.join(''))
+
+                            var initialSlide = $(this).index()
+                            new Swiper('.swiper-container', {
+                                initialSlide: initialSlide,
+                                loop: true,
+                            })
+                        })
+                        $('.mask .back').on('click', function () {
+                            $('.mask').hide()
+                        })
+                    })
+                }
+            })
+            $('.header .right').on('click', function () {
+                alert('手机拍照上传整套水电照片后，再也不用给业主制作水电光盘了，永远不会丢失以后维修用的水电照片。')
+            })
+            break;
+        case "1":
+        $('.header .title').html('现场写真照片')
+            $.ajax({   //获取项目水电留档照片
+                url: "http://app.zhuangneizhu.com/v3/set/gainScenePhoto.do",
+                type: "post",
+                data: {
+                    projectId: projectId,
+                    organizationId: organizationId,
+                    userId: userId,
+                    version: "3.0",
+                },
+                dataType: "json",
+                success: function (data) {
+                    message = data.data.scenePhoto;
+                }
+            }).done(function () {
+                console.log(message)
+                if (message == null) {
+
+                } else {
+                    var photo = message.split(",");
+                    $.each(photo, function (index, item) {
+                        var reg1 = /2017/;
+                        var reg2 = /2018/;
+                        var reg3 = /2019/;
+                        var reg4 = /2020/;
+                        var reg5 = /2021/;
+                        if (reg1.test(item)) {
+                            var time = item.substr(item.indexOf("2017"), 10);
+                        }
+                        if (reg2.test(item)) {
+                            var time = item.substr(item.indexOf("2018"), 10);
+                        }
+                        if (reg3.test(item)) {
+                            var time = item.substr(item.indexOf("2019"), 10);
+                        }
+                        if (reg4.test(item)) {
+                            var time = item.substr(item.indexOf("2020"), 10);
+                        }
+                        if (reg5.test(item)) {
+                            var time = item.substr(item.indexOf("2021"), 10);
+                        }
+
+                        if (item != '') {
+                            var html = '<div class="img-wrap"><div class="time">' + time + '</div><img src=' + "https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/" + item + '></div>'
+                            $(".myphoto").append(html);
+                        }
+                        $('.myphoto').on('click', '.img-wrap', function () {
+                            var swiperImg = photo.map(function (item, index) {
+                                return `<div class="swiper-slide"><img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}" title="${index}"/></div>`
+                            });
+                            $('.mask').show();
+                            $('.swiper-wrapper').append(swiperImg.join(''))
+
+                            var initialSlide = $(this).index()
+                            new Swiper('.swiper-container', {
+                                initialSlide: initialSlide,
+                                loop: true,
+                            })
+                        })
+                        $('.mask .back').on('click', function () {
+                            $('.mask').hide()
+                        })
+                    })
+                }
+            })
+            $('.header .right').on('click', function () {
+                alert('手机拍照上传整套水电照片后，再也不用给业主制作水电光盘了，永远不会丢失以后维修用的水电照片。')
+            })
+
+            break;
+    }
+
+</script>
+
+</html>

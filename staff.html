@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="personnelTit">
+        <div @click="back"></div>
+        <span>设置部门和员工</span>
+    </div>
+    <div class="main" style="top: 0.88rem;bottom: 0rem;overflow-y: auto;overflow-x: hidden;width: 7.8rem">
+        <div class="staffMain" v-for="(value,index) in datas">
+            <h3 v-html="value.departName"  @click="_ulopen(index)"></h3>
+            <div class="sta-btn">
+                <span class="sta-btn-A" @click="mu01=true"></span>
+                <span class="sta-btn-M" @click="_staM(index,value.name)"></span>
+                <span class="sta-btn-C" @click="_staC(index,value.name)"></span>
+                <span class="sta-btn-T"  v-if="index!=0" @click="_staT(index)"></span>
+            </div>
+            <ul class="ulopen">
+                <li  class="liopen" v-for="(value,index) in value.groups" v-show="show">
+                    <div class="sta-admin-L">
+                        <span v-html="value.organizationUserName" @click="_admin(index)"></span>
+                        <span  v-html="value.roleName"></span>
+                    </div>
+                    <div class="sta-admin" @click="_director02(index,value)">
+                        <span class="gray" v-if="value.isAdmin">管理员</span>
+                        <span class="blue" v-else>设为管理员</span>
+                    </div>
+                    <div class="sta-admin02 sta-admin" @click="_director01(index,value)">
+                        <span class="gray" v-if="value.isSupervisor">部门主管</span>
+                        <span class="blue" v-else>设为部门主管</span> 
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--添加大类-->
+    <div class="stamu" v-show="mu01" v-cloak>
+        <div class="stamu-tit">
+            <a href="###" @click="mu01=false"></a>
+            <span>编辑部门名字</span>
+        </div>
+        <div class="stamu-box">
+            <h3>上级部门-{{father}}</h3>
+            <input type="text" placeholder="请输入子部门名称" v-model="muval01">
+        </div>
+        <div class="stamu-stb" @click="_staadd">确定</div>
+    </div>
+    <!--修改大类名字-->
+    <div class="stamu" v-show="mu02" v-cloak>
+        <div class="stamu-tit">
+            <a href="###" @click="mu02=false"></a>
+            <span>添加子部门</span>
+        </div>
+        <div class="stamu-box">
+            <input type="text" placeholder="请输入子部门名称" v-model="muval01">
+        </div>
+        <div class="stamu-stb" @click="_staMadd">确定</div>
+    </div>
+    <!--添加人员弹窗-->
+    <div class="personnelBox" v-show="personnelshow" :data-id="personnelId">
+        <div class="personnelTit">
+            <div @click="personnelshow=false"></div>
+            <span>编辑成员</span>
+            <span style="display: inline-block;float: right;font-size:0.3rem;color: #5677FC;margin-right: 20px;" @click="_preservation">确定</span>
+        </div>
+        <div class="personnelMain" v-cloak>
+            <div><input type="text" placeholder="请输入手机号码" v-model="personnel.tel"></div>
+            <div><input type="text" placeholder="请输入成员姓名" v-model="personnel.name"></div>
+            <div @click="_memberdown(0,'department02')"><span>{{personnel.department02}}</span></div>
+            <div @click="_memberdown(1,'department01')"><span>{{personnel.department01}}</span></div>
+            <div @click="_memberdown(2,'director02')">
+                <span v-if="personnel.director02">管理员</span><span v-else>非管理员</span>
+            </div>
+        </div>
+        <div class="personnel-close" @click="_close">删除</div>
+    </div>
+    <!--下拉弹窗-->
+    <div class="member-down"  v-show="mainmu"  v-cloak>
+        <h3>{{memberdownbox.name}}</h3>
+        <div class="member-downBox">
+            <div v-for="(value,index) in memberdownbox.key" @click="_downBox(value,index)">{{value}}</div>
+        </div>
+        <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+    </div>
+    <!--弹窗幕-->
+    <div class="main-mu" v-show="mainmu" @click="mainmu=false"></div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+  var data2 =localStorage.getItem('key');
+  var userId=Number(data2);
+  var org=localStorage.getItem('orgkey');
+  var ver=localStorage.getItem('version');
+    $(function(){
+        var app=new Vue({
+            el:'#demo',
+            data:{
+                father:'',//上级部门
+                datas:[],//设置部门里面所有的数据都存放这里
+                depertmentpeople:[],//部门里的员工信息
+                show:false,//点就判断显示还是不显示的依据
+                mainindex:'',//点击部门时获取的部门索引（最外层的）
+                people:'',//部门员工
+                delindex:'',
+                peo:'',
+                roldata:'',//角色信息（id.名称）
+                rolid:'', //修改时用到的角色id
+                rolname:'',//修改时用到的角色名称
+                departdata:'',//部门信息（id,名称）
+                depardid:'',//修改时用到的部门id
+                admin:'',//判断是否用拥有管理员权限
+                key:'',//if判断所用到的e
+                type:'',//
+
+                mu01:false,//添加子部门显示隐藏判断值
+                muval01:'',//添加子部门的名字,修改子部门的名字
+                mu02:false,//修改部门名字弹窗
+                muindex:'',//暂时存储修改数组的index值,
+                muindex02:'',//暂时保存需改第几组第几个
+                personnel:{
+                    name:'',
+                    tel:'',
+                    department01:'',
+                    department02:'',//存放角色名
+                    director01:'',
+                    director02:''
+                },//存放需要修改的成员信息
+                mainmu:false,//下拉框
+                mainmuId:'',//判断是否是管理员那个下拉选项框
+                personnelshow:false,//成员编辑页
+                personnelId:'',
+                memberdownbox:{name:'',key:[]},
+                memberdown:[
+                    {
+                        name:'选择成员角色',
+                        key:[]
+                    },
+                    {
+                        name:'选择部门',
+                        key:[]
+                    },
+                    {
+                        name:'是否设置管理',
+                        key:['管理员','非管理员']
+                    }
+                ],
+            },
+            beforeCreate:function(){
+                    let that=this;
+                    $.ajax({  //获取公司部门信息
+                        "url":"http://app.zhuangneizhu.com/v2/set/showDepartInfo.do",
+                        "type":"post",
+                        data:{
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.datas=data.data;
+                            that.father=data.data[0].departName;
+                            console.log(that.datas);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    $.ajax({    //获取员工角色
+                        "url":"http://app.zhuangneizhu.com/set/gainEmployeeType.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.roldata=data.data;
+                            for(var i = 0 ;i < data.data.length ; i++){
+                            that.memberdown[0].key.push(data.data[i].roleName);      
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    $.ajax({    //获取部门信息
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainDepartInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.departdata=data.data;
+                            for(var i = 0 ;i < data.data.length ; i++){
+                            that.memberdown[1].key.push(data.data[i].departName);      
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    })
+              },
+            methods:{
+                back:function(){
+                    window.location.href="personal.html";
+                },
+                //下面内容显示隐藏
+                _ulopen:function (key) {
+                    let that = this
+                    that.mainindex=key;
+                        $(".ulopen").each(function(i,li){
+                            if (key==i) {
+                                console.log(i);
+                                let length=$(this).find(".liopen").length;
+                                if (length!=0) {
+                                    var display = $(this).find(".liopen").css("display");
+                                display=="none"?display="block":display="none";
+                                $(this).find(".liopen").css("display",display);
+                             }
+                            }
+                        })
+                },
+                //添加大类弹窗保存按钮
+                _staadd:function () {
+                    let that = this;
+                    let a=that._data.muval01;
+                    if(a==''){
+                        alert('请输入部门名字');
+                    }else{
+                    $.ajax({  //添加部门
+                        "url":"http://app.zhuangneizhu.com/v2/set/addDepart.do",
+                        "type":"post",
+                        data:{
+                              departName:a,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            window.location.href="staff.html";
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    }
+                    
+                },
+                //大类修改名字显示按钮
+                _staM:function (index,name) {
+                    let that = this
+                    console.log(index,name);
+                    that._data.muval01 = that.datas[index].departName;
+                    that._data.muindex = index;
+                    that._data.mu02=true;
+                },
+                //大类修改名字确定按钮
+                _staMadd:function () {
+                    let that = this ;
+                    let myid=that.muindex;
+                    let deparId=that.datas[myid].departId;
+                    console.log(deparId);
+                    $.ajax({  //修改公司部门名称
+                        "url":"http://app.zhuangneizhu.com/v2/set/editDepart.do",
+                        "type":"post",
+                        data:{
+                              departId:deparId,
+                              departName:that.muval01,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that._data.mu02=false;
+                            // window.location.href="staff.html"
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                },
+                //大类删除组按钮
+                _staC:function (index,name) {
+                    let that = this;
+                    let deparId=that.datas[index].departId;
+                    if (confirm("确认删除"+name+"吗")) {
+                        that._data.datas.splice(index,1);
+                        that._data.personnelshow = false;
+                    $.ajax({  //删除部门
+                        "url":"http://app.zhuangneizhu.com/v2/set/delDepart.do",
+                        "type":"post",
+                        data:{
+                              departId:deparId,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    }
+                    else {
+                        return;
+                    }
+                },
+                //大类置顶按钮
+                _staT:function (index) {
+                    let that = this
+                    console.log(index);
+                    $.ajax({  //设置公司部门置顶
+                        "url":"http://app.zhuangneizhu.com/v2/set/setOrganizationDepartPrev.do",
+                        "type":"post",
+                        data:{
+                              currentOrganizationDepartId:that.datas[index].departId,
+                              beforeOrganizationDepartId:that.datas[index-1].departId,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            // window.location.href="staff.html"
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    let k = that._data.datas[index];
+                    that._data.datas.splice(index, 1);
+                    that._data.datas.splice(index-1,0,k);
+                },
+                //设为管理员
+                _director02:function (index,val) {
+                    console.log(index); ;
+                    let that = this;
+                    if (confirm("确认修改权限?")) {
+                            let b=val.isAdmin=!val.isAdmin
+                            let c;
+                            if (b==true) {
+                                c=1;
+                            }else{
+                                c=0;
+                            }
+                    $.ajax({  //设置公司管理员
+                        "url":"http://app.zhuangneizhu.com/user/setOrganizationMaster.do",
+                        "type":"post",
+                        data:{
+                              setOrCancle:c,//整数
+                              sUserId:val.userId,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    }
+                    else {
+                        return;
+                    }
+                },
+                //设为部门主管
+                _director01:function (index,val) {
+                    console.log(index,val);
+                    let that = this;
+                    if (confirm("确认修改权限?")) {
+                            let b=val.isSupervisor=!val.isSupervisor;
+                               console.log(b);
+                               let c;
+                               if (b==true) {
+                                  c=1;
+                                  console.log(c)
+                               }else{
+                                  c=0;
+                                  console.log(c)
+                               }
+                    $.ajax({  //设置公司部门主管
+                        "url":"http://app.zhuangneizhu.com/v2/set/setDepartMaster.do",
+                        "type":"post",
+                        data:{
+                              departId:val.departId,
+                              setOrCancle:c,//整数
+                              sUserId:val.userId,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    }
+                    else {
+                        return;
+                    }
+                },
+                 //员工详细资料弹窗按钮
+                _admin:function (index) {
+                    console.log(index);
+                    let that = this ;
+                    that.delindex=index;
+                     that.peo=that.datas[that.mainindex].groups[index];
+                    console.log(that.peo);
+                    that.people=that.datas[that.mainindex].groups;
+                    that._data.personnel=that.peo;
+                    that._data.personnelshow=true;
+                    // that._data.muindex=val
+                    that._data.muindex02=index; 
+                    that.depardid=that.datas[that.mainindex].groups[index].departId;
+                    that.rolid=that.datas[that.mainindex].groups[index].roleId;
+
+                    that.personnel.tel = that.datas[that.mainindex].groups[index].mobile;
+                    that.personnel.name = that.datas[that.mainindex].groups[index].organizationUserName;
+                    that.personnel.department01 = that.datas[that.mainindex].groups[index].departName;
+                    that.personnel.department02 = that.datas[that.mainindex].groups[index].roleName;
+                    that.personnel.director02=that.datas[that.mainindex].groups[index].isAdmin;
+                },
+                //人员编辑删除按钮
+                _close:function(){
+                    let that=this
+                    let key=that.delindex;
+                    console.log(key);
+                    if(confirm("确认删除吗")){
+                        that._data.personnelshow=false;
+                        that._data.people.splice(key,1);
+                    $.ajax({    //删除公司联系人
+                        "url":"http://app.zhuangneizhu.com/user/delContactsInfo.do",
+                        "type":"post",
+                        data:{
+                        sUserId:that.peo.userId,
+                        userId:userId,
+                        organizationId:org,
+                        version:ver,    
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    })
+                    }else{
+                       return;
+                    }
+                },
+                //保存按钮
+               _preservation:function(){
+                    let that=this
+                        $.ajax({    //修改公司联系人
+                                "url":"http://app.zhuangneizhu.com/v2/set/editContactsInfo.do",
+                                "type":"post",
+                                data:{
+                                sUserId:that.peo.userId,
+                                userId:userId,
+                                name:that.personnel.name,
+                                mobile:that.personnel.tel,
+                                roleId:that.rolid,
+                                roleName:that.personnel.department02,
+                                organizationId:org,
+                                departId:that.depardid,
+                                departName: that.personnel.department01,
+                                version:ver,    
+                                isAdmin:that.admin,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data); 
+                                     // that._data.personnelshow=false
+                                      window.location.href="staff.html";
+                                 },
+                                "error":function(){
+                                 console.log("输入有误");
+                                }
+                            })
+                 },
+                //下拉弹窗点击
+                _downBox:function(e,index){
+                   let that=this;
+                    console.log(e,index);
+//                    console.log(e)
+                    let k =that._data.type;//对应的那个组
+//                    let a=that._data.personnel
+                    that._data.personnel[k]=e;
+//                    console.log(e)
+                    that._data.mainmu=false;
+                    // let judgeindex=that.index;   
+                     if(that.key==0){
+                    that.rolid=that.roldata[index].organizationRoleId;
+                    that.personnel.department02=that.roldata[index].roleName;
+                    console.log(that.rolid,that.rolname);
+                    }else if (that.key==1) {
+                    that.depardid=that.departdata[index].id;
+                    that.depardname=that.departdata[index].departName;
+                    console.log(that.depardid,that.depardname);
+                    }else if (that.key==2) {
+                        if (index==0) {
+                            that.admin=true;  
+                        }else{
+                            that.admin=false;
+                        }
+                    }
+                },
+                //编辑页面点击
+                _memberdown:function (e,key) {
+                    let that=this;
+                    that._data.mainmu=true;
+                    that._data.mainmuId=e;
+                    that._data.memberdownbox=that._data.memberdown[e];
+                    that.type=key;
+                    console.log(key);
+                    that.key=e; //0,1,2
+                   console.log(that.key);
+                },
+            }
+        })
+    })
+</script>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script src="js/JR.js"></script>
+    <link rel="stylesheet" href="css/index.css ">
+</head>
+<body>
+<div class="wap-wrap">
+    <div class="head-min" style="height: 0.88rem;width: 7.5rem">
+        <div class="personnelTit">
+            <div id="back"></div>
+            <span>调整公司设置</span>
+        </div>
+    </div>
+    <div class="main" style="top: 0.88rem;cursor:pointer;width: 7.8rem;overflow-y: auto;">
+        <div class="setBox">
+            <a >
+                <span>设置公司名称和logo</span>
+                <i></i>
+            </a>
+            <a >
+                <span >设置成员角色</span>
+                <i></i>
+            </a>
+            <a >
+                <span>设置装修类型</span>
+                <i></i>
+            </a>
+            <a >
+                <span>设置款项构成</span>
+                <i></i>
+            </a>
+            <a >
+                <span>设置收款状态</span>
+                <i></i>
+            </a>
+            <a >
+                <span>设置渠道来源</span>
+                <i></i>
+            </a>
+            <a >
+                <span>设置建材支出分类</span>
+                <i></i>
+            </a>
+            <div class="on-off">
+                <a id="onoffcontral">
+                    <apan>设置内控权限</apan>
+                    <i></i>
+                </a>
+                <a id="onoffLoding">
+                    <apan>完成进度必须上传照片</apan>
+                    <i></i>
+                </a>
+                <a id="progressOfStandard">
+                    <apan>允许业主查看进度标准</apan>
+                    <i></i>
+                </a>
+                <a id="onoffOver">
+                    <apan>完工检查开关</apan>
+                    <i></i>
+                </a>
+                <a id="companyphone">
+                    <apan>是否显示公司成员手机号码</apan>
+                    <i></i>
+                </a>
+                <a id="ownersign">
+                    <apan>是否允许业主查看签到记录</apan>
+                    <i></i>
+                </a>
+            </div>
+            <a>
+                <span>设置项目模板</span>
+                <i></i>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript">
+    $(".setBox a").click(function(){
+        var index = $(this).index();
+        console.log(index)
+        window.location.href='setpage.html?index='+index; 
+    });
+$("#onoffLoding").click(function(){
+      window.location.href='setonoff.html'
+})
+$("#onoffcontral").click(function(){
+      window.location.href='onoffContral.html'
+})
+$("#progressOfStandard").click(function(){
+      window.location.href="progressofstandard.html"
+})
+$("#onoffOver").click(function(){
+      window.location.href="onoffOver.html"
+})
+$("#back").click(function(){
+    window.location.href="personal.html";
+})
+$("#companyphone").click(function(){
+    window.location.href="companyphone.html";
+})
+$("#ownersign").click(function(){
+    window.location.href="ownersign.html";
+})
+</script>
+</html>

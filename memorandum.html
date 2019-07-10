@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="dome">
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div id="back"></div>
+            <span>备忘录</span>
+        </div>
+    </div>
+    <div class="main"  style="top:0.88rem;bottom: 0.88rem;padding: 0.2rem 0;overflow-x: hidden;" >
+        <div class="memBox" >
+        </div>
+    </div>
+    <div v-show="box2" style="width: 100%;height: 100%;background-color: #f6f8ff;"></div>
+    <div class="fot-btn" id="add">添加备忘</div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script>
+var  data2= localStorage.getItem('key');
+var  userId=Number(data2);
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version');
+var dataArr=[];
+var admain;
+var fatherIndex;
+$.ajax({    //判断用户是否管理员
+        "url":"http://app.zhuangneizhu.com/user/gainIsOrNotAdmin.do",
+        "type":"post",
+        data:{
+          organizationId:org,
+          userId:userId,
+          version:ver,
+        },
+        "dataType":"json",
+        "success":function(data){
+            console.log(data);
+            admain=data.data.isAdmin;
+         },
+        "error":function(){
+         console.log("输入有误");
+        }
+});
+$.ajax({    //获取项目留言板信息
+    "url":"http://app.zhuangneizhu.com/project/gainProjectBoard.do",
+    "type":"post",
+    data:{
+      projectId:pro,
+      organizationId:org,
+      userId:userId,
+      version:ver,
+    },
+    "dataType":"json",
+    "success":function(data){
+       dataArr=data.data;
+     },
+    "error":function(){
+     console.log("输入有误");
+    }
+}).done(function(){
+  $.each( dataArr,function(index,item){
+      console.log(item);
+      fatherIndex=index;
+      if(item.replyId==null){
+      var txt=
+      ` <div class="mem-box">
+          <div class="mem-boxL"><img src="image/perlogo.png" alt=""></div>
+          <div class="mem-boxR">
+                   <div class="mem-box-l">
+                          <h3>${item.userName}</h3>
+                          <div>
+                             ${item.content}
+                          </div>
+                  </div>
+                  <div class="mem-box-r">
+                        <h3 style="font-size: 0.24rem;">${item.createTime}</h3>
+                        <h3 style="float: left;"><a onclick="reply(${item.userId})">回复</a></h3>
+                        <h3 style="color: red;"><a onclick="deleat(${fatherIndex})">删除</a></h3>
+                  </div>
+          </div>
+      </div>`;
+      }else{
+      var txt=
+      ` <div class="mem-box">
+          <div class="mem-boxL"><img src="image/perlogo.png" alt=""></div>
+          <div class="mem-boxR">
+                   <div class="mem-box-l">
+                          <h3>${item.userName}</h3>
+                          <div>
+                             回复${item.replyName}:${item.content}
+                          </div>
+                  </div>
+                  <div class="mem-box-r">
+                        <h3 style="font-size: 0.24rem;">${item.createTime}</h3>
+                        <h3 style="float: left;"><a onclick="reply(${item.userId})">回复</a></h3>
+                        <h3 style="color: red;"><a onclick="deleat(${fatherIndex})">删除</a></h3>
+                  </div>
+          </div>
+      </div>`;
+      }
+      $(".memBox").append(txt);
+      if (item.photo.split(',')!='') {
+        var photoArr=item.photo.split(',');
+        $.each(photoArr,function(index,i){
+          var img=`<div class="mem-box-img">
+                             <a href="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${i}" target="view_window"><img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${i}"></a>
+                      </div>`
+          $(".mem-box").eq(fatherIndex).find('.mem-boxR').append(img)
+        })
+      }
+  })
+});
+$("#back").click(function(){
+    window.location.href="detailed-two.html"
+});
+
+function deleat(i){
+    console.log(i);
+    if(admain){
+        if (confirm("确认删除吗")){
+            var id=dataArr[i].id;
+            $.ajax({    //删除项目留言板信息
+                "url":"http://app.zhuangneizhu.com//project/delProjectBoard.do",
+                "type":"post",
+                data:{
+                  projectBoardId:id,
+                  projectId:pro,
+                  organizationId:org,
+                  userId:userId,
+                  version:ver,
+                },
+                "dataType":"json",
+                "success":function(data){
+                    if(data.code==10000){
+                        $(".mem-box").eq(i).remove();
+                    }                 },
+                "error":function(){
+                 console.log("输入有误");
+                }
+            });
+        }
+    }else{
+        alert("你的权限不足，请联系管理员。");
+    }
+};
+function reply(i){
+    console.log(i);
+    window.location.href="./myHTML/addthememo.html?replayid="+i;
+};
+$("#add").click(function(){
+    window.location.href="./myHTML/addthememo.html"
+});
+</script>
+</html>

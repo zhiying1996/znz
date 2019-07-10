@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助业主透明浏览模式</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <style>
+        .inforTime{
+            width: 6.9rem;
+            height: 0.88rem;
+            color: #ccc;
+            font-size: 0.28rem;
+        }
+        .infor-name{
+            position: absolute;
+            top:0;
+            width: 7.5rem;
+            bottom: 0;
+            left: 0;
+            z-index: 500;
+            background-color: #f6f8ff;
+        }
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="personnelTit">
+        <div onclick="javascript:history.back(-1);"></div>
+        <span>基本信息</span>
+    </div>
+    <div class="main" style="top: 0.88rem;">
+        <div class="inforBox">
+            <h3 >
+                <span>项目地址</span>
+                <div id="tit">
+                    <span style="float:right;">创建</span>
+                </div>
+                
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" >
+                    <p id="address"></p>
+                </div>
+            </div>
+            <h3>
+                <span>装修面积</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box" id="arer">
+                </div>
+            </div>
+            <h3>
+                <span>装修类型</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box">
+                    <span id="style"></span>
+                </div>
+            </div>
+            <h3>
+                <span>签约时间</span>
+            </h3>
+            <div class="inforText">
+                <div class="infor-box">
+                    <span id="overtime"></span>
+                    <span id="overname"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script>
+let data2= localStorage.getItem('key');
+let userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+var pro=localStorage.getItem('pro');
+            $.ajax({           //初始化项目基本信息页（含业主）
+                                "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                                "type":"post",
+                                data:{
+                                  projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:"2.9",
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                   console.log(data);
+                                   $("#tit").append(
+                                    '<span >'+data.data.projectCreateTime+'</span>'+
+                                    '<span>'+data.data.projectCreateName+'</span>'
+                                    )
+                                   $("#address").html(data.data.projectName);
+                                   if(data.data.area!=null){
+                                   	$("#arer").append(
+                                    '<p style="display:block;">'+data.data.area+'㎡'+'</p>'
+                                    );
+                                   }else{
+                                   		$("#arer").append(
+                                    '<p style="display:block;">'+'暂无数据'+'</p>'
+                                    );
+                                   }
+                                   
+                                   $("#style").html(data.data.decorationType);
+                                   $("#overtime").html(data.data.signedTime)
+                                   $("#overname").html(data.data.signedUserName);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                    });
+</script>
+</html>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <style type="text/css">
+        .test{border:0;outline: medium;height:0.88rem;line-height: 0.88rem;font-size: 0.23rem;text-align: center;display:block;float: left;}
+        .text{font-size: 0.3rem;color:#4c94ff;font-weight:600;text-align:center;}
+        .textbottom{color: #808080;font-size: 0.2rem;line-height: 0.4rem;padding-left: 0.2rem;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+        <!-- 加载开始 -->
+        <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+            <div id="loader"></div>
+            <div class="loader-section"></div>
+        </div>
+        <!-- 加载结束 -->
+        <!-- 分享主体框开始 -->
+        <div id="box" style="width:7.5rem;height:100%;background-color:rgba(0,0,0,0.3);position:absolute;z-index:2" v-show="show" >
+            <div style="position: absolute;top:50%;left: 50%;transform: translate(-50%,-50%);background-color: #fff;width: 4rem;height:auto;border-radius: 0.3rem;">
+                <a href="###" @click="show=false"><span style="position: absolute;font-size:0.3rem;right: 0.25rem;color: #000;">×</span></a>
+                <p class="text">业主可透明浏览工地</p>
+                <p class="text">并可转介绍客户</p>
+                <p class="text">扫描以下二维码即可分享</p>
+                <div id="qrCodeDiv" style="width: 150px;height:150px;margin:0 auto;">
+                </div>
+                <div style="width:3.2rem;height:0.7rem;padding-left: 0.8rem;">
+                    <img src="image/下载.png" style="width:50px; height:42px;float: left;">
+                    <a href="javascripet:void(0)" @click="download" style="font-size: 0.28rem;color: #3164af;font-weight: 600;line-height:0.7rem;">下载二维码</a>
+                </div>
+                <p class="textbottom">1、二维码可用于线上/线下宣传；</p>
+                <p class="textbottom">2、业主可通过扫码体验本公司的装修服务。</p>
+            </div> 
+        </div>
+        <!-- 分享主体框结束 -->
+        <div style="margin: auto;height: 100%;">
+            <a href="javascript:void(0)" v-show="brandshow"  @click="brand" style="position:absolute;bottom: 1rem;right:0.3rem;background-color:#f76859;width:1.2rem;height:1.15rem;border-radius: 50%;z-index:2;overflow: hidden;">
+               <img :src="brandimg" style="display: block;margin: 0 auto;width:1.2rem;height: 1.2rem;">
+            </a>
+            <div class="header" style="height: auto;">
+                <div class="header-tit"  style="width: 7.5rem;height: 0.88rem"  v-cloak>
+                    <a  class="header-tit-l" @click="search" style="display: none;" v-if="feeshow==true"></a>
+                    <a href="mybacklog.html" class="blue header-tit-r" style="display: none;" v-else-if="vipshow==true">我的待办</a>
+                    <a  class="header-tit-l" @click="search"  v-else></a>
+                    <div  @click="check" style="font-size: 0.3rem">
+                        {{name}}
+                        <img v-if="img" src="./image/head02.png" style="width: 0.25rem;height: 0.2rem;" >
+                        <img v-else src="./image/head03.png" style="width: 0.25rem;height: 0.2rem;">
+                    </div>
+                    <div class="header-mu" v-show="titpar" v-cloak>  <!-- 公司选择下拉显示框部分-->
+                        <div style="text-align: left;" v-for="(value,index) in titularr" @click="li(index,value.name)">
+                                <span>{{value.name}}</span>
+                                <i v-show="value.on"></i>
+                        </div>
+                    </div>
+                    <a href="mybacklog.html" class="blue header-tit-r" style="display: none;" v-if="feeshow==true">我的待办</a>
+                    <a href="mybacklog.html" class="blue header-tit-r" style="display: none;" v-else-if="vipshow==true">我的待办</a>
+                    <a href="mybacklog.html" class="blue header-tit-r" v-else-if="several2>0">我的待办<span style="z-index: 3;color: red;">&nbsp•</span></a>
+                    <a href="mybacklog.html" class="blue header-tit-r" v-else>我的待办</a>
+                </div>
+                <!-- 三级选择 -->
+                <div class="header-ul" v-cloak v-show="selectshow" style="position: absolute;top: 0.88rem;width: 7.5rem;height: 0.88rem;background-color: #fff;">
+                    <div v-for="(value,index) in titul" :class="{on:value.on}" @click="titjump(index)"><span>{{value.name}}</span></div>
+                </div>
+                <div class="header-mu" v-show="titmuon" style="width: auto;height: 14rem;width:7.5rem;overflow-y: auto;top:1.75rem;" v-cloak>
+                    <div v-for="(value,index) in titmu" @click="lijump(value.name,index)" style="position: relative;">
+                        <span>{{value.name}}</span>
+                        <span style="position: absolute;right: 3rem;width: 1.5rem;text-align: center;">{{value.roleName}}</span>
+                        <i v-show="value.state"></i>
+                    </div>
+                    <div v-show="timepickbox">
+                        <input type="" name="" id="test1" class="test" v-model="star" placeholder="请选择开始时间"> 
+                        <span style="display:block;">——</span>
+                        <input type="" name="" id="test2" class="test" v-model="end" placeholder="请选择结束时间">
+                    </div>
+                </div>
+            </div>
+            <!-- 头部结束 -->
+            <div class="mainBox" v-cloak style="width:7.8rem;top:1.76rem;position:absolute;" v-show="box1">
+                <div v-for="(value,index) in maindata">
+                    <div style="height: 0.8rem;padding-left: 0.3rem;padding-top: 0.12rem;padding-bottom: 0.05rem;line-height: 0.8rem;background-color: #E9EEFF;" >
+                        <a href="###"><img src="assets/项目列表-已经签到@2x.png" style="display: block;width:0.4rem;height: 0.4rem;position: absolute;right:1.85rem;margin-top: 0.1rem" v-show="value.isSigned"></a>
+                        <a href="###"><img src="assets/收藏2@2x.png"style="display: block;width:0.4rem;height: 0.4rem;position: absolute;right:1.1rem;margin-top: 0.1rem" v-if="value.isCollect"></a>
+                        <a href="###" @click="share(value.id,value.name)"><img src="image/微信(黑).png"style="display: block;width:0.4rem;height: 0.4rem;position: absolute;right: 0.35rem;margin-top: 0.1rem"></a>
+                        <div class="prompt" style="font-size:0.3rem;" @click="jump(value.id,index)">
+                            <a href="###"><h3 style="float: left;margin-right: 0.1rem;font-weight: 549;color: #000">{{value.name}}</h3></a>
+                            <a href="###"><img src="assets/提示小图标@2x.png"style="width:0.35rem;height: 0.35rem;padding-top: 0.18rem" v-if="value.isDelay"></a>
+                        </div>
+                    </div>
+                    <div class="mainUnit-box" style="height:1.3rem;padding-top: 0.2rem;padding-left: 0.2rem;margin: 0;background-color: #fff;padding-bottom: 0.12rem" @click="jump(value.id,index)">
+                        <div class="mainUnit-box-L">
+                            <div class="mainUnit-box-L01">
+                                <h4 v-if="value.isUpdateThree==true" style="color: red">{{value.overavg}}%&nbsp•</h4>
+                                <h4 v-else>{{value.overavg}}%</h4>
+                                <span></span>
+                            </div>
+                            <div class="mainUnit-box-L02">
+                                项目进度
+                            </div>
+                        </div>
+                        <div class="mainUnit-box-R">
+                            <div class="mainUnit-box-R01">
+                                <span>已收款 ￥{{value.alreadypayMoney}}</span>
+                                <span>待收款 ￥{{value.tardyMoney}}</span>
+                            </div>
+                            <div class="mainUnit-box-R02">
+                                <span>{{value.createTime}}</span>
+                                <span>{{value.userName}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div> 
+            <div v-show="box2" style="width: 100%;height:14rem;background-color:#f6f8ff"></div>
+            <!--底部-->
+            <div class="appFot" v-show="bottomshow">
+                <a href="project.html"><img src="image/fot1-2.jpg" alt=""><span>项目</span></a>
+                <a href="news.html"><img src="image/fot2-1.jpg" alt=""><span>消息</span></a>
+                <a href="new.html"><img src="image/fot3-2.jpg" alt="" style="width: 0.64rem;height: 0.64rem;margin-top: 0.2rem;"></a>
+                <a href="member.html"><img src="image/fot4-1.jpg" alt=""><span>成员</span></a>
+                <a href="personal.html"><img src="image/fot5-1.jpg" alt=""><span>我的</span></a>
+            </div>
+        </div>
+        <div style="margin: auto;" v-show="feeshow">
+            <div style="width: 100%;height:14.8rem;background-color:rgb(246, 248, 255);" ><!-- 此处删除了position：abslote -->
+                <img style="display:block;top: 3rem;left:2.38rem;position: absolute;width: 2.7rem;height: 2rem;" src="image/服务到期@2x.png">
+                <div style="position:absolute;top:6rem;left:0.75rem;width:6rem;height:auto;margin: 0,auto;">
+                    <p style="font-size: 0.4rem;line-height: 0.8rem;color: #2C2D2E;text-align: center;">您的服务已到期!</p>
+                    <p style="font-size: 0.25rem;line-height: 0.4rem;color: #2C2D2E;">{{txt}}</p>
+                </div>
+                    <div style="position: absolute;top: 8rem;left: 0.75rem;">
+                        <p style="color: #808083;width:6rem;font-size: 0.28rem;display:block;margin-bottom: 0.5rem">请联系装内助延长服务期，也可以点击下方按钮申请续费。</p>
+                        <button style="width: 100%;height:0.88rem;background-color:#5677FC;color: #fff;font-size: 0.3rem;border:none;border-radius: 0.1rem;" @click="fee">申请续费</button>
+                    </div>
+                    <div style="position: absolute;top: 11.5rem;width: 3rem;height:0.8rem;left: 2.25rem;">
+                        <div style="float: left;">
+                            <img style="display: block;width: 0.8rem;height: 0.8rem;" src="image/热线电话@2x.png">
+                        </div>
+                        <div style="float: right;">
+                            <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">装内助客服热线</p>
+                            <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">400-181-0060</p>
+                        </div>
+                    </div>
+            </div> 
+        </div> 
+        <div style="margin: auto;" v-show="vipshow">
+            <div style="width: 100%;height:14.8rem;background-color:rgb(246, 248, 255);">
+                <img style="display:block;top: 3rem;left:2.38rem;position: absolute;width: 2.7rem;height: 2rem;" src="image/申请成功@2x.png">
+                <div style="position:absolute;top:6rem;left:2.25rem;width:3rem;height:auto;margin: 0,auto;">
+                    <p style="font-size: 0.4rem;line-height: 0.8rem;color: #2C2D2E;text-align: center;">您已申请成功!</p>
+                </div>
+                <div style="position: absolute;top: 7.5rem;left: 0.5rem;" ><!-- -->
+                    <p style="color: #808083;width:6.5rem;font-size: 0.28rem;display:block;margin-bottom: 0.5rem;text-align: center;">工作人员将审核您的公司信息，并与您取得联系！</p>
+                    <button style="width: 100%;height:0.88rem;background-color:#5677FC;color: #fff;font-size: 0.3rem;border:none;border-radius: 0.1rem;" @click="vip">申请VIP</button>
+                </div>
+                <div style="position: absolute;top:11.5rem;width: 3rem;height:0.8rem;left: 2.25rem;">
+                    <div style="float: left;">
+                        <img style="display: block;width: 0.8rem;height: 0.8rem;" src="image/热线电话@2x.png">
+                    </div>
+                    <div style="float: right;">
+                        <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">装内助客服热线</p>
+                        <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">400-181-0060</p>
+                    </div>
+                </div>
+            </div> 
+        </div> 
+</div>
+</body>
+<script type="text/javascript" src="js/JR.js"></script>
+<script src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/myqrcode.js"></script>
+<script type="text/javascript" src="js/myutf.js"></script>
+<script src="js/vue.js"></script>
+<script src="laydate/laydate.js"></script>
+<script>
+  var userId=localStorage.getItem('key');
+  var org=localStorage.getItem('orgkey');
+  var ver=localStorage.getItem('version');
+  var pro=localStorage.getItem('pro');
+    $(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                star:'',
+                end:'',
+                loding:true,
+                collection:false,//收藏
+                show:false,//分享主体框显示判断
+                maindata:'',//初始化数据；
+                admain:'',//用于区别是否是管理员；
+                titularr:'',//存储头部公司数据
+                name:'',//公司名称
+                index:'',//公司头li的每个索引
+                img:true,//公司头部箭头
+                titpar:false,//判断头部公司li显示与否的条件
+                projectName:'',//公司名称
+                select:'',//三个ul的索引
+                order:'',
+                usid:'',
+                bol:'',
+                issign:'',
+                box1:true,
+                box2:false,
+                vipshow:false,
+                feeshow:false,
+                selectshow:true,
+                bottomshow:true,
+                several2:'',//延期事项的数量
+                txt:'',
+                titul:[
+                    {
+                        name:'按时间降序',
+                        key:[
+                            {
+                                name:'按时间降序',
+                                state:true,
+                                work:''
+                            },
+                            {
+                                name:'按完成度降序',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'按时间升序',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'按完成度升序',
+                                state:false,
+                                work:''
+                            }
+                        ],
+                        on:false
+                    },
+                    {
+                        name:'查看全部',
+                        key:[ {
+                                name:'查看全部',
+                                state:false,
+                                work:''
+                            },],
+                        on:false
+                    },
+                    {
+                        name:'按条件筛选',
+                        key:[
+                            {
+                                name:'进行中项目',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'全部项目',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'已签约',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'未签约',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'已完工',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'已延期',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'已收藏',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'选择时间段',
+                                state:false,
+                                work:''
+                            },
+
+                        ],
+                        on:false
+                    }
+                ],
+                titjump:'',
+                titmu:[
+                    {
+                        name:'',
+                        state:false,
+                        work:''
+                    }
+                ],
+                titmuon:false,
+                lijump:'',
+                muBox:'',
+                logoimg:'',//公司logo
+                timepickbox:false,//时间选择容器
+                dataURL:'',//二维码下载
+                shareproname:'',//工地名称-云分享
+                brandshow:false,
+                brandimg:"./assets/漂浮-内容提示@2x.png",
+                isSigned:false,//签到状态,
+                brandurl:''
+            },
+            created:function(){
+               let that=this;
+               $.ajax({    //获取项目列表
+                        "url":"http://app.zhuangneizhu.com/project/showProject.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          pageNum:"1",
+                          pageSize:"1000",
+                          order:"0",// 0 按时间由高到低 2 按时间由低到高  1 按完成度由高到低； 3 按完成度由低到高
+                          version:ver,
+                          isSpecial:false, //标识是否是特殊情况（比如是成员列表）
+                          isSign:2, //3 0 未签约;1 已签约；2全部
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.loding=false;
+                            console.log(data);
+                            that.usid=userId;
+                            that.order="0";
+                            that.bol=false;
+                            that.issign=2;
+                            if(data.code!=10000){
+                              that.box2=true;
+                              that.box1=false
+                            }else{
+                                that.maindata=data.data.items;//存储初始化时的所有数据
+                            };
+                            if(data.code==11280){
+                                that.feeshow=true;
+                                that.selectshow=false;
+                                that.bottomshow=false;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+               $.ajax({    //获取公司列表
+                        "url":"http://app.zhuangneizhu.com/user/gainOrganizationList.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.titularr=data.data;
+                            for (var i = that.titularr.length - 1; i >= 0; i--) {
+                                if(that.titularr[i].isDefault){
+                                    that.name=that.titularr[i].name;
+                                    var isAudit=that.titularr[i].isAudit;
+                                    if(isAudit){
+                                        that.vipshow=false;
+                                    }else{
+                                        that.vipshow=true;
+                                        that.selectshow=false;
+                                        that.bottomshow=false;
+                                    }
+                                    that.index=i;
+                                }
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+               $.ajax({    //判断用户是否管理员
+                        "url":"http://app.zhuangneizhu.com/user/gainIsOrNotAdmin.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.admain=data.data.isAdmin;
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+               $.ajax({    //获取项目首页下来用户列表
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainIndexUser.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data); 
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+               $.ajax({    //获取项目首页下来用户列表
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainIndexUser.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.people=data.data.list;
+                            if (that.people.length==0) {
+                                that.titul.splice(1,1);
+                            }
+                            for (var i = 0; i < data.data.list.length; i++) {
+                                that.titul[1].key.push(data.data.list[i]); 
+                            } 
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+               $.ajax({    //获取VIP信息
+                            "url":"http://app.zhuangneizhu.com/set/gainVipInfo.do",
+                            "type":"post",
+                            data:{
+                              organizationId:org,
+                              version:ver,
+                              userId:userId,  
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                that.txt=data.data.vipInfo;
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                    });
+               $.ajax({  //获取延期项目数量
+                        "url":"http://app.zhuangneizhu.com/project/countProjectDelay.do",
+                        "type":"post",
+                        data:{
+                              version:ver, 
+                              userId:userId, 
+                              organizationId:org, 
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.several2=data.data;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+               $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            if(data.data.companyLogo==""){
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/photo/DATE2019-02-25DATE/edb3b6eb-2fa8-43ad-8e93-9bcc6a5deabd.png";
+                            }else {
+                                that.logoimg="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+data.data.companyLogo;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });     
+               $.ajax({    //获取滚动广告
+                        "url":"http://app.zhuangneizhu.com/third/gainAdvise.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            if(data.data.title!=""){
+                                that.brandshow=true;
+                                that.brandimg=data.data.photo;
+                                that.brandurl=data.data.url;
+                            }
+                        },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+            },
+            mounted(){
+                var that = this;
+                lay('.test').each(function(){
+                    laydate.render({
+                        elem: this,
+                        trigger: 'click',
+                        done: function(value) {
+                            var id = $(this.elem).attr("id");
+                            if (id == "test1"){
+                                that.star=value.slice(0,10)
+                            }else{
+                                that.end=value.slice(0,10)
+                            }
+                        }
+                    });
+                });
+                that.titjump = function(index){
+                    console.log(index);//三个选项头部索引
+                    //判断时间容器的显示与隐藏开始
+                    if(index==2){
+                        that.timepickbox=true;
+                    }else{
+                        that.timepickbox=false;
+                    }
+                    //判断时间容器的显示与隐藏结束
+                    that.select=index;
+                    let k=that._data.titul
+                    that._data.titmuon=true
+                    if(k[index].on==true){
+                        k[index].on=!k[index].on
+                        that._data.titmuon=false
+                        return
+                    }
+                    that._data.titmu=k[index].key
+                      k.forEach(function(item){
+                           item.on=false
+                     })
+                    that._data.titmuon=true
+                    k[index].on=!k[index].on
+                },
+                that.lijump=function(name,index){
+                    console.log(index,name);//三个选项li的内部索引
+                    let k = that._data.titul
+                    k.forEach(function(item){
+                        let a=item.key
+                        a.forEach(function(item){
+                            item.state=false
+                        })
+                    });
+
+                    if (that.select==0) {
+                        that.order=index;
+                        that.titul[0].name=name;
+                    }else if (that.select==1) {
+                        that.titul[1].name=name;
+                        if (name=="查看全部") {
+                            that.usid=userId;
+                            that.bol=false;
+                            console.log(that.usid);
+                        }else if (name!="查看全部") {
+                            that.usid=that.people[index-1].userId;
+                            console.log(that.usid)
+                        }else{
+                             that.bol=true;
+                        }
+                    }else if (that.select==2) { 
+                        if(index==0){
+                            that.issign=3;
+                        }else if(index==1){
+                            that.issign=2;
+                        }else if(index==2){
+                            that.issign=1;
+                        }else if(index==3){
+                            that.issign=0;
+                        }else{
+                            that.issign=index;
+                        }
+                        that.titul[2].name=name;
+                    }
+                    // if(index==7){
+                    //     if(that.end==''||that.star==''){
+                    //         alert("请选择时间")
+                    //     }else{
+                    //         $.ajax({    //获取项目列表
+                    //             "url":"http://app.zhuangneizhu.com/project/showProject.do",
+                    //             "type":"post",
+                    //             data:{
+                    //               userId:that.usid,
+                    //               organizationId:org,
+                    //               pageNum:"1",
+                    //               pageSize:"1000",
+                    //               projectName:that.projectName,
+                    //               order:that.order,// 0 按时间由高到低 2 按时间由低到高  1 按完成度由高到低； 3 按完成度由低到高
+                    //               version:ver,
+                    //               isSpecial:that.bol, //标识是否是特殊情况（比如是成员列表）
+                    //               isSign:that.issign, // 0 未签约;1 已签约；2全部
+                    //               startTime:that.star,//开始时间
+                    //               endTime:that.end//结束时间
+                    //             },
+                    //             "dataType":"json",
+                    //             "success":function(data){
+                    //                 console.log(data);
+                    //                 if (data.message=="暂无数据") {
+                    //                     that.maindata="";
+                    //                 }
+                    //                that.maindata=data.data.items;
+                    //              },
+                    //             "error":function(){
+                    //              console.log("输入有误");
+                    //             }
+                    //         });
+                    //         that.star='';
+                    //         that.end='';
+                    //         that._data.titmu[index].state=true;
+                    //         //下面两个操作让header-ul里面的div还原,下拉框隐藏和幕隐藏
+                    //         k.forEach(function(item){
+                    //             item.on=false;
+                    //         });
+                    //         that._data.titmuon=false;
+                    //     }
+                    // }else{
+                        $.ajax({    //获取项目列表
+                            "url":"http://app.zhuangneizhu.com/project/showProject.do",
+                            "type":"post",
+                            data:{
+                              userId:that.usid,
+                              organizationId:org,
+                              pageNum:"1",
+                              pageSize:"1000",
+                              // projectName:that.projectName,
+                              order:that.order,// 0 按时间由高到低 2 按时间由低到高  1 按完成度由高到低； 3 按完成度由低到高
+                              version:ver,
+                              isSpecial:that.bol, //标识是否是特殊情况（比如是成员列表）
+                              isSign:that.issign, // 0 未签约;1 已签约；2全部
+                              // startTime:that.star,//开始时间
+                              // endTime:that.end//结束时间
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                if (data.message=="暂无数据") {
+                                    that.maindata="";
+                                }
+                               that.maindata=data.data.items;
+                             },
+                            "error":function(){
+                             console.log("输入有误");
+                            }
+                        });
+                        that._data.titmu[index].state=true
+                        //下面两个操作让header-ul里面的div还原,下拉框隐藏和幕隐藏
+                        k.forEach(function(item){
+                            item.on=false
+                        })
+                        that._data.titmuon=false;
+                    // }
+                },
+                that.muBox=function(){
+                    let k=that._data.titul
+                    //下面两个操作让header-ul里面的div还原,下拉框隐藏和幕隐藏
+                    k.forEach(function(item){
+                        item.on=false
+                    })
+                    that._data.titmuon=false;
+                }
+            },
+            methods:{
+                jump:function(id,index){
+                    let that=this;
+                    localStorage.setItem("pro",id);
+                    window.location.href="detailed-two.html";
+                    that.pro=id;
+                },
+                check:function(){  //点击头部触发的事件
+                    let that=this;
+                    that.img=!that.img;
+                    that.titpar=!that.titpar;
+                },
+                li:function(index,name){  //点击头部li触发的事件
+                    let that=this;
+                    that.projectName=name;
+                    let orgid=that.titularr[index].organizationId;
+                    localStorage.setItem('orgkey',orgid);
+                    that.org=localStorage.getItem('orgkey');
+                    let k=that.titularr;
+                    k.forEach(function(item){
+                        console.log(item);   //item出来的就是li,给li添加了一个on属性
+                           item.on=false;
+                     })
+                    that.name=that.titularr[index].name;
+                    that.img=!that.img;
+                    that.titpar=!that.titpar;
+                    that.titularr[index].on=true;
+                    window.location.href="project.html";
+                },
+                share:function(id,proname){
+                    var that=this;
+                    that.shareproname=proname;
+                    var pro=id;
+                    $("#qrCodeDiv").empty()
+                    $("#qrCodeDiv").qrcode({
+                        render: "canvas", // 渲染方式有table方式（IE兼容）和canvas方式
+                        width:150, //宽度
+                        height:150, //高度
+                        text:"http://web.zhuangneizhu.com/SHARE.html?projectid="+pro+"&uid="+userId+"&orgid="+org,
+                        typeNumber: -1,//计算模式
+                        correctLevel: 2,//二维码纠错级别
+                        background: "#ffffff",//背景颜色
+                        foreground: "#000000", //二维码颜色
+                        src:that.logoimg,
+                      })
+                        that.show=true;
+                    var canvas = document.getElementsByTagName('canvas')[0];
+                    that.dataURL=canvas.toDataURL("image/png");
+                    console.log(that.dataURL); 
+                },
+                download:function(){
+                    var that=this;
+                    var alink=document.createElement("a");
+                    alink.href=that.dataURL
+                    alink.download=that.shareproname+"-云工地二维码.png";
+                    alink.click();
+                },
+                search:function(){
+                    window.location.href="search.html?key="+0;
+                },
+                fee:function(){
+                    window.location.href="projectVIP.html?index="+1;
+                },
+                vip:function(){
+                    window.location.href="projectVIP.html?index="+1;
+                },
+                brand:function(){
+                    var that=this;
+                    window.open(that.brandurl);
+                }
+            }
+        })
+    })
+</script>
+</html>

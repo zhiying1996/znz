@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>装内助透明浏览模式</title>
+    <link rel="shortcut icon" href="#" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="./css-share/common.css">
+    <link rel="stylesheet" href="./css-share/swiper.min.css">
+    <script src="./js-share/rem.js"></script>
+</head>
+
+<body>
+    <div class="detail">
+        <div class="header">
+            <div class="left"><img src="./img/return1.png" alt=""></div>
+            <div class="title"></div>
+            <div class="right"></div>
+        </div>
+        <div class="pic-list">
+            <h3 class="sec1">
+                <img src="./img/step.png" alt="">
+                <p class="s1"></p>
+                <span class="s2"></span>
+                <div class="s3"></div>
+            </h3>
+            <h3 class="sec2">
+                <img src="./img/over1.png" alt="">
+                <p>计划完成时间</p>
+                <span class="s2"></span>
+            </h3>
+            <h3 class="sec3">
+                <img src="./img/clock.png" alt="">
+                <p>到时未完成提醒人</p>
+                <span class="s2"></span>
+            </h3>
+            <h3>
+                <img src="./img/my-pic.png" alt="">
+                <p>已上传照片</p>
+            </h3>
+            <div class="myphoto"></div>
+            <h3 class="standard ">
+                <div><img src="./img/stand.png" alt=""></div>
+                <p>进度标准</p>
+            </h3>
+            <div class="standard-content standard">
+
+            </div>
+        </div>
+    </div>
+    <div class="mask">
+        <div class="back">返回</div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script src="./js-share/jquery v3.1.1.js"></script>
+<script src="./js-share/swiper.min.js"></script>
+<script>
+    $(function () {
+        $('.header .left').on('click', function () {
+            window.history.go(-1);
+        })
+        //获取url中的参数
+        var url = window.location.href;
+        var obj = {};
+        if (url.indexOf('?') != -1) {
+            var str = url.substring(url.indexOf('?') + 1);
+            var arr = str.split('&');
+            for (var i = 0; i < arr.length; i++) {
+                obj[arr[i].split('=')[0]] = decodeURI(arr[i].split('=')[1]);
+            }
+        }
+        var userId = obj.userId;
+        var organizationId = obj.organizationId;
+        var projectId = obj.projectId;
+        var projectName=obj.projectName
+        var index = obj.index;
+
+        if (sessionStorage.getItem('projectSchedule')) {
+            
+            var item = JSON.parse(sessionStorage.getItem('projectSchedule')).vos[Number(index)]
+            bb(item)
+        } else {
+            $.ajax({
+                url: "http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                type: "get",
+                data: {
+                    version: "3.8",
+                    userId: userId,
+                    projectId: projectId,
+                    organizationId: organizationId,
+                },
+                success: res => {
+                    item = JSON.parse(res).data.vos[Number(index)]
+                    console.log(item)
+                    bb(item)
+                },
+            })
+
+        }
+
+        function bb(item) {
+            $('.title').html(item.organizationScheduleName)
+            $('.sec1 .s1').html(item.organizationScheduleName)
+            $('title').html(projectName+'-'+item.organizationScheduleName)
+            item.overTime ? $('.sec1 .s2').html(item.overTime) : $('.sec1 .s2').html('')
+            var img1 = '<img src="./img/over.png">';
+            var img2 = '<img src="./img/noover.png">';
+            item.state ? $('.sec1 .s3').append(img1) : $('.sec1 .s3').append(img2);
+            item.scheduleTime ? $('.sec2 .s2').html(item.scheduleTime) : $('.sec2 .s2').html('未设置')
+            item.notifyUsers ? $('.sec3 .s2').html(item.notifyUsers) : $('.sec3 .s2').html("未设置")
+            item.scheduleText ? $('.standard-content').html(item.scheduleText) : $('.standard-content').html('未设置')
+
+            var photo = item.photo.split(",");
+            console.log(photo)
+            $.each(photo, function (index, item) {
+                if (item != '') {
+                    var reg1 = /2017/;
+                    var reg2 = /2018/;
+                    var reg3 = /2019/;
+                    var reg4 = /2020/;
+                    var reg5 = /2021/;
+                    if (reg1.test(item)) {
+                        var time = item.substr(item.indexOf("2017"), 10);
+                    }
+                    if (reg2.test(item)) {
+                        var time = item.substr(item.indexOf("2018"), 10);
+                    }
+                    if (reg3.test(item)) {
+                        var time = item.substr(item.indexOf("2019"), 10);
+                    }
+                    if (reg4.test(item)) {
+                        var time = item.substr(item.indexOf("2020"), 10);
+                    }
+                    if (reg5.test(item)) {
+                        var time = item.substr(item.indexOf("2021"), 10);
+                    }
+                    var html = `
+                            <div class="img-wrap">
+                                <div class="time">${time}</div>
+                                    <img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}" title="${index}">
+                            </div>
+                        `
+                    $(".myphoto").append(html);
+                }
+            })
+
+            $.ajax({
+                url: "http://app.zhuangneizhu.com/v2/set/gainCustomerScheduleStandardSocket.do",
+                type: "post",
+                data: {
+                    userId: userId,
+                    organizationId: organizationId,
+                    version: "3.0",
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.data == true) {
+                        $('.standard').css('display', 'flex')
+                    } else {
+                        $('.standard').css('display', 'none')
+                    }
+                },
+            })
+            var swiperImg = photo.map(function (item, index) {
+                return `<div class="swiper-slide"><img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}" title="${index}"/></div>`
+            })
+
+
+            $('.myphoto').on('click', '.img-wrap img', function () {
+                var initialSlide = $(this).attr('title')
+                $('.mask').show();
+                $('.swiper-wrapper').append(swiperImg.join(''))
+                new Swiper('.swiper-container', {
+                    initialSlide: initialSlide,
+                    loop: true,
+                })
+            })
+            $('.mask .back').on('click', function () {
+                $('.mask').hide()
+            })
+        }
+
+    })
+
+</script>
+
+</html>

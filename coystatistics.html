@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" href="css/jquery-ui.min.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="head-min">
+        <div class="personnelTit">
+            <div onclick="window.history.back(-1)"></div><!-- @click="back" -->
+            <span>公司总项目</span>
+        </div>
+    </div>
+    <div class="mainBox" style="height:94%;padding:0.15rem 0 0.3rem;top:0.88rem">
+        <div class="staBox">
+            <div class="ste-box" ><!-- id="time" -->
+                <span id="time"></span> <!-- {{datefrom}}-{{dateto}}  -->
+                <span class="blue">选择时间段</span>
+            </div>
+        </div>
+        <div class="sta-h3">项目总数</div>
+        <div class="staBox">
+            <div class="ste-box">
+                <span>总项目</span>
+                <span id="total"></span><!-- {{datas.totalProject}}个 -->
+            </div>
+            <div class="ste-box">
+                <span>新增签约数<i>(以签约时间为准)</i></span>
+                <span id="newsig"></span><!-- {{datas.newSigned}}个 -->
+            </div>
+        </div>
+        <div class="sta-h3">总项目来源渠道(以项目创建时间为准)</div>
+        <div class="staBox" id="channel">
+        </div>
+        <div class="sta-h3">总项目装修类型(以项目创建时间为准)</div>
+        <div class="staBox" id="style">
+        </div>
+        <div class="sta-h3">已签约合同金额(以签约时间为准)</div>
+        <div class="staBox" id="hetong">
+            <div class="ste-box">
+                <span>合同总金额</span>
+                <span id="money"></span><!-- {{datas.totalContractsMoney}}元 -->
+            </div>
+        </div>
+        <div class="sta-h3">已签约合同收款状态(以签约时间为准)</div>
+        <div class="staBox">
+            <div class="ste-box">
+                <span>总应收款</span>
+                <span id="totalRecive"></span><!-- {{statistics.totalRecive}}元 -->
+            </div>
+            <div class="ste-box">
+                <span>已收款</span>
+                <span id="alreadyMoney"></span><!-- {{statistics.alreadyMoney}}元 -->
+            </div>
+            <div class="ste-box">
+                <span>待收款</span>
+                <span id="waitMoney"></span><!-- {{statistics.waitMoney}}元 -->
+            </div>
+        </div>
+        <div class="sta-h3">已支出建材金额</div>
+        <div class="staBox">
+            <div class="ste-box">
+                <span>总计</span>
+                <span id="zong"></span><!-- {{zhi.supplyMaterialsTotal}}元 -->
+            </div>
+        </div>
+        <div class="sta-h3">以支出人工金额</div>
+        <div class="staBox">
+            <div class="ste-box">
+                <span>总计</span>
+                <span id="zero"></span><!-- {{zhi.workTotal}}元 -->
+            </div>
+            <div class="ste-box">
+                <span>水电人工支出</span>
+                <span id="one"></span><!-- {{zhi.waterElectricityTotal}}元 -->
+            </div>
+            <div class="ste-box">
+                <span>泥瓦工人支出</span>
+                <span id="two"></span><!-- {{zhi.mudTotal}}元 -->
+            </div>
+            <div class="ste-box">
+                <span>木作工人支出</span>
+                <span id="three"></span><!-- {{zhi.woodTotal}}元 -->
+            </div>
+            <div class="ste-box">
+                <span>油漆工人支出</span>
+                <span id="four"></span><!-- {{zhi.paintTotal}}元 -->
+            </div>
+            <div class="ste-box">
+                <span>其他支出</span>
+                <span id="five"></span><!-- {{zhi.otherTotal}}元 -->
+            </div>
+        </div>
+    </div>
+    <!--日历选择-->
+    <div class="rili-mu" style="display: none;"></div><!-- v-show="rilishow" -->
+    <div class="rilimain" style="display: none;"><!-- v-show="rilishow" -->
+        <div class="rili-tit">修改时间</div>
+        <div class="riliBox" >
+            <input type="text" id="from"  placeholder="开始时间">
+            <input type="text" id="to"  placeholder="结束时间">
+        </div>
+        <div class="riliBtn">
+            <div class="rili-ok rili-btn" id="riliok">确定</div><!-- @click="_riliok" -->
+            <div class="rili-close rili-btn" id="riliclose">取消</div><!-- @click="_" -->
+        </div>
+    </div>
+    <!--日历结束-->
+</div>
+</body>
+<script src="js/jquery-1.8.3.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var data2=localStorage.getItem('key');
+var userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+var k=window.location.href.split("=")[1];
+var ver=localStorage.getItem('version');
+var a=[0,0];
+$.ajax({  //获取公司统计信息
+    "url":"http://app.zhuangneizhu.com/project/gainOrganizationProjectStatistics.do",
+    "type":"post",
+    data:{
+          userId:userId,
+          organizationId:org,
+          version:ver, 
+    },
+    "dataType":"json",
+    "success":function(data){
+        console.log(data);
+        $("#total").html(data.data.totalProject);
+        $("#newsig").html(data.data.newSigned);
+        var massage=data.data.source;
+        $.each(massage,function(index,item){
+            var html="<div class='ste-box'><span>"+item.name+"</span><span>"+item.value+"</span></div>";
+            $("#channel").append(html);
+        });
+        var massageTwo=data.data.decoration;
+        $.each(massageTwo,function(index,item){
+            var html="<div class='ste-box'><span>"+item.name+"</span><span>"+item.value+"</span></div>";
+            $("#style").append(html);
+        });
+        $("#money").html(data.data.totalContractsMoney+"元");
+        var massagethree=data.data.contracts;
+        $.each(massagethree,function(index,item){
+            var html="<div class='ste-box'><span>"+item.name+"</span><span>"+item.money+"</span></div>";
+            $("#hetong").append(html);
+        });
+        $("#totalRecive").html(data.data.statistics.totalRecive);
+        $("#alreadyMoney").html(data.data.statistics.alreadyMoney);
+        $("#waitMoney").html(data.data.statistics.waitMoney);
+        $("#zong").html(data.data.supplyMaterialsTotal);
+
+        $("#zero").html(data.data.workTotal);
+        $("#one").html(data.data.waterElectricityTotal);
+        $("#two").html(data.data.mudTotal);
+        $("#three").html(data.data.woodTotal);
+        $("#four").html(data.data.paintTotal);
+        $("#five").html(data.data.otherTotal);
+    },
+    "error":function(){
+        console.log("错误");
+    }
+});
+$(".blue").on("click",function(){
+  $(".rilimain,.rili-mu").css("display","block");
+});
+$("#riliclose").on("click",function(){
+  $(".rilimain,.rili-mu").css("display","none");
+});
+$("#riliok").on("click",function(){
+    $.ajax({  //获取公司项目统计
+        "url":"http://app.zhuangneizhu.com/project/gainOrganizationProjectStatistics.do",
+        "type":"post",
+        data:{
+              startTime:a[0],
+              endTime:a[1],
+              userId:userId,
+              organizationId:org,
+              version:ver, 
+        },
+        "dataType":"json",
+        "success":function(data){
+            console.log(data);
+        $("#total").html(data.data.totalProject);
+        $("#newsig").html(data.data.newSigned);
+        $("#channel").empty();
+        var massage=data.data.source;
+        $.each(massage,function(index,item){
+            var html="<div class='ste-box'><span>"+item.name+"</span><span>"+item.value+"</span></div>";
+            $("#channel").append(html);
+        });
+         $("#style").empty();
+        var massageTwo=data.data.decoration;
+        $.each(massageTwo,function(index,item){
+            var html="<div class='ste-box'><span>"+item.name+"</span><span>"+item.value+"</span></div>";
+            $("#style").append(html);
+        });
+        $("#money").html(data.data.totalContractsMoney+"元");
+         $("#hetong").empty();
+        var massagethree=data.data.contracts;
+        $.each(massagethree,function(index,item){
+            var html="<div class='ste-box'><span>"+item.name+"</span><span>"+item.money+"</span></div>";
+            $("#hetong").append(html);
+        });
+        $("#totalRecive").html(data.data.statistics.totalRecive);
+        $("#alreadyMoney").html(data.data.statistics.alreadyMoney);
+        $("#waitMoney").html(data.data.statistics.waitMoney);
+        // $("#zong").html(data.data.supplyMaterialsTotal);
+
+        // $("#zero").html(data.data.workTotal);
+        // $("#one").html(data.data.waterElectricityTotal);
+        // $("#two").html(data.data.mudTotal);
+        // $("#three").html(data.data.woodTotal);
+        // $("#four").html(data.data.paintTotal);
+        // $("#five").html(data.data.otherTotal);
+        $("#time").html(a[0]+"-"+a[1])
+        },
+        "error":function(){
+            console.log("错误");
+        }
+    });
+    $(".rilimain,.rili-mu").css("display","none");
+});
+$( "#from" ).datepicker({
+    dateFormat:'yy/mm/dd',
+    defaultDate: "+1w",
+    changeMonth: true,
+    numberOfMonths: 1,
+    onClose: function(selectedDate) {
+        $( "#to" ).datepicker( "option", "minDate", selectedDate );
+        var key='/';
+        a[0]= selectedDate.replace(new RegExp(key,'g'),'-');
+        console.log(a[0]);
+    }
+});
+$( "#to" ).datepicker({
+    dateFormat: 'yy/mm/dd',
+    defaultDate: "+1w",
+    changeMonth: true,
+    numberOfMonths: 1,
+    onClose: function( selectedDate ) {
+        $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+        var key='/';
+         a[1]=selectedDate.replace(new RegExp(key,'g'),'-');
+        console.log(a[1]);
+    }
+});
+</script>
+</html>

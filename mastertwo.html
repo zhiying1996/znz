@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/swiper-4.2.6.min.css">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <style type="text/css">
+    .base{
+        width:7.5rem;height:1rem;display: flex;flex-wrap: wrap;justify-content:space-around;border-top:1px solid #f6f8ff;
+    }
+    .base span{
+        width:40%;font-size: 0.27rem;
+    }
+    .flexbox{width:7.1rem;background-color:#F6F8FF;display: flex;flex-wrap:wrap;justify-content:flex-start;padding:0.2rem;}
+    /*.flexrow{width: 100%;display: flex;justify-content:space-between;margin-bottom: 0.2rem}
+    .flexrow div{width:2.2rem;height:2rem;background-color:#fff;}
+    .flexColumn img{display: block;width:1rem;width: 1rem;padding-top:0.2rem;margin: 0 auto;}
+    .flexColumn p{text-align: center;padding-top: 0.1rem}
+    .flexColumn span{display: block;text-align: center;}*/
+
+
+
+
+    .flexbox{width:7.1rem;background-color:#F6F8FF;padding:0.2rem;}
+    .flexrow{width: 100%;display: flex;flex-wrap: wrap;}
+    .flexrow div{width:2.2rem;height:2rem;background-color:#fff;float: left;margin-bottom: 0.2rem;margin-right: 0.08rem;margin-left: 0.08rem;}
+    .flexColumn img{display: block;width:1rem;width: 1rem;padding-top:0.2rem;margin: 0 auto;}
+    .flexColumn p{text-align: center;padding-top: 0.1rem}
+    .flexColumn span{display: block;text-align: center;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo" style="overflow: hidden" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="header">
+       <div class="personnelTit">
+            <div @click="back"></div>
+            <span>项目详情</span>
+        </div>
+        <div class="news-ul" id="contrast">
+            <div class="blue" id="btn1"><img src="image/进度.png" style="width: 0.5rem;height: 0.5rem;display: block;float: left;padding-left:0.8rem;margin-top: 0.15rem;"><span>项目进度&nbsp{{ove}}%</span></div>
+            <div id="btn2"><img src="image/详情.png" style="width: 0.5rem;height: 0.5rem;display: block;float: left;padding-left: 0.5rem;margin-top: 0.15rem;"><span>项目信息</span></div>
+        </div>
+    </div>
+    <div class="newsBox" style="bottom:0;width: 7.8rem">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" style="overflow-x: hidden;overflow-y:auto;">
+                    <div class="sched-tit">
+                        <span>照片</span>
+                        <span>类目</span>
+                        <span>状态</span>
+                        <span>操作人</span>
+                        <span>计划完成时间</span>
+                    </div>
+                    <div class="sched-box" >
+                        <h3 v-for="(value,index) in data"  @click="_link(index)" style="font-weight:500">
+                            <div v-if="value.isBold==false" style="font-weight:550;width: 100%;display: flex;justify-content: space-between;">
+                                <img style="width:0.6rem;height: 0.6rem;" :src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+img[index]">
+                                <span v-if="value.isDelay" style="color:red;">{{value.organizationScheduleName}}</span>
+                                <span v-else-if="value.isNew" style="color:blue;">{{value.organizationScheduleName}}</span>
+                                <span v-else >{{value.organizationScheduleName}}</span>
+                                <img style="width:0.35rem;height: 0.35rem;" v-if="value.state&&value.isNew" src="image/已完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else-if="value.state" src="image/已完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else-if="((value.state==false)&&value.isDelay)" src="image/未完成@2x.png">
+                                <img style="width:0.35rem;height: 0.35rem;" v-else src="image/未完成@2x.png">
+                                <span v-if="value.isDelay" style="color:red;text-align: center;">{{value.userName}}</span>
+                                <span v-else-if="value.isNew" style="color:blue;text-align: center;">{{value.userName}}</span>
+                                <span v-else style="text-align: center;">{{value.userName}}</span>
+                                <span v-if="value.isDelay" style="color:red">{{value.scheduleTime}}</span>
+                                <span v-else-if="value.isNew" style="color:blue">{{value.scheduleTime}}</span>
+                                <span v-else-if="value.scheduleTime!=null">{{value.scheduleTime}}</span>
+                                <span v-else>未设置</span>
+                            </div>
+                        </h3>
+                    </div>
+                    <!-- <a href="###" class="signbox" @click="signclick">
+                            <img :src="signimg" >
+                            <p>{{signtext}}</p>
+                    </a> -->
+                </div>
+<!-- =================================================================================================== -->
+                <div class="swiper-slide"  style="overflow-x: hidden;">
+                    <div class="perBox">
+                        <a class="per-a" @click="conten">
+                            <span class="per-img"><img src="image/detailed/detailed01.png" alt=""></span>
+                            <span class="per-text">基本信息</span>
+                            <span class="per-R"></span> 
+                            <span class="per-textR"></span>
+                        </a>
+                        <div class="base">
+                                <span>装修面积：<a>{{area}}㎡</a></span>
+                                <span v-if="protype!=null">装修类型：<a>{{protype}}</a></span>
+                                <span v-else>装修类型：<a>未选择类型</a></span>
+                                <span v-if="sign!=''">签约时间：<a style="color:green">{{sign}}</a></span>
+                                <span v-else>签约时间：<a style="color:red">未签约</a></span>
+                                <span v-if='over==""'>完工状态：<a style="color: red">未完工</a></span>
+                                <span v-else>完工状态：<a style="color:green">已完工</a></span>
+                        </div>
+                    </div>
+                    <div class="flexbox" style="overflow-y:auto;"> 
+                            <div class="flexrow">
+                                <div class="flexColumn" @click="people">
+                                    <img src="assets/项目成员@2x.png">
+                                    <p>项目成员</p>
+                                    <span>({{content.memberNum}})</span>
+                                </div>
+                               <div class="flexColumn" @click="origination">
+                                    <img src="assets/合同@2x.png">
+                                    <p>合同金额和构成</p>
+                                    <span>{{content.contract}}</span>
+                                </div>
+                                <div class="flexColumn" @click="have">
+                                    <img src="assets/收款状态@2x.png">
+                                    <p>收款状态</p>
+                                    <span>{{content.totalAlreadyFundMoney}}/{{content.totalNeedFundMoney}}</span>
+                                </div>
+                                <div class="flexColumn" @click="signselect" v-show="signshow">
+                                        <img src="assets/工地签到@2x.png">
+                                        <p>工地签到</br>（{{signtext}}）</p>
+                                </div>
+                                <div class="flexColumn" @click="zengjian">
+                                    <img src="assets/增减项@2x.png">
+                                    <p>增减项</p>
+                                    <span>{{content.moreOrLess}}</span>
+                                </div>
+                                <div class="flexColumn" @click="photo(5)">
+                                    <img src="assets/现场写真@2x.png">
+                                    <p>现场写真</br>照片留档</p>
+                                </div>
+                                <div class="flexColumn" @click="photo(0)">
+                                    <img src="assets/装修合同@2x.png">
+                                    <p>装修合同</br>照片留档</p>
+                                </div>
+                                <div class="flexColumn" @click="photo(1)">
+                                    <img src="assets/设计图@2x.png">
+                                    <p>设计图</br>照片留档</p>
+                                </div>
+                                <div class="flexColumn" @click="photo(2)">
+                                    <img src="assets/预算清单@2x.png">
+                                    <p>预算清单</br>照片留档</p>
+                                </div>
+                                <div class="flexColumn" @click="photo(3)">
+                                    <img src="assets/材料清单@2x.png">
+                                    <p>材料清单</br>照片留档</p>
+                                </div>
+                                <div class="flexColumn" @click="photo(4)">
+                                    <img src="assets/水电@2x.png">
+                                    <p>水电</br>照片留档</p>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+<!-- ---------------------------------------------------------------------------------------------------- -->
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/swiper-4.2.6.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+let  ver=localStorage.getItem('version');
+let  signorg=localStorage.getItem('signorg');
+let  siguid=localStorage.getItem('siguid');
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                data:'',//模板内容
+                ove:'',//进度百分比
+                area:'',
+                protype:'',
+                sign:'',//签约时间
+                over:'',//完工时间
+                content:'',
+                img:[],
+                signtext:'',
+                // signimg:'',
+                signshow:false
+            },
+            beforeCreate:function(){ 
+                let that=this;  
+                $.ajax({  //获取项目进度列表
+                        "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                        "type":"post",
+                        data:{
+                              projectId:pro,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.loding=false;
+                            console.log(data);
+                            that.data=data.data.vos;
+                            that.ove=data.data.overAvg;
+                            var massage=data.data.vos
+                                $.each(massage, function(index,item){
+                                    if(item.photo.split(',')[0]!=''){
+                                        that.img.push(item.photo.split(',')[0]);
+                                    }else{
+                                        that.img.push("photo/DATE2019-02-13DATE/74a3edab-6fa1-4063-a9a0-e50a8b6b9d2b.png");
+                                    }
+                                });
+                        },
+                        "error":function(){
+                            that.loding=true;
+                            console.log("错误");
+                        }
+                });
+                $.ajax({ //获取项目首页信息数据
+                    "url":"http://app.zhuangneizhu.com/v2/set/gainProjectIndexData.do",
+                    "type":"post",
+                    data:{
+                      organizationId:org,
+                      userId:userId,
+                      version:ver,
+                      projectId:pro,
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        that.content=data.data;
+                    },
+                    "error":function(){
+                       console.log("错误"); 
+                    }
+                });
+                $.ajax({   //初始化项目基本信息页（含业主）
+                            "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                            "type":"post",
+                            data:{
+                            projectId:pro,
+                              organizationId:org,
+                              userId:userId,
+                              version:ver,
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                that.area=data.data.area;
+                                that.protype=data.data.decorationType;
+                                that.sign=data.data.signedTime;
+                                that.over=data.data.completeTime;
+                            }
+                });
+                $.ajax({    //获取签到状态
+                        "url":"http://app.zhuangneizhu.com/sign/gainSignState.do",
+                        "type":"post",
+                        data:{
+                          organizationId:signorg,
+                          userId:siguid,
+                          version:ver,
+                          projectId:pro
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data)
+                            if(data.data.isSigned==0){
+                                that.signtext="未签到"
+                                // that.signimg="assets/漂浮-未签到@2x.png"
+                            }else if(data.data.isSigned==1){
+                                that.signtext="已签到";
+                                // that.signimg="assets/漂浮-已经签到@2x.png" 
+                            }else{
+                                that.signtext="已签退";
+                                // that.signimg="assets/漂浮-已离岗@2x.png" 
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                $.ajax({    //获取是否允许业主查看签到记录的开关
+                        "url":"http://app.zhuangneizhu.com/v3/set/getIsShowSignInSocket.do",
+                        "type":"post",
+                        data:{
+                          organizationId:signorg,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data)
+                            if(data.data==1){
+                                that.signshow=true;
+                            }else{
+                                that.signshow=false;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+
+            },
+            methods:{
+                back:function(){
+                 window.location.href="master.html";
+                },
+                _link:function (myid) {
+                    window.location.href="MASschedulepage.html?myid="+myid;
+                },
+                conten:function(){
+                     window.location.href="masterinformation.html"
+                },
+                people:function(){
+                    window.location.href="masterteamber.html"
+                },
+
+                origination:function(){
+                     window.location.href="MASoriginal.html";
+                },
+                have:function(){
+                     window.location.href="MASreceivables.html";
+                },
+                zengjian:function(){
+                    window.location.href="MASreduce.html";
+                },
+                photo:function(i){
+                    if(i==0){
+                        window.location.href="MASimg.html?photoid="+i;
+                    }else if(i==1){
+                        window.location.href="MASimg.html?photoid="+i;
+                    }else if (i==2) {
+                        window.location.href="MASimg.html?photoid="+i;
+                    }else if(i==3) {
+                        window.location.href="MASimg.html?photoid="+i;
+                    }else if(i==4){
+                       window.location.href="MASimg.html?photoid="+i;
+                    }else if(i==5){
+                        window.location.href="MASimg.html?photoid="+i;
+                    }
+                },
+                signselect:function(){
+                    window.location.href="mastersign.html"
+                }
+            },
+            mounted(){
+                    var that = this;
+                    var mySwiper = new Swiper('.swiper-container', {
+                        on: {
+                            slideChangeTransitionStart: function () {
+                                $("#contrast .blue").removeClass('blue');
+                                $("#contrast div").eq(this.activeIndex).addClass('blue');
+                            }
+                        }
+                    })
+                    $("#contrast div").on('click', function(e) {
+                        e.preventDefault();
+                        $("#contrast .blue").removeClass('blue');
+                        $(this).addClass('blue');
+                        mySwiper.slideTo($(this).index());
+                    })
+                 //    let photo=document.querySelectorAll("#photoid .per-a")
+                 //    for (var i = 0; i <photo.length; i++) {
+                 //    photo[i].index=i;
+                 //    photo[i].onclick=function(){
+                 //        let photoid=this.index;
+                 //    window.location.href="MASimg.html?index="+getInfo+"&photoid="+photoid;
+                 //    }
+                 // }
+            }
+    })
+})
+</script>
+<style>
+    .swiper-slide{
+        -webkit-overflow-scrolling: touch;
+        overflow-y:auto;
+    }
+</style>
+</html>

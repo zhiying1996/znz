@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <style type="text/css">
+      .delayContent{ width: 6rem;height: 4rem;background-color: #fff;position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);border-radius: 0.2rem;}
+      #close{position: absolute;right: 0.3rem;top:0.1rem;display: block;font-size: 0.35rem}
+      .title{text-align: center;font-size: 0.3rem;line-height:0.8rem;}
+      .delayContent div{width: 5rem;height: 2.3rem;margin: 0 auto;}
+      .delayContent div>p{line-height: 0.55rem;font-size: 0.25rem;color: #2C2D2E}
+      #yesNo{position: absolute;bottom: 0;width: 6rem;height: 0.9rem;border-top: 1px solid #F6F8FF}
+      #yesNo:after{content: "";width: 1px;height:0.9rem;background-color: #ccc;position: absolute;left: 50%;}
+      #yesNo span{display: block;float: left;width: 50%;height: 0.9rem;line-height: 0.9rem;text-align: center;font-size: 0.25rem}
+      #yesNo span:nth-child(1){color:blue;}
+      #yesNo span:nth-child(2){color:red;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id='demo' v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+      <div id="loader"></div>
+      <div class="loader-section"></div>
+    </div>
+    <!-- 加载层结束 -->
+    <div class="personnelTit" v-show="outbox">
+        <div @click="back()"></div>
+        <span>{{data.organizationScheduleName}}</span>
+        <img style="width: 0.35rem;height: 0.35rem;display: block;position: absolute;right:0.3rem;top:0.25rem;"src="image/mat03.png" @click="changeNameshow=true,outbox=false">
+    </div>
+
+    <div class="personnelTit" v-show="changeNameshow">
+        <div @click="changeNameshow=false,outbox=true"></div>
+        <span>修改进度名称</span>
+    </div>
+    <div class="main" style="width: 7.5rem;padding-top: 0.15rem;top:0.8rem;z-index:2" v-show="changeNameshow">
+          <input type="text" name="" style="width:7rem;height: 0.8rem;line-height: 0.8rem;font-size: 0.35rem;padding-left: 0.5rem;outline:none" v-model="data.organizationScheduleName">
+          <input class="photodeleat" type="submit" value="确定" @click="changeNameOk" style="top:2.1rem;" >
+    </div>
+
+    <div class="main " style="top: 0.88rem;padding-top: 0.2rem;overflow-x: hidden;overflow-y: auto;">
+                <div class="inforBox">
+                    <div class="eng-box"> 
+                        <span>{{data.organizationScheduleName}}</span>
+                        <a v-if="data.state" @click="link()">{{data.overTime}}</a>
+                        <span v-if="data.state" style="color: blue;"><a @click="link()">已完成</a></span>
+                        <span v-else ><a @click="link()">未完成</a></span>
+                    </div>
+                </div>
+                <div class="inforBox">
+                    <div class="eng-box" id="time01" @click="setPlanTime" >
+                        <input type="text"  class="inforTime" placeholder="计划完成时间" style="font-size: 0.28rem;color: #000;font-weight: 450;width:7.5rem;height: 100%">
+                        <p style="display: block;width: 100px;padding-right: 20px;font-size:18px;">{{plantime}}</p>
+                        <span class="myper-R"></span>
+                    </div>
+                </div>
+                <div class="inforBox"  @click="alertppeople">
+                    <div class="eng-box" v-if="data.notifyUsers!=''">
+                        <p style="font-size: 0.27rem;color: #000;">到时未完成提醒人</p>
+                        <span><a>{{data.notifyUsers}}</a></span> 
+                    </div>
+                    <div class="eng-box" v-else @click="alertppeople">
+                        <p style="font-size: 0.27rem;color: #000;">到时未完成提醒人</p> 
+                        <span><a>选择人员</a></span>
+                    </div>
+                </div>
+                <div class="inforBox">
+                        <div class="eng-box">
+                            <span>上传照片</span>
+                            <a href="###" @click='mainmu=true'>上传</a>
+                        </div>
+                </div>
+              <!-- 进度注意事项开始啊 -->
+              <div style="width:100%;height:auto;position: relative;">
+                    <div  class="myengMain"  style="position: relative">
+                            <div class="eng-img" v-for="(value,index) in sr" v-if="value!=''">
+                               <a :href="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" target="view_window"><img v-bind:src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" ></a>
+                               <p v-html='time'></p>
+                               <span style="width: 20px;height: 20px;background-color: rgba(0,0,0,0.4);display: inline-block;position: absolute;right:0;top: 0" @click="deleat(index)" >
+                                    <a style="color: #fff;font-size: 15px;text-align: center;padding-bottom: 15px;padding-left: 8px;">x</a>
+                                </span>
+                            </div>
+                    </div>
+                    <div class="inforBox" style="width: 7.8rem;height: 2.5rem;margin-top:0.3rem;position:relative;height: auto;">
+                        <div class="eng-box" @click="standard">
+                            <p style="font-size: 0.27rem;color: #000;">该进度注意事项</p>
+                            <span class="myper-R"></span>
+                        </div>
+                        <div style="width: 7.1rem;height:auto;background-color: #fff;padding: 0.2rem;border-bottom: 1px solid #F6F8FF;">
+                            <div style="padding-left: 0.1rem;font-size: 0.25rem;" v-show="showTXT1">进度标准可自定义</div>
+                            <div id="content" style="padding-left: 0.2rem;padding-right: 0.2rem;" v-show="showTXT2"></div>
+                        </div>
+                    </div>
+                    <div style="width: 7.5rem;height:0.88rem;position: absolute;margin-top:0.8rem">
+                            <input class="photodeleat" type="submit" value="确定" @click="compvare" style="position: absolute;" >
+                    </div>
+              </div>
+              <!-- 进度注意事项结束 -->
+          <!--下拉弹窗-->
+              <div class="member-downcai"  v-show="mainmu"  v-cloak>
+                  <form id="from" enctype="multipart/form-data">
+                      <h3>
+                          本地上传
+                          <input type="file"  name="files" multiple="multiple" class="img-file">
+                      </h3>
+                  </form>
+                  <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+              </div>
+          <!--弹窗幕-->
+              <div class="main-mucai" v-show="mainmu" @click="mainmu=false"></div>
+      </div>
+      <div style="width: 7.5rem;height: 100%;background-color:rgba(0,0,0,0.3);position: absolute;" v-show="delayContent">
+              <div class="delayContent">
+                  <a href="###"><span id="close" @click="close">×</span></a>
+                  <p class="title">是否修改后续节点</p>
+                  <div>
+                      <p>您已把该节点设置为<span v-if="keyDay>0" style="font-weight: 800;">延后</span><span v-if="keyDay<0" style="font-weight: 800;">提前</span><span>{{day}}</span>天，是否修改后续节点？</p>
+                      <p>选<span style="color: blue">是</span>，后续节点也将<span v-if="keyDay>0" style="font-weight: 800;">延后</span><span v-if="keyDay<0" style="font-weight: 800;">提前</span>{{day}}</span>天</p>
+                      <p>选<span style="color: red">否</span>，仅修改该节点，后续节点不变动。</p>
+                  </div>
+                  <div id="yesNo">
+                      <span @click="atrue">是</span>
+                      <span @click="afalse">否</span>
+                  </div>
+              </div>
+      </div>
+</div>
+</body>
+<script src="js/datePicker.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var url = window.location.search;
+  var request = new Object();
+if (url.indexOf("?") != -1) {  
+   var str = url.substr(1);
+  var strs = str.split("&"); 
+  for (var i = 0; i < strs.length; i++) {
+       request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+   }
+}
+var index=request["index"];
+var myid=request["myid"];
+console.log(myid);
+var  data2= localStorage.getItem('key');
+var  userId=Number(data2);
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version');
+    $(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                delayContent:false,
+                text:'',//进度标准
+                lu:[],//提交图片路径
+                sr:[],//获取图片路径 
+                time:'',//图片时间
+                showTXT1:false,
+                showTXT2:false,
+                data:'',//模板某个条目的详情
+                id:'',  //存放的projectScheduleId（模板某个详情的id）
+                plantime:'',//计划时间
+                theSelectData:'',//节点修改后的时间
+                day:'',
+                keyDay:'',//判断天数正负的依据
+                outbox:true,
+                changeNameshow:false,
+                show:true,
+                mainmu:false,//下拉框和下拉框幕显示隐藏的判断值
+                image:[],
+                img:{
+                    src:'',
+                    time:''
+                }
+            },
+               beforeCreate:function(){ 
+                    var that=this;
+                        $.ajax({  //获取项目进度列表
+                            "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                            "type":"post",
+                            data:{
+                                  projectId:pro,
+                                  organizationId:org,
+                                  userId:userId,
+                                  version:ver,
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                that.loding=false
+                                console.log(data);
+                                that.data=data.data.vos[myid];
+                                that.id=data.data.vos[myid].projectScheduleId;
+                                that.plantime=data.data.vos[myid].scheduleTime;
+                                  $.ajax({  //获取进度标准
+                                    "url":"http://app.zhuangneizhu.com/v2/set/gainProjectScheduleDetail.do",
+                                    "type":'post',
+                                    data:{
+                                        projectScheduleId:that.id,
+                                        userId:userId,
+                                        projectId:pro,
+                                        organizationId:org,
+                                        version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        console.log(data);
+                                        that.sr=data.data.photo.split(",");
+                                        that.lu=data.data.photo.split(",");
+                                        for (var i = that.sr.length - 1; i >= 0; i--) {
+                                              var a=that.sr[i];
+                                               if(a.substring(0, 1)=="p"){
+                                                    that.time=a.substring(10, 20);
+                                              }else if(a.substring(0, 1)=="i"){
+                                                     that.time=a.substring(6, 16);
+                                              };
+                                        }
+                                        if(data.data.scheduleText==""){
+                                          that.showTXT1=true;
+                                        }else{
+                                          var text=data.data.scheduleText;
+                                          $("#content").html(text);
+                                          that.showTXT2=true;
+                                        }
+                                        
+                                    }
+                                })
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                        });
+                },
+            methods:{ 
+                link:function(){
+                    window.location.href="myHTML/loding.html?index="+index+"&myid="+myid;
+                 },
+                alertppeople:function(){
+                    window.location.href="myHTML/alertpeople.html?index="+index+"&myid="+myid;
+                 },
+                back:function(){
+                    window.location.href="detailed-two.html?index="+index;
+                 },
+                standard:function(){
+                   window.location.href="lodingStandard.html?myid="+myid;
+                 },
+                compvare:function(){
+                    var that=this;
+                    $.ajax({
+                        url:'http://app.zhuangneizhu.com//project/addProjectScheduleOssPhoto.do',
+                        type:'post',
+                        data:{
+                            photo:that.lu.join(","),
+                            id:that.id,
+                            version:ver,
+                            projectId:pro,
+                            userId:userId,
+                            organizationId:org,  
+                        },
+                       dataType:'json',
+                       success:function(data){
+                            console.log(data);
+                            // if (data.code==10000) {
+                            //    alert("上传照片成功。")
+                            // }
+                            window.location.href="detailed-two.html?index="+index;
+                       },
+                       error:function(){
+                        console.log("error");
+
+                       }
+                    })    
+                 },
+                deleat:function(index){
+                       var that=this; 
+                        that.sr.splice(index,1);
+                        console.log(that.sr);
+                        that.lu=that.sr;
+                },
+                setPlanTime:function(){
+                  var that=this;
+                  if(that.plantime!=null){
+                    alert("您将进行改期操作，改期后，后续节点将自动修改。");
+                  } 
+                },
+                close:function(){
+                    this.delayContent=false; 
+                },
+                atrue:function(){
+                  var that=this
+                  $.ajax({  //设置项目进度预计完成时间
+                                "url":"http://app.zhuangneizhu.com/v4/project/setProjectScheduleTimeV3.do",
+                                "type":"post",
+                                data:{
+                                      projectScheduleId:that.id,
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                      scheduleTime:that.theSelectData,
+                                      isCascade:true
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                    that.delayContent=false;
+                                    $.ajax({  //获取项目进度列表
+                                        "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                                        "type":"post",
+                                        data:{
+                                              projectId:pro,
+                                              organizationId:org,
+                                              userId:userId,
+                                              version:ver,
+                                        },
+                                        "dataType":"json",
+                                        "success":function(data){
+                                            that.plantime=data.data.vos[myid].scheduleTime;
+                                        },
+                                        "error":function(){
+                                            console.log("错误");
+                                        }
+                                    });
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                          });
+                },
+                afalse:function(){
+                  var that=this
+                  $.ajax({  //设置项目进度预计完成时间
+                                "url":"http://app.zhuangneizhu.com/v4/project/setProjectScheduleTimeV3.do",
+                                "type":"post",
+                                data:{
+                                      projectScheduleId:that.id,
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                      scheduleTime:that.theSelectData,
+                                      isCascade:false
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                    that.delayContent=false;
+                                    $.ajax({  //获取项目进度列表
+                                            "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+                                            "type":"post",
+                                            data:{
+                                                  projectId:pro,
+                                                  organizationId:org,
+                                                  userId:userId,
+                                                  version:ver,
+                                            },
+                                            "dataType":"json",
+                                            "success":function(data){
+                                                that.plantime=data.data.vos[myid].scheduleTime;
+                                            },
+                                            "error":function(){
+                                                console.log("错误");
+                                            }
+                                    });
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                },
+                changeNameOk:function(){
+                  var that=this;
+                  that.loding=true
+                  $.ajax({
+                    "url":"http://app.zhuangneizhu.com/v4/project/editProjectScheduleName.do",
+                    "type":"post",
+                    data:{
+                          version:ver,
+                          projectId:pro,
+                          organizationId:org,
+                          userId:userId,
+                          scheduleName:this.data.organizationScheduleName,
+                          scheduleId:this.id
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        // that.changeNameshow=false;
+                        if(data.code==10000){
+
+                          that.changeNameshow=false;
+                          that.outbox=true;
+                          that.loding=false
+                        }
+                    },
+                    "error":function(){
+                        console.log("错误");
+                    }
+                  })
+                }
+            },
+            mounted: function() {
+                    var that=this;
+                    var calendar = new datePicker();
+                    calendar.init({
+                        'trigger': '#time01',
+                        'type': 'date',
+                        'minDate':'1900-1-1',
+                        'maxDate':'2100-12-31',
+                        'onSubmit':function(){
+                          if (that.plantime!=null){
+                              that.delayContent=true;
+                              that.theSelectData=calendar.value;
+                              console.log(that.theSelectData);
+                              var endTime=calendar.value.replace(/-/g,'/');
+                              var date1 = new Date(endTime)
+                              var s1=date1.getTime();
+                              var startTime=that.data.scheduleTime.replace(/-/g,'/');
+                              var date2=new Date(startTime);
+                              var s2=date2.getTime();
+                              var total=(s1-s2)/1000;
+                              that.keyDay=parseInt(total/(24*60*60));
+                              var endDay=parseInt(total / (24*60*60));
+                              if(endDay>0){
+                                   that.day=endDay;
+                              }else{
+                                    that.day=Math.abs(endDay);
+                              }
+                             
+                          }else{  
+                            var theSelectData=calendar.value;
+                            that.plantime=theSelectData.replace(/-/g,'.');
+                            console.log(theSelectData);
+                            $.ajax({  //设置项目进度预计完成时间
+                                "url":"http://app.zhuangneizhu.com/project/setProjectScheduleTime.do",
+                                "type":"post",
+                                data:{
+                                      projectScheduleId:that.id,
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                      scheduleTime:theSelectData,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                          }
+                        },
+                        'onClose':function(){
+                        }
+                    });
+                    $("input[type='file']").change(function(){   
+                       var file = this.files[0];
+                       var imgSize = file.size;
+                       var formdata= new FormData($("#from")[0]);
+                       // if(imgSize<1024*1024){
+                        $.ajax({
+                            url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                            data:formdata,
+                            type:'post',
+                            processData: false,   // 告诉jQuery不要去处理发送的数据
+                            contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                            dataType:"json",
+                            success:function(data){
+                              var photo=data.split(",")
+                              var photo=data.split(",")
+                                for(var i = photo.length - 1; i >= 0; i--) {
+                                         that.sr.unshift(photo[i]);
+                                }
+                                that.lu.unshift(data)
+                                for (var i = that.lu.length - 1; i >= 0; i--) {
+                                         var a=that.lu[i];
+                                         if(a.substring(0, 1)=="p"){
+                                              that.time=a.substring(10, 20);
+                                         }else if(a.substring(0, 1)=="i"){
+                                               that.time=a.substring(6, 16);
+                                         }
+                                }
+                            }
+                        })
+                       // }else{
+                       //  alert("您的图片过大，请上传小于1M的图片。");
+                       // } 
+                    });
+            },
+    })
+})
+</script>
+</html>

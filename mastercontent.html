@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if (document.getElementById('app').offsetWidth > 1100) {
+                    rootElement.style.fontSize = '60px'
+                } else {
+                    console.log(document.getElementById('app').offsetWidth)
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'complete')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="css/index.css ">
+</head>
+<body>
+<div class="wap-wrap" id="demo" style="position: relative;">
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div @click="back"></div>
+            <span>项目详细</span>
+        </div>
+    </div>
+
+    <div class="main" style="top: 0.88rem; padding: 0.2rem 0;">
+        <div class="perBox">
+            <a class="per-a" @click="conten"><!-- id="content" -->
+                <span class="per-img"><img src="image/detailed/detailed01.png" alt=""></span>
+                <span class="per-text">基本信息</span>
+                <span class="per-R"></span> 
+                <span class="per-textR">{{content.projectName}}</span>
+            </a>
+        </div>
+        <div class="perBox">
+            <a  @click="loding"  class="per-a"><!-- id="loding" -->
+                <span class="per-img"><img src="image/detailed/detailed02.png" alt=""></span>
+                <span class="per-text">项目进度</span>
+                <span class="per-R"></span>
+                <span class="per-textR"></span>
+            </a>
+            <a  @click="people" class="per-a"><!-- id="people"  -->
+                <span class="per-img"><img src="image/detailed/detailed03.png" alt=""></span>
+                <span class="per-text">项目成员</span>
+                <span class="per-R"></span>
+                <span class="per-textR"></span>
+            </a>
+        </div>
+        <div class="perBox">
+            <a class="per-a" @click="origination"><!-- id="origination" -->
+                <span class="per-img"><img src="image/detailed/detailed04.png" alt=""></span>
+                <span class="per-text">原始合同金额和构成</span>
+                <span class="per-R"></span>
+                <span class="per-textR"></span>
+            </a>
+            <a class="per-a"  @click="have"><!-- id="have" -->
+                <span class="per-img"><img src="image/detailed/detailed05.png" alt=""></span>
+                <span class="per-text">收款状态</span>
+                <span class="per-R"></span>
+                <span class="per-textR"></span>
+            </a>
+            <a class="per-a" @click="zengjian"><!-- id="zengjian" -->
+                <span class="per-img"><img src="image/detailed/detailed06.png" alt=""></span>
+                <span class="per-text">增减项(独立于合同金额)</span>
+                <span class="per-R"></span>
+                <span class="per-textR"></span>
+            </a>
+        </div>
+        <div class="perBox" id="photoid" @click="photoid">
+            <a  class="per-a">
+                <span class="per-img"><img src="image/detailed/detailed13.png" alt=""></span>
+                <span class="per-text">装修合同照片留档</span>
+                <span class="per-R"></span>
+            </a>
+            <a  class="per-a">
+                <span class="per-img"><img src="image/detailed/detailed14.png" alt=""></span>
+                <span class="per-text">设计图照片留档</span>
+                <span class="per-R"></span>
+            </a>
+            <a  class="per-a">
+                <span class="per-img"><img src="image/detailed/detailed15.png" alt=""></span>
+                <span class="per-text">预算清单照片留档</span>
+                <span class="per-R"></span>
+            </a>
+            <a  class="per-a">
+                <span class="per-img"><img src="image/detailed/detailed16.png" alt=""></span>
+                <span class="per-text">项目材料单照片留档</span>
+                <span class="per-R"></span>
+            </a>
+            <a  class="per-a">
+                <span class="per-img"><img src="image/detailed/detailed17.png" alt=""></span>
+                <span class="per-text">水电照片留档</span>
+                <span class="per-R"></span>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+var url = window.location.search;
+                var request = new Object();
+             if (url.indexOf("?") != -1) {  
+                 var str = url.substr(1);
+                var strs = str.split("&"); 
+                for (var i = 0; i < strs.length; i++) {
+                     request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+                 }
+            }
+             let getInfo=request["index"];
+             let k=request["k"];
+             console.log(k);
+             console.log(getInfo);
+
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let org=localStorage.getItem('orgkey');
+$(function(){
+    var app=new Vue({
+        el:"#demo",
+        data:{
+            k:'',
+            content:'',
+            staty:false,
+            id:'',
+        },
+        mounted(){
+                let photo=document.querySelectorAll("#photoid .per-a")
+                 for (var i = 0; i <photo.length; i++) {
+                    photo[i].index=i;
+                    photo[i].onclick=function(){
+                        let photoid=this.index;
+                    window.location.href="MASimg.html?index="+getInfo+"&photoid="+photoid;
+                    }
+                 }
+        },
+        methods:{
+            back:function(){
+                if (k=='1') {
+                    window.history.back();
+                }else if (k=='2') {
+                    window.history.back();
+                }else{
+                 window.location.href="master.html";
+                }
+            },
+            statychenge:function(ev){
+                    let that=this;
+                    that.staty=!that.staty; 
+            },
+            projectdelet:function(){
+                let that=this;
+                if(confirm("确认删除该项目？")){
+                $.ajax({    //删除项目
+                        "url":"http://app.zhuangneizhu.com/project/delProject.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:"2.8",
+                          projectId:that.id,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            window.location.href="project.html";
+                        },
+                        "error":function(){
+                           console.log("错误"); 
+                        }   
+                })
+                }else{
+                return;
+                }
+            },
+
+            conten:function(){
+                 window.location.href="masterinformation.html?index="+getInfo;
+            },
+            loding:function(){
+                 window.location.href="MASschedule.html?index="+getInfo;
+            },
+            people:function(){
+                window.location.href="masterteamber.html?index="+getInfo;
+            },
+            origination:function(){
+                 window.location.href="MASoriginal.html?index="+getInfo;
+            },
+            have:function(){
+                 window.location.href="MASreceivables.html?index="+getInfo;
+            },
+            zengjian:function(){
+                window.location.href="MASreduce.html?index="+getInfo;
+            },
+            Thememo:function(){
+                window.location.href="memorandum.html?index="+getInfo; 
+            },
+            photoid:function(){
+            }
+        },
+    })
+})
+</script>
+</html>

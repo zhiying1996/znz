@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<style type="text/css">
+    .record-main{
+        width: 7.5rem;
+        background-color: #fff;
+        box-sizing: border-box;
+    }
+    .record-li{
+        width: 7.5rem;
+        box-sizing: border-box;
+        height:0.88rem;
+        padding: 0  0.7rem 0 0.3rem;
+        display: flex;
+        background-image: url("../image/perR.png");
+        background-repeat: no-repeat;
+        background-size: 0.14rem 0.24rem;
+        background-position:7rem 0.32rem;
+        border-bottom: 1px solid #F6F8FF;
+    }
+    .record-li div span{
+        font-size: 0.28rem;
+        line-height: 0.88rem;
+        color: #2C2D2E;
+    }
+    .record-li div p{
+        font-size: 0.24rem;
+        width: 2.8rem;
+        color: #2C2D2E;
+        line-height: 0.4rem;
+        overflow:hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+</style>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="personnelTit">
+        <div @click="back"></div>
+        <span>已领建材记录</span>
+        <span @click="explain" class="blue header-tit-r">说明</span>
+    </div>
+    <div class="main" style="top: 0.88rem;bottom: 0.88rem;padding-top: 0.2rem;overflow-y: auto;overflow-x: hidden;">
+        <div v-show="noteshow" style="position: absolute; width:6.5rem; height: 60px;left: 0.5rem; border-radius: 5px; background-color: rgba(0, 0, 0, 0.6); z-index: 1000; color: #fff;font-size:0.24rem;" >
+            <p style="line-height: 25px;padding:6px 6px 3px 13px;" >记录每一笔工长领取的建材金额，一旦超过内控最高限额会有提醒，仅管理员能添加和查看项目各支出记录。</p>
+        </div>
+        <div style="width: 100%;height: 1.7rem;background-color: #fff;"> 
+            <div class="record-box" style="display: flex;justify-content: space-between;border-bottom:1px solid #F6F8FF ">
+               <div style="width: 50%;height: 100%;font-size: 0.28rem;line-height: 0.85rem;color: #5677Fc;text-align:left;border-right:1px solid #F6F8FF">
+                   <span style="display: block;width: 3.45rem;">以支出建材总计{{total}}元</span>
+               </div>
+               <div style="width: 50%;height: 100%;font-size: 0.28rem;line-height: 0.85rem;color: #808083;text-align: right;">
+                   <span style="display: block;width: 3.45rem;">建材支出总限额{{limit}}元</span>
+               </div>
+            </div>
+            <div class="record-box" @click="_set()" style="border-bottom:1px solid #F6F8FF">
+                <span class="record-L">设置建材分类支出限额</span>
+                <span class="myper-R"></span>
+            </div>
+        </div>
+        <div class="recordTit">
+            <span>建材类型/品牌型号</span>
+            <span>供货价/数量</span>
+            <span>单项统计</span>
+        </div>
+        
+        <div class="record-main">
+            <div v-for="(ite,index) in item" style="width: 7.5rem;line-height: 0.85rem;font-size: 0.25rem;background-color: #fff;">
+                <div style="display: flex;position:relative;justify-content: space-between;width:6.9rem;padding: 0 0.3rem;">
+                     <span>{{ite.expenseTypeName}}</span>
+                     <span v-if="Number(ite.expenseTypeTotal)>Number(ite.expenseTypeLimit)" style="color:red;">已超额</span>
+                     <span>支出{{ite.expenseTypeTotal}}|限额{{ite.expenseTypeLimit}}</span>
+                     <span class="myper-R" style="height: 0.3rem;width: 0.3rem;margin-top: 0.3rem;" @click="details(index)"></span>
+                </div>
+                <div class="showfather" style="display: none;width:7.5rem;">
+                    <div  v-for="(val,listindex) in ite.list" style="display: flex;position:relative;justify-content: space-between;width: 100%;height: 0.88rem;width: 6.9rem;padding: 0 0.3rem;background-color: #f6f8ff;border-bottom: 1px solid #fff;" @click="deleat(listindex,index)"><!-- v-show="show" -->
+                         <div style="width: 30%;">
+                            <p style="height: 0.4rem;line-height: 0.4rem;text-align: left;">{{val.materialsName}}</p>
+                            <p style="height: 0.4rem;line-height: 0.4rem;text-align: left;">{{val.brandName}}</p>
+                         </div>
+                         <div style="width: 30%;">
+                             <p style="height: 0.4rem;line-height: 0.4rem;text-align:  center;">{{val.supplyPrice}}</p>
+                            <p style="height: 0.4rem;line-height: 0.4rem;text-align:  center;">{{val.supplyNum}}</p>
+                         </div>
+                         <div style="width: 20%;">
+                             <p style="height: 0.8rem;line-height: 0.8rem;text-align:center;">{{val.totalMoney}}</p>
+                         </div>
+                         <div style="width: 10%;">
+                             <span class="myper-R" style="height: 0.3rem;width: 0.3rem;margin-top: 0.3rem"></span>
+                         </div>
+                    </div>
+                </div>
+             </div >
+        </div>
+
+    </div>
+    <div class="staff-Fot" style="display:flex;justify-content: space-around;">
+        <span @click="_link">记一笔建材支出</span>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let data2= localStorage.getItem('key');
+let userId=Number(data2);
+let org=localStorage.getItem('orgkey');
+let pro=localStorage.getItem('pro');
+let ver=localStorage.getItem('version')
+    $(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                limit:'',
+                total:'',
+                item:[],
+                k:true,
+                noteshow:false,
+                // show:false,
+            },
+            beforeCreate:function(){
+                let that=this;
+                $.ajax({     //初始化新的领用建材记录页面
+                            "url":"http://app.zhuangneizhu.com/v3/project/showSupplyMaterialBrand.do",
+                            "type":"post",
+                            "anyns":true,
+                            data:{ 
+                            projectId:pro,
+                            userId:userId,
+                            organizationId:org,
+                            version:ver,
+                            appType:"znz",
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                            that.loding=false;
+                            console.log(data);
+                            that.item=data.data.elist;
+                            that.limit=data.data.limitTotal;
+                            that.total=data.data.expenseTotal;
+                            },
+                            "error":function(){
+                             console.log("输入有误");
+                            }
+                    });
+            },
+            methods:{
+                details:function(i){
+                    console.log(i);
+                    $(".showfather").eq(i).toggle();
+                },
+                deleat:function(myid,index){
+                    console.log(myid,index);
+                    window.location.href="./myHTML/caideleat.html?listindex="+myid+"&index="+index;
+                },
+                _set:function(){
+                    window.location.href="./myHTML/limit.html";
+                },
+                _link:function () {
+                    window.location.href="addrecord.html";
+                },
+                batch:function(){
+                    window.location.href="addBatch.html"
+                },
+                back:function(){
+                    window.location.href="detailed-two.html";
+                },
+                explain:function(){
+                    let that=this;
+                    that.noteshow=!that.noteshow;
+                }
+            }
+    })
+})
+</script>
+</html> 

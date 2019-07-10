@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if (document.getElementById('app').offsetWidth > 1100) {
+                    rootElement.style.fontSize = '60px'
+                } else {
+
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'compvare')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="css/index.css ">
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <div class="personnelTit">
+        <div  onclick="javascript:window.history.back();return false;"></div>
+        <span>原始合同金额和构成</span>
+    </div>
+    <div class="main" style="top: 0.88rem;overflow-y: auto;">
+        <div class="inforBox">
+            <h3>
+                <span class="blue" style="display: block;float: right;">总金额：{{money}}元</span>
+            </h3>
+            <div style="width: 100%;padding:0,0.3rem,0,0.3rem;font-size: 0.27rem;display: flex;justify-content:space-around;"> 
+                <span style="width: 27%;">款项构成</span>
+                <span style="width: 27%;">金额</span>
+                <span style="width: 27%;">操作人</span>
+            </div>
+                
+            <div class="inforText">
+                <div class="orig-box" v-for="(ite,index) in item" @click="engineering(index)">
+                    <span style="width: 30%;">{{ite.projectContractName}}</span>
+                    <span style="width: 30%;">{{ite.money}}</span>
+                    <span  style="width: 30%;" v-if="ite.userName!=''">{{ite.userName}}</span>
+                    <span  style="width: 30%;" v-else>无操作人</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var  data2= localStorage.getItem('key');
+var  userId=Number(data2);
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version');
+var myid=window.location.href.split('=')[1];
+    $(function(){  
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                item:[],
+                money:'',
+            },
+            beforeCreate:function () {
+                    var that=this 
+                    $.ajax({   //获取项目合同款项明细
+                                "url":"http://app.zhuangneizhu.com/v2/set/gainProjectContract.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    projectId:pro,
+                                    version:ver,
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                     console.log(data);
+                                     that.item=data.data.vos;
+                                     that.money=data.data.contractTotal;
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                    })
+ },
+            methods:{
+                engineering:function (myid) {
+                     window.location.href="MASengineeriing.html?myid="+myid;
+                },
+            }
+        })
+    })
+</script>
+</html>

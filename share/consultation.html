@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>装内助透明浏览模式</title>
+    <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="common.css">
+    <script src="rem.js"></script>
+</head>
+<body>
+    <div class="consultation">
+        <header>
+            <p class="left goback"><img src="./img/return1.png" alt=""></p>
+            <p class="title">装内助演示装饰</p>
+            <p></p>
+        </header>
+        <div class="main">
+            <div class="banner">
+                <section></section>
+                <section>
+                    <h2>透明装修公司</h2>
+                    <p>装内助平台特约认证</p>
+                </section>
+                <section></section>
+                <section>
+                    <h4>支持向业主提供</h4>
+                    <div><i></i><p>在线进度跟踪</p></div>
+                    <div><i></i><p>现代化管理控制</p></div>
+                    <div><i></i><p>资料云存档</p></div>
+                </section>
+            </div>
+            <div class="content">
+                <div class="top">
+                    <h2>留言咨询</h2>
+                    <p>补充您的联系方式，我们将与您取得联系</p>
+                </div>
+                <div class="form">
+                    <section>
+                        <label>您的姓名</label>
+                        <input type="text" placeholder="必填" id="in1" maxlength="10">
+                    </section>
+                    <section>
+                        <label>您的号码</label>
+                        <input type="text" placeholder="必填" id="in2" maxlength="11">
+                    </section>
+                    <section>
+                        <label>您的地址</label >
+                        <input type="text" placeholder="必填" id="in3" maxlength="20" >
+                    </section>
+                    <section>
+                        <label>房屋面积㎡</label>
+                        <input type="text" placeholder="必填" id="in4" maxlength="4">
+                    </section>
+                    <section>
+                        <label>您的留言</label>
+                        <textarea placeholder="选填" id="in5"></textarea>
+                    </section>
+                    <button class="mysure">提交</button>
+                </div>
+            </div>          
+        </div>
+    <span style="display:none">
+        <script src="https://s22.cnzz.com/z_stat.php?id=1275035264&web_id=1275035264" language="JavaScript"></script>
+    </span> 
+</body>
+
+<script src="jquery-3.3.1.min.js"></script>
+
+<script type="text/javascript">
+    var  projectId= sessionStorage.getItem('projectId');
+    var  userId=sessionStorage.getItem('userId');
+    var  organizationId=sessionStorage.getItem('organizationId');
+   $('.goback').on('click',function(){
+       window.history.go(-1);
+   })
+
+   $('.mysure').on('click',function(){
+    var in1 =filter($('#in1').val());
+    var in2 =filter($('#in2').val());
+    var in3 =filter($('#in3').val());
+    var in4 =filter($('#in4').val());
+    var in5 =filter($('#in5').val());
+    console.log(in1,in2,in3,in4,in5)
+    $.ajax({
+        url:"http://app.zhuangneizhu.com/third/addOrganizationCustomer.do",
+        type:"post",
+        data:{
+            customerName:in1,
+            mobile:in2,
+            address:in3,
+            houseArea:in4,
+            message:in5,
+            organizationId:organizationId,
+            sourceProjectId:projectId,
+            sourceUserId:userId,
+            version:'3.0',
+        },
+        dataType:"json",
+        success:function(data){
+            console.log(data); 
+            if(data.code==10000){
+                alert("您已提交成功。");
+                window.history.go(-1);
+            }else{
+                alert("请将数据填写完整。")
+            }
+        }
+    })
+    })
+
+
+    function filter(val){
+        var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+        var result = ""; 
+        for (var i = 0; i < val.length; i++) { 
+            result = result+val.substr(i, 1).replace(pattern, ''); 
+        }
+        return result; 
+    }
+  
+</script>
+
+</html>

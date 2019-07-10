@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="header" style="height: 1rem" >
+        <div class="header-ul" v-cloak>
+            <div @click="check"> 
+                {{name}}
+                <img v-if="img" src="./image/head02.png" style="width: 0.25rem;height: 0.2rem;" >
+                <img v-else src="./image/head03.png" style="width: 0.25rem;height: 0.2rem;">
+            </div>
+        </div>
+        <div class="header-mu" v-show="titpar" v-cloak>
+            <div style="width:7.2rem;" v-for="(value,index) in titularr" @click="li(index)">
+                <span>{{value.name}}</span>
+                <i v-show="value.on"></i>
+            </div>
+        </div>
+    </div>
+    <div v-show="contentshow" id="content">
+            <div class="mainBox" style="top:0.88rem;padding-bottom: 0.5rem; width: auto;" v-cloak>
+                <div class="pername" @click="_personnelBox">
+                    <div class="perlogo">
+                        <img :src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+json.logo" alt="">
+                    </div>
+                    <div class="pername-box">
+                        <h3><span>{{json.name}}</span><span>{{json.department02}}</span></h3>
+                        <p>{{json.tel}}</p>
+                    </div>
+                    <div class="per-R"></div>
+                </div>
+                <div class="perBox">
+                    <a href="mybacklog.html" class="per-a">
+                        <span class="per-img"><img src="image/per01.png" alt=""></span>
+                        <span class="per-text">我的待办</span>
+                        <span class="per-R"></span>
+                        <span class="per-num" v-show="k">{{delayNumber}}</span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a  @click="count" class="per-a">
+                        <span class="per-img"><img src="image/per02.png" alt=""></span>
+                        <span class="per-text">项目统计</span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a  class="per-a" @click="HT">
+                        <span class="per-img"><img src="image/per03.png" alt=""></span>
+                        <span class="per-text">合同收款确认</span>
+                        <span class="per-R"></span>
+                        <span class="per-num" v-show="k">{{num}}</span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a  class="per-a" @click="introduce">
+                        <span class="per-img"><img src="image/转介绍客户@2x.png" alt=""></span>
+                        <span class="per-text">转介绍客户</span>
+                        <span class="per-R"></span>
+                        <span class="per-num" v-show="k">{{peoplenum}}</span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a  class="per-a" @click="Setcompany">
+                        <span class="per-img"><img src="image/per04.png" alt=""></span>
+                        <span class="per-text">调整公司设置</span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a class="per-a" @click="Setjiancai">
+                        <span class="per-img"><img src="image/per05.png" alt=""></span>
+                        <span class="per-text">设置建材库</span>
+                        <span class="per-R"></span>
+                    </a>
+                    <a class="per-a" @click="Setdepartment">
+                        <span class="per-img"><img src="image/per06.png" alt=""></span>
+                        <span class="per-text">设置部门和员工</span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a class="per-a" @click="Seton">
+                        <span class="per-img"><img src="image/per07.png" alt=""></span>
+                        <span class="per-text">设置启动时广告页</span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div class="perBox" id="adpeople">
+                    <a class="per-a">
+                        <span class="per-img"><img src="image/per08.png" alt=""></span>
+                        <span class="per-text">申请增加成员数或人工客服</span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a href="http://admin.zhuangneizhu.com/admin/showCourse.do" target="view_window" class="per-a">
+                        <span class="per-img"><img src="image/per11.png" alt=""></span>
+                        <span class="per-text">产品使用教程</span>
+                        <span class="per-R"></span>
+                    </a>
+                    <a href="system.html" class="per-a">
+                        <span class="per-img"><img src="image/per12.png" alt=""></span>
+                        <span class="per-text">系统设置</span>
+                        <span class="per-R"></span>
+                    </a>
+                    <a href="feedback.html" class="per-a">
+                        <span class="per-img"><img src="image/per14.png" alt=""></span>
+                        <span class="per-text">意见反馈</span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div class="perBox"  @click="Exportdata" v-show='k'>
+                    <a class="per-a"  id="export">
+                        <span class="per-img"><img src="image/per14.png" alt=""></span>
+                        <span class="per-text">导出公司数据</span>
+                        <span id="time" style="color: #b8b9bf;line-height: 0.88rem;font-size: 0.25rem;padding-left: 0.6rem;"></span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div class="perBox">
+                    <a class="per-a" href="newregister.html">
+                        <span class="per-img"><img src="image/注册.png" alt=""></span>
+                        <span class="per-text">注册一个新公司</span>
+                        <span class="per-R"></span>
+                    </a>
+                </div>
+                <div>
+                    <p style="width: 100%;font-size: 0.24rem;height: auto;color: red;margin-top: 18px;">*{{text}}</p>
+                </div>
+                <div class="perBox"> 
+                     <a class="per-a" @click="exit">
+                        <span class="per-text" style="text-align: center;color: red;width: 100%">退出账号</span>
+                    </a>
+                </div>
+            </div>
+            <!--底部-->
+            <div class="appFot">
+                <a href="project.html"><img src="image/fot1-1.jpg" alt=""><span>项目</span></a>
+                <a href="news.html"><img src="image/fot2-1.jpg" alt=""><span>消息</span></a>
+                <a href="new.html"><img src="image/fot3-2.jpg" alt="" style="width: 0.64rem;height: 0.64rem;margin-top:0.2rem;"></a>
+                <a href="member.html"><img src="image/fot4-1.jpg" alt=""><span>成员</span></a>
+                <a href="personal.html"><img src="image/fot5-2.jpg" alt=""><span>我的</span></a>
+            </div>
+            <!--添加人员弹窗-->
+            <div class="personnelBox" v-show="personnelshow" :data-id="personnelId">
+                <div class="personnelTit">
+                    <div @click="personnelshow=false"></div>
+                    <span>编辑成员</span>
+                    <span style="display: inline-block; float: right; font-size: 0.3rem; color: rgb(86, 119, 252);margin-right: 20px;" @click="_preservation">确定</span>
+                </div>
+                <div class="personnelMain" v-cloak>
+                    <div><input type="text" placeholder="请输入手机号码" v-model="personnel.tel" disabled="true" style="color: rgba(144,144,144,0.8);"></div>
+                    <div><input type="text" placeholder="请输入成员姓名" v-model="personnel.name"></div>
+                    <div @click="_memberdown(0,'department02')"><span>{{personnel.department02}}</span></div>
+                    <div @click="_memberdown(1,'department01')"><span>{{personnel.department01}}</span></div>
+                    <div @click="_memberdown(2,'director02')"><span>{{personnel.director02}}</span></div>
+                    <p style="color: red;line-height: 0.3rem;padding-left:0.3rem;padding-right: 0.3rem;padding-top: 0.2rem;font-size: 0.24rem">*手机号用于身份识别，暂不支持修改。如需修改，请删除成员后重新添加。</p>
+                </div>
+                <div class="personnel-close" @click="_close">删除</div>
+            </div>
+            <!--下拉弹窗-->
+            <div class="member-down" v-show="mainmu" v-cloak>
+                <h3>{{memberdownbox.name}}</h3>
+                <div class="member-downBox">
+                    <div v-for="(value,index) in memberdownbox.key" @click="_downBox(value,index)" style="color:#000">{{value}}</div>
+                </div>
+                <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+            </div>
+            <!--弹窗幕-->
+            <div class="main-mu" v-show="mainmu" @click="mainmu=false" v-cloak></div>
+            <div class="main-mu" v-show="mainmu02" @click="mainmu02=false" v-cloak></div>
+    </div>
+
+    <div style="margin: auto;" v-show="feeshow"><!--延长服务界面 -->
+            <div style="width: 100%;height:14.8rem;background-color:rgb(246, 248, 255);z-index: 100;" >
+                <img style="display:block;top: 3rem;left:2.38rem;position: absolute;width: 2.7rem;height: 2rem;" src="image/服务到期@2x.png">
+                <div style="position:absolute;top:6rem;left:0.75rem;width:6rem;height:auto;margin: 0,auto;">
+                    <p style="font-size: 0.4rem;line-height: 0.8rem;color: #2C2D2E;text-align: center;">您的服务已到期!</p>
+                    <p style="font-size: 0.25rem;line-height: 0.4rem;color: #2C2D2E;">{{text}}</p>
+                </div>
+                <div style="position: absolute;top: 8rem;left: 0.75rem;">
+                    <p style="color: #808083;width:6rem;font-size: 0.28rem;display:block;margin-bottom: 0.5rem">请联系装内助延长服务期，也可以点击下方按钮申请续费。</p>
+                    <button style="width: 100%;height:0.88rem;background-color:#5677FC;color: #fff;font-size: 0.3rem;border:none;border-radius: 0.1rem;" @click="fee">申请续费</button>
+                </div>
+                <div style="position: absolute;bottom: 1rem;width: 3rem;height:0.8rem;left: 2.25rem;">
+                    <div style="float: left;">
+                        <img style="display: block;width: 0.8rem;height: 0.8rem;" src="image/热线电话@2x.png">
+                    </div>
+                    <div style="float: right;">
+                        <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">装内助客服热线</p>
+                        <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">400-181-0060</p>
+                    </div>
+                </div>
+            </div> 
+    </div> 
+    
+    <div style="margin: auto;" v-show="vipshow" id="vip"><!--申请成功界面  -->
+            <div style="width: 100%;height:14.8rem;background-color:rgb(246, 248, 255);z-index: 100">
+                <img style="display:block;top: 3rem;left:2.38rem;position: absolute;width: 2.7rem;height: 2rem;" src="image/申请成功@2x.png">
+                <div style="position:absolute;top:6rem;left:2.25rem;width:3rem;height:auto;margin: 0,auto;">
+                    <p style="font-size: 0.4rem;line-height: 0.8rem;color: #2C2D2E;text-align: center;">您已申请成功!</p>
+                </div>
+                <div style="position: absolute;top: 7.5rem;left: 0.5rem;">
+                    <p style="color: #808083;width:6.5rem;font-size: 0.28rem;display:block;margin-bottom: 0.5rem;text-align: center;">工作人员将审核您的公司信息，并与您取得联系！</p>
+                    <button style="width: 100%;height:0.88rem;background-color:#5677FC;color: #fff;font-size: 0.3rem;border:none;border-radius: 0.1rem;" @click="vip">申请VIP</button>
+                </div>
+                <div style="position: absolute;bottom: 3rem;width: 3rem;height:0.8rem;left: 2.25rem;">
+                    <div style="float: left;">
+                        <img style="display: block;width: 0.8rem;height: 0.8rem;" src="image/热线电话@2x.png">
+                    </div>
+                    <div style="float: right;">
+                        <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">装内助客服热线</p>
+                        <p style="color: #F64E3C;font-size: 0.28rem;line-height:0.4rem;">400-181-0060</p>
+                    </div>
+                </div>
+            </div> 
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+var  org=localStorage.getItem('orgkey');
+var  ver=localStorage.getItem('version');
+    $(function () {
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                titularr:'',
+                name:"公司名称",
+                index:'',
+                img:true,
+                titpar:false,
+
+                vipshow:false,
+                feeshow:false,
+                contentshow:true,
+
+
+                delayNumber:'',//待延期事件的数量
+                kk:'',
+                text:'',//vip文本信息
+                k:'',//判断用户身份，是否为管理员
+                organizationname:'',//公司名称
+                num:'',//项目统计数据
+                peoplenum:'',//转介绍客户统计数据
+                roldata:'',//角色数据
+                departdata:'',//部门数据
+                json:{
+                    id:'1',//用户id预留暂时没用到
+                    name:'',//用户名
+                    logo:'',//头像
+                    tel:'',//电话
+                    department02:'',//职位
+                    department01:'',//部门
+                    director02:'',//是否是管理
+                    uid:'',
+                },
+                type:'',
+                personnelId:'',
+                personnelshow:false,//编辑页面的显示隐藏判断值
+                mainmu:false,//下拉框和下拉框幕显示隐藏的判断值
+                mainmu02:false,
+                memberdownbox:{name:'',key:[]},//存放下拉框的内容
+                memberdown:[
+                    {
+                        name:'选择成员角色',
+                        key:[]
+                    },
+                    {
+                        name:'选择部门',
+                        key:[]
+                    },
+                    {
+                        name:'是否设置管理',
+                        key:['管理员','非管理员']
+                    }
+                ],
+                personnel:{
+                    name:'',
+                    logo:'image/perlogo.png',
+                    tel:'',
+                    department01:'',
+                    department02:'',
+                    director01:'',
+                    director02:''
+                },
+            },
+            beforeCreate:function(){
+                    let that=this;
+                    $.ajax({    //获取待审核的收款状态数量
+                            "url":"http://app.zhuangneizhu.com/v2/set/gainAuditCount.do",
+                            "type":"post",
+                            data:{
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                let dt=data.data;
+                                that.num=dt;
+                             },
+                            "error":function(){
+                             console.log("输入有误");
+                            }
+                    });
+                    $.ajax({    //获取延期项目数量
+                            "url":"http://app.zhuangneizhu.com/project/countProjectDelay.do",
+                            "type":"post",
+                            data:{
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                that.delayNumber=data.data;
+                             },
+                            "error":function(){
+                             console.log("输入有误");
+                            }
+                    });
+                    $.ajax({    //获取员工角色
+                        "url":"http://app.zhuangneizhu.com/set/gainEmployeeType.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          version:ver,
+                          userId:userId,  
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.roldata=data.data;
+                            let rolnamearr=data.data;
+                            for (var i = 0; i < rolnamearr.length; i++){
+                                that.memberdown[0].key.push(rolnamearr[i].roleName);
+                            }
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    })
+                    $.ajax({    //获取公司部门信息
+                        "url":"http://app.zhuangneizhu.com/v2/set/showDepartInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          version:ver,
+                          userId:userId,  
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.departdata=data.data;
+                            let departarr=data.data;
+                            for (var i = 0; i <departarr.length; i++){
+                                that.memberdown[1].key.push(departarr[i].departName);
+                            }
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    })
+                    $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            let people=data.data;
+                            that.json.name=data.data.name;
+                            that.json.tel=data.data.mobile;
+                            that.json.department02=data.data.roleName;
+                            that.json.department01=data.data.departName;
+                            that.json.uid=data.data.userId;
+                            that.json.logo=data.data.companyLogo;
+                            that.k=data.data.isAdmin;
+                            let k=data.data.isAdmin;
+                            if(k==true){
+                                that.json.director02="设置为非管理员";
+                            }else{
+                                that.json.director02="设置为管理员";
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });  
+                    $.ajax({    //获取公司名称
+                        "url":"http://app.zhuangneizhu.com/set/gainCompanyName.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data); 
+                            that.organizationname=data.data.organizationName;
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    $.ajax({    //获取VIP信息
+                        "url":"http://app.zhuangneizhu.com/set/gainVipInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          version:ver,
+                          userId:userId,  
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.text=data.data.vipInfo;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                    $.ajax({    //获取公司列表
+                        "url":"http://app.zhuangneizhu.com/user/gainOrganizationList.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.titularr=data.data;
+                            for (var i = that.titularr.length - 1; i >= 0; i--) {
+                                if(that.titularr[i].isDefault){
+                                    that.name=that.titularr[i].name;
+                                    that.index=i;
+                                };
+                                var isAudit=that.titularr[i].isAudit;
+                                if(isAudit){
+                                    that.vipshow=false;
+                                    that.contentshow=true;
+                                }else{
+                                    that.vipshow=true;
+                                    that.contentshow=false;
+                                }
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    $.ajax({    //获取转介绍客户数量
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainNotFloweCustomerCount.do",
+                        "type":"post",
+                        data:{
+                            userId:userId,
+                            organizationId:org,
+                            version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                           that.loding=false;
+                           that.peoplenum=data.data;   
+                        }
+                    })
+            },
+            methods: {
+                fee:function(){
+                    window.location.href="projectVIP.html?index="+2;
+                },
+                vip:function(){
+                    window.location.href="projectVIP.html?index="+2;
+                },
+                // 数据导出
+                Exportdata:function(){
+                    let that=this;
+                    if (that.org==undefined) {
+                      link="http://app.zhuangneizhu.com/v3/project/downFile.do?organizationId="+org+"&userId="+userId+"&version="+'3.0';
+                        console.log(org,userId);
+                        $("#export").attr("href",link)
+                    }else{
+                     link='http://app.zhuangneizhu.com/v3/project/downFile.do?organizationId='+that.org+"&userId="+userId+"&version="+'3.0';
+                     $("#export").attr("href",link)
+                    }
+                },
+                introduce:function(){
+                    window.location.href="customer.html";
+                },
+                count:function(){
+                    window.location.href="mystatistics.html?k="+"2";
+                },
+                check:function(){
+                    let that=this;
+                    that.img=!that.img;
+                    that.titpar=!that.titpar;
+                },
+                li:function(index){
+                    let that=this;
+                    let k=that.titularr;
+                    let orgid=that.titularr[index].organizationId;
+                    localStorage.setItem('orgkey',orgid);
+                    that.org=localStorage.getItem('orgkey');
+                    $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:that.org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            if(data.code==11280){
+                                that.feeshow=true;
+                                that.contentshow=false;
+                            }else {
+                                that.contentshow=true;
+                                that.feeshow=false;
+                            }
+                            let people=data.data;
+                            that.json.name=data.data.name;
+                            that.json.tel=data.data.mobile;
+                            that.json.department02=data.data.roleName;
+                            that.json.department01=data.data.departName;
+                            that.k=data.data.isAdmin;
+                            let k=data.data.isAdmin;
+                            if(k==true){
+                                that.json.director02="设置为非管理员";
+                            }else{
+                                that.json.director02="设置为管理员";
+                            };
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                     });
+                    $.ajax({    //获取待审核的收款状态数量
+                                "url":"http://app.zhuangneizhu.com/v2/set/gainAuditCount.do",
+                                "type":"post",
+                                data:{
+                                    userId:userId,
+                                    organizationId:that.org,
+                                    version:ver,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    let dt=data.data;
+                                    that.num=dt;
+                                 },
+                                "error":function(){
+                                 console.log("输入有误");
+                                }
+                        });
+                    k.forEach(function(item){
+                        console.log(item);   //item出来的就是li,给li添加了一个on属性
+                           item.on=false;
+                     })
+                    that.name=that.titularr[index].name;
+                    that.img=!that.img;
+                    that.titpar=!that.titpar;
+                    that.titularr[index].on=true;
+                   var mas=that.titularr[index].isAudit;
+                     if(mas){
+                        $("#content").css("display","block");
+                        $("#vip").css("display","none");
+                    }else{
+                        $("#vip").css("display","block");
+                        $("#content").css("display","none");
+                    }
+                },
+                exit:function(){
+                    $.ajax({    //修改公司联系人
+                        "url":"http://app.zhuangneizhu.com/user/logout.do",
+                        "type":"post",
+                        data:{
+                        userId:userId,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            localStorage.removeItem("key");
+                            localStorage.removeItem("orgkey");
+                            localStorage.removeItem("pro");
+                            localStorage.removeItem("isKey");
+                            window.location.href="index.html";
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    })
+                },
+                HT:function(){
+                    let that=this;
+                    if (that.k) {
+                         window.location.href="contract.html";
+                     }else{
+                        alert("权限不足，仅对管理员开放。");
+                     }
+                },
+                Setcompany:function(){
+                  let that=this;
+                    if (that.k) {
+                         window.location.href="companyset.html";
+                     }else{
+                        alert("权限不足，仅对管理员开放。");
+                     }
+                },
+                Setjiancai:function(){
+                     let that=this;
+                    if (that.k) {
+                         window.location.href="material.html";
+                     }else{
+                        alert("权限不足，仅对管理员开放。");
+                     }
+                },
+                Setdepartment:function(){
+                     let that=this;
+                    if (that.k) {
+                         window.location.href="staff.html";
+                     }else{
+                        alert("权限不足，仅对管理员开放。");
+                     }
+                },
+                Seton:function(){
+                     let that=this;
+                    if (that.k) {
+                         window.location.href="startup.html";
+                     }else{
+                        alert("权限不足，仅对管理员开放。");
+                     }
+                 },
+                //分享弹窗
+                _share:function () {
+                    let that = this;
+                    that._data.mainmu02=true;
+                },
+                // 弹窗的删除按钮
+                _close: function () {
+                    let that = this;
+                    let key = that._data.personnelId;
+                    if (confirm("确认删除吗")) {
+                        that._data.personnelshow = false;
+                        console.log('这里写移除用户');
+                    }
+                    else {
+                        return;
+                    }
+                },
+                //保存按钮
+                _preservation: function (){
+                    let that = this;
+                    let k = that._data.personnel;
+                    that._data.personnelshow = false;
+                    $.ajax({    //修改公司联系人
+                        "url":"http://app.zhuangneizhu.com/v2/set/editContactsInfo.do",
+                        "type":"post",
+                        data:{
+                        sUserId:that.json.uid,
+                        userId:userId,
+                        name:that.personnel.name,
+                        mobile:that.personnel.tel,
+                        roleId:that.rolid,
+                        roleName:that.rolname,
+                        organizationId:org,
+                        departId:that.depardid,
+                        departName:that.depardname,
+                        version:ver,    
+                        isAdmin:that.admin
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    })
+
+                },
+                //下拉弹窗点击
+                _downBox: function (e,index) {
+                    console.log(e,index);
+                    let that = this;
+                    let k = that._data.type//对应的那个组
+                    if (that.kk==0) {
+                        that.rolname=e;
+                        that.rolid=that.roldata[index].organizationRoleId;
+                         that._data.personnel[k] = e;
+                        console.log(that.rolname,that.rolid);
+                    }else if(that.kk==1){
+                        that.depardname=e;
+                        that.depardid=that.departdata[index].departId;
+                         that._data.personnel[k] = e;
+                    }
+                    that._data.mainmu = false;
+                },
+                //编辑页面点击
+                _memberdown: function (e, key) {
+                    let that = this;
+                    that._data.mainmu = true;
+                    that._data.memberdownbox = that._data.memberdown[e];
+                    that._data.type = key;
+                    that.kk=e;
+                },
+                //人员点击
+                _personnelBox: function () {
+                    let that=this;
+                    if (that.k) {
+                         let that = this;
+                    that._data.personnel = that._data.json;
+                    that._data.personnelshow = true;
+                    }else{
+                       alert("权限不足，请联系管理员。");
+                    }
+                }
+            }
+        })
+               var date=new Date();
+               var year=date.getFullYear(); //获取完整的年份(4位,1970-????)
+               var month=date.getMonth()+1; //获取当前月份(0-11,0代表1月)
+               var day=date.getDate()-1; //当前是几号
+               var time="(数据截止"+year+"-"+month+"-"+day+")";
+               $("#time").html(time);
+              let ad=document.querySelectorAll("#adpeople .per-a")
+              for (var i = 0; i < ad.length; i++) {
+                    ad[i].index=i;
+                    ad[i].onclick=function(){
+                    let myid=this.index;
+                    console.log(myid);
+                    window.location.href="adduser.html?myid="+myid;
+                  }
+             }
+    })
+</script>
+</html>

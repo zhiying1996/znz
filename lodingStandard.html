@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id='demo'>
+    <div class="personnelTit">
+        <div onclick="javascript:window.history.back();return false;"></div>
+        <span>该进度注意事项</span>
+    </div>
+    <div class="main " style="width: 7.5rem;top: 0.88rem;padding-top: 0.2rem;overflow-x: hidden;overflow-y: auto;">
+        <div id="editor" style="width: 7.5rem;height: 5rem;"></div>
+        <input type="submit" name="" value="保存" style="width: 7rem;height: 1rem;display: block;background-color: #5677FC;font-size: 0.3rem;color: #fff;border-radius: 0.1rem;position:absolute;bottom: 0;left: 0.25rem;bottom: 0.3rem;margin:0 auto;">
+    </div>         
+</div>
+</body>
+<script type="text/javascript" src="kindeditor/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="kindeditor/wangEditor.min.js"></script>
+<script type="text/javascript">
+var  userId=localStorage.getItem('key');
+var  org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var  ver=localStorage.getItem('version');
+var  myid=window.location.href.split("=")[1]
+$.ajax({  //获取项目进度列表
+    "url":"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+    "type":"post",
+    data:{
+          projectId:pro,
+          organizationId:org,
+          userId:userId,
+          version:ver,
+    },
+    "dataType":"json",
+    "success":function(data){
+    }
+}).done(function(data){
+    var text;
+    var id=data.data.vos[myid].projectScheduleId;
+        $.ajax({
+            "url":"http://app.zhuangneizhu.com/v2/set/gainProjectScheduleDetail.do",
+            "type":'post',
+            data:{
+                projectScheduleId:id,
+                userId:userId,
+                projectId:pro,
+                organizationId:org,
+                version:ver,
+            },
+            "dataType":"json",
+            "success":function(data){
+            }
+        }).done(function(data){
+            var text=data.data.scheduleText;
+            var E = window.wangEditor
+            var editor = new E('#editor')
+            editor.customConfig.menus = [
+                'head',  // 标题
+                'bold',  // 粗体
+                'fontSize',  // 字号
+                'fontName',  // 字体
+                'italic',  // 斜体
+                'underline',  // 下划线
+                'strikeThrough',  // 删除线
+                'foreColor',  // 文字颜色
+                'backColor',  // 背景颜色
+                'link',  // 插入链接
+                'list',  // 列表
+                'justify',  // 对齐方式
+                'quote',  // 引用
+                'image',  // 插入图片
+                'table',  // 表格
+                'undo',  // 撤销
+                'redo'  // 重复
+            ]
+            editor.customConfig.debug = true;
+            // 关闭粘贴内容中的样式
+            editor.customConfig.pasteFilterStyle = false;
+            // 忽略粘贴内容中的图片
+            editor.customConfig.pasteIgnoreImg = true;
+            // 使用 base64 保存图片
+            editor.customConfig.uploadImgShowBase64 = false;
+            editor.customConfig.customUploadImg = function (files, insert) {
+                console.log(files)
+                var img;
+                var fd = new FormData();
+                fd.append("files", files[0])
+                var xhr = new XMLHttpRequest();
+                xhr.open('post', 'http://app.zhuangneizhu.com/image/addOssPhoto.do');
+                xhr.send(fd);
+                xhr.onreadystatechange=function(){
+                // 这步为判断服务器是否正确响应
+                    if(xhr.readyState == 4 && xhr.status == 200){
+                        console.log(xhr.responseText);
+                        img='https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+xhr.responseText
+                        insert(img)
+                    }
+                }
+            }
+            editor.customConfig.onchange = (html) => {
+                    endtxt= html
+            }
+            editor.create();
+            editor.txt.html(text)
+            $("input").on("click",function(){
+                $.ajax({
+                    "url":"http://app.zhuangneizhu.com/v2/project/setProjectScheduleText.do",
+                    "type":'post',
+                    data:{
+                        projectScheduleId:id,
+                        userId:userId,
+                        projectId:pro,
+                        organizationId:org,
+                        version:ver,
+                        text:endtxt,
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        if(data.code==10060){
+                            alert("权限不足,请联系管理员");
+                            window.location.href="schedulepage.html?myid="+myid
+                        }else if(data.code==10000){
+                           window.location.href="schedulepage.html?myid="+myid 
+                        }
+                    }
+                })
+            })
+        })
+})
+</script>
+</html>

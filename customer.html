@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if(document.getElementById('app').offsetWidth>1100){
+                    rootElement.style.fontSize='60px'
+                }else{
+                    console.log(document.getElementById('app').offsetWidth)
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'complete')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;display: block">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="header"  style="height: 1rem">
+        <div class="header-tit">
+            <a class="returnBox" onclick="window.location.href='personal.html'"></a>
+            转介绍客户 
+        </div>
+        <div class="head-search" style="position: absolute;top: 0.8rem;background-color: #fff;border-top: 1px solid #f6f8ff;border-bottom: 1px solid #f6f8ff;">
+            <div class="header-ul" >
+                 <div id="selecttwo"><span>跟进状态</span></div>
+            </div>
+            <div class="header-mu" style="display:none" id="follow">
+                <div>
+                    <span>全部</span>
+                </div>
+                <div>
+                    <span>未跟进</span>
+                </div>
+                <div>
+                    <span>已跟进</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main" style="overflow-x:hidden;overflow-y: auto;top: 1.6rem;background-color:#fff;width:7.8rem"></div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script>
+let  data2= localStorage.getItem('key')
+let  userId=Number(data2)
+let  org=localStorage.getItem('orgkey');
+var  ver=localStorage.getItem('version');
+var  a=['','']
+var  k=[];
+var massage;
+$.ajax({    //获取待审核收款列表(可以合同收款确认上边的下拉菜单选择)
+    "url":"http://app.zhuangneizhu.com/third/gainOrganizationCustomerList.do",
+    "type":"post",
+    data:{
+        userId:userId,
+        organizationId:org,
+        version:ver,
+        orderStatus:2,
+        appType:"znz",
+    },
+    "dataType":"json",
+    "success":function(data){
+        $("#loader-wrapper").css("display"," none")
+        console.log(data);
+        massage=data.data 
+        $.each(massage,function(index,item){
+            var show
+            k.push(item.allowWatch);
+            if(k[index]){
+                if(item.followStatus==0){
+                    show="未跟进";
+                    var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC;"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:red;">'+show+'</spna></div></div>';
+                    $(".main").append(html);
+                }else{
+                    show="已跟进";
+                    var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:green;">'+show+'</spna></div></div>';
+                    $(".main").append(html);
+                }
+            }else{
+                if(item.followStatus==0){
+                    show="未跟进";
+                    var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC;"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                    $(".main").append(html);
+                }else{
+                    show="已跟进";
+                    var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                    $(".main").append(html);
+                }
+            }
+        });
+        $(".follow").on("click",function(){
+            var index=$(this).index();
+            if(k[index]==false){
+                    alert("您可查看的转介绍业主数量已达上限，请联系装内助客服升级版本4001810060。")
+                }else{
+                    window.location.href="followcontent.html?index="+index+"&time="+a[0]+"&follow="+a[1];
+                } 
+        });
+    }
+}).done(function(){
+$("#selecttwo").on("click",function(){
+    $("#follow").toggle();
+    $("#follow div").on("click",function(){
+        var txt=$(this).text();
+        $("#selecttwo span").html(txt);
+        $(".main").empty();
+        var k=$(this).index();
+        if(k==0){
+            var twoselectkey=[];
+            $.each(massage,function(index,item){
+                        var show;
+                        twoselectkey.push(item.allowWatch);
+                        if (twoselectkey[index]) {
+                            if(item.followStatus==0){
+                                show="未跟进";
+                                var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:red;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }else{
+                                show="已跟进";
+                                var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:green;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }
+                        }else{
+                            if(item.followStatus==0){
+                                show="未跟进";
+                                var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }else{
+                                show="已跟进";
+                                var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }
+                        }
+                    });
+            $(".follow").on("click",function(){
+                var index=$(this).index();
+                if(twoselectkey[index]==false){
+                        alert("您可查看的转介绍业主数量已达上限，请联系装内助客服升级版本4001810060。")
+                    }else{
+                        window.location.href="followcontent.html?index="+index+"&time="+a[0]+"&follow="+a[1];
+                    } 
+            });
+        }else if(k==1){
+            var arr=[]
+            $.each(massage,function(index,item){
+                if(item.followStatus==0){
+                    arr.push(massage[index]);
+                }
+            })
+            var twoselectkey=[];
+            $.each(arr,function(index,item){
+                        var show;
+                        twoselectkey.push(item.allowWatch);
+                        if (twoselectkey[index]) {
+                            if(item.followStatus==0){
+                                show="未跟进";
+                                var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:red;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }else{
+                                show="已跟进";
+                                var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:green;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }
+                        }else{
+                            if(item.followStatus==0){
+                                show="未跟进";
+                                var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }else{
+                                show="已跟进";
+                                var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }
+                        }
+                });
+                $(".follow").on("click",function(){
+                    var index=$(this).index();
+                    if(twoselectkey[index]==false){
+                            alert("您可查看的转介绍业主数量已达上限，请联系装内助客服升级版本4001810060。")
+                        }else{
+                            var b=0
+                            window.location.href="followcontent.html?index="+index+"&time="+a[0]+"&follow="+b;
+                        } 
+                });
+        }else if(k==2){
+            var arr=[]
+            $.each(massage,function(index,item){
+                console.log(index,item.followStatus);
+                if(item.followStatus==1){
+                    arr.push(massage[index]);
+                }
+            })
+            var twoselectkey=[];
+            $.each(arr,function(index,item){
+                        var show;
+                        twoselectkey.push(item.allowWatch);
+                        if (twoselectkey[index]) {
+                            if(item.followStatus==0){
+                                show="未跟进";
+                                var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:red;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }else{
+                                show="已跟进";
+                                var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#303132">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:green;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }
+                        }else{
+                            if(item.followStatus==0){
+                                show="未跟进";
+                                var html='<div class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }else{
+                                show="已跟进";
+                                var html='<div  class="follow" style="width:7.1rem;height:0.8rem;padding:0.2rem;border-bottom:1px solid #E6E7EC"><div style="width:3rem;height:1rem;float:left;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.3rem;color:#B8B9BB;">'+item.consumerName+'</p>'+'<span style="display:block;width:3rem;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB">来源：'+item.sourceUserName+'</span></div>'+'<div style="width:3rem;height:1rem;float:right;"><p style="display:block;height:0.5rem;line-height:0.5rem;font-size:0.25rem;color:#B8B9BB;text-align:right;">'+item.createTime+'</p><span style="display:block;float:right;font-size:0.25rem;color:#B8B9BB;">'+show+'</spna></div></div>';
+                                $(".main").append(html);
+                            }
+                        }
+                    });
+            $(".follow").on("click",function(){
+                var index=$(this).index();
+                if(twoselectkey[index]==false){
+                        alert("您可查看的转介绍业主数量已达上限，请联系装内助客服升级版本4001810060。")
+                    }else{
+                        var b=1
+                        window.location.href="followcontent.html?index="+index+"&time="+a[0]+"&follow="+b;
+                    } 
+            });
+        };
+        $("#follow").css("display","none");
+    })
+});
+})             
+</script>
+</html>

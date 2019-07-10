@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/honeySwitch.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap">
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div id="back"></div>
+            <span>设置内控权限</span>
+        </div>
+    </div>
+    <div class="main" style="top: 0.88rem;width: 7.5rem">
+        <div style="width: 7.5rem;height:0.6rem;background-color: #fff;margin-top: 0.2rem;line-height: 0.6rem;font-size: 0.3rem;color: #4c94ff;padding-left: 0.2rem">
+            普通成员的内控权限
+            <span id="onoff" class="switch-off" style="display:block;float: right;margin-right: 0.2rem"></span>
+        </div>
+        <div style="color: red;padding-left: 0.2rem;padding-right: 0.2rem;font-size: 0.3rem">
+            注：</br>
+            内控权限是指项目内的建材与人员支出的控制权限</br>
+            打开：公司的普通成员可以管理内控支出。可以查看并管理自己所属项目的内控功能。</br>
+        关闭：仅管理员可以管理内控功能。管理员可以进入项目单独赋予项目成员内控权限。</p>
+        </div>
+
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/honeySwitch.js"></script>
+<script type="text/javascript">
+var data2 =localStorage.getItem('key');
+var userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+$("#back").on("click",function(){
+    window.location.href="companyset.html" 
+})
+$.ajax({    
+            "url":"http://app.zhuangneizhu.com/set/gainOrganizatioProjectVisual.do",
+            "type":"post",
+            data:{
+            userId:userId,
+            organizationId:org,
+            version:"3.0",    
+            },
+            "dataType":"json",
+            "success":function(data){
+                console.log(data);
+                if(data.data){
+                honeySwitch.showOn("#onoff")
+                }
+             },
+            "error":function(){
+             console.log("输入有误");
+            }
+})
+$(function() {
+    switchEvent("#onoff", function() {
+        var k=true
+        $.ajax({   
+            "url":"http://app.zhuangneizhu.com/set/setOrganizatioProjectVisual.do",
+            "type":"post",
+            data:{
+            userId:userId,
+            organizationId:org,
+            version:"3.0",
+            isVisible:k,    
+            },
+            "dataType":"json",
+            "success":function(data){
+                console.log(data);
+             },
+            "error":function(){
+             console.log("输入有误");
+            }
+        })
+    }, function() {
+        var k=false
+        $.ajax({
+            "url":"http://app.zhuangneizhu.com/set/setOrganizatioProjectVisual.do",
+            "type":"post",
+            data:{
+            userId:userId,
+            organizationId:org,
+            version:"3.0",
+            isVisible:k,    
+            },
+            "dataType":"json",
+            "success":function(data){
+                console.log(data);
+             },
+            "error":function(){
+             console.log("输入有误");
+            }
+        })
+    });
+});
+</script>
+</html>

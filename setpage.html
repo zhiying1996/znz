@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script src='js/JR.js'></script>
+    <link rel="stylesheet" href="css/index.css ">
+    <style>
+        .showbox{width: 7.5rem;height: 100%;background-color: rgba(0,0,0,0.3);position: relative;display: none;z-index:100;}
+        .showcontent{width: 4rem;height:2.5rem;background-color: #FFF;border-radius: 0.3rem;position: relative;top: 50%;left: 50%;transform: translate(-50%,-50%);}
+        .showtit{width: 100%;height: 1.2rem;position: absolute;top: 0.3rem;}
+        .showtit p{width: 100%;line-height: 0.6rem;text-align: center;font-size: 0.3rem;}
+        .showselect{width: 100%;height: 0.8rem;border-top: 1px solid #c9c9c9;position: absolute;bottom: 0;display: flex;justify-content: space-around;}
+        .showselect span{width: 48%;height:100%;text-align: center;font-size: 0.28rem;line-height: 0.8rem;}
+        .showselect span:nth-child(1){color: #5677FC;}
+        .showselect span:nth-child(2){color:red;}
+        .showselect span:after{content:"";position: absolute;width: 1px;height: 100%;left: 50%;top: 0;background-color: #ccc;}
+        .DescriptionBox{width:6.5rem;height:2.5rem;background-color: rgba(0,0,0,0.7);color: #fff;position: absolute;line-height: 0.43rem;font-size: 0.25rem;border-radius: 0.1rem;padding: 0.1rem;left: 0.4rem;display: none;}
+    </style>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div class="back"></div>
+            <span class='title'>设置公司名称</span>
+            <a class="blue header-tit-r" style="right: 1rem">
+                <strong style="display:none;" class="Description">说明</strong>
+            </a>
+            <a class="blue header-tit-r">
+                <strong style="display: none;" class="mysure">确定</strong>
+                <strong style="display: none;" class="myedit">编辑</strong>
+                <strong style="display: none;" class='myover'>完成</strong>
+            </a>
+        </div>
+    </div>
+    <!-- 设置公司名称页面 -->
+    <div class="main" style="top: 0.88rem;bottom: 0rem;padding-bottom:0.88rem;padding-top: 0.2rem;overflow-y:auto;overflow-x: hidden;width: 7.8rem;">
+            <input  style="width: 100%;height:0.88rem;font-size: 0.28rem;padding-left: 0.3rem;display: none;" class="info0">
+            <div style="display:none;font-size:0.28rem;width: 7.8rem;" class="mylist"></div>
+            <!-- 公司logo上传 -->
+            <div style="display: none;font-size:0.28rem;width: 7.8rem;" class="Uploadphoto">
+                <div style="width: 100%;height: 2.5rem;background-color:#f6f8ff;position: relative;" >
+                    <form  id="upload" enctype="multipart/form-data" style="width:2.1rem;height: 2.1rem;display: block;border: 1px dashed #000;margin-left: 2.7rem;margin-top: 0.5rem;background-color: #fff;">
+                        <img src="http://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/image/2019/01/02/3001fa8d-aa39-462e-a8a4-9c5572545dd0.png" style="width: 1.5rem;height: 1.5rem;position: absolute;left: 3rem;top: 0.05rem;display: block;">
+                        <span style="color: #5677fc;font-size: 0.25rem;position: absolute;bottom: 0.5rem;left: 3rem;">上传公司logo</span>
+                        <input type='file' name="files" multiple="multiple" style="width: 2rem;height: 2rem;outline:none;display: block;position: absolute;left: 2.75rem;top: 0.05rem;font-size:0;opacity: 0;" >
+                    </form>
+                </div>
+            </div>
+    </div>
+    <div  class="fot-btn" style="display: none;z-index:520">新建</div> 
+    <div  class="addstyle-btn" style="position: absolute;left: 0;width: 7.5rem;bottom: 0;background-color: #fff;font-size: 0.28rem;color: #5677FC;line-height: 0.88rem;text-align: center;display: none;z-index:520">添加装修类型</div> 
+    <!--普通新建-->
+    <div class="main-cai newcreate" style="display:none;"> 
+        <div class="personnelTit">
+            <div class="goback"></div>
+            <span class="newtitle"></span>
+        </div>
+        <div class="main-cai-input">
+            <input type="text"  placeholder="请输入">
+
+        </div>
+        <div class="main-cai-btn" style="background-color: #4c94ff;">确认</div>
+    </div>
+    <!--修改-->
+    <div class="main-cai modify" style="display:none;">
+        <div class="personnelTit">
+            <div class="backOf"></div>
+            <span class="newtitle xgtitle"></span>
+        </div>
+        <div class="main-cai-input">
+            <input type="text"  placeholder="请输入">
+        </div>
+        <div class="main-cai-btn xgsure" style="background-color: #4c94ff;">确认</div>
+    </div>
+    <!--项目模板新建-->
+    <div class="main-cai addtemplate" style="display: none;overflow-y: auto;overflow-x: hidden;width: 7.8rem">
+        <div class="personnelTit">
+            <div class="templategoback"></div>
+            <span class="newtitle"></span>
+        </div>
+        <div class="main-cai-input" style="top:1.1rem;">
+            <input  class="templateName" type="text"  placeholder="请输入">
+        </div>
+        <div style="position: absolute;top:2.2rem">
+           <p class="inputTit" type="text"  style="width:7.3rem;height: 0.7rem;font-size: 0.3rem;line-height: 0.7rem;padding-left: 0.2rem;background-color: #fff;">从装内助模板库新建模板</p>
+           <p id="showTemplateName" class="R" type="text" style="width:7.3rem;height: 0.7rem;font-size: 0.3rem;line-height: 0.7rem;padding-left: 0.2rem;background-color: #fff;float: left;">可选模板</p>
+           <img  src="image/perD.png" class="R" style="display:inline-block;width: 0.3rem;height: 0.2rem;position: absolute;right: 0.1rem;top: 1rem;">
+           <div class="selectTemplate" style="width: 7.5rem;height: auto;background-color: #fff;position: relative;z-index: 2;display: none;overflow-y: auto;margin-bottom: 0.88rem;overflow-x: hidden;">
+           </div>
+        </div>
+       <div class="main-cai-btn" style="background-color: #4c94ff;margin-top: 1.8rem;">确认</div>
+    </div>
+    <!--项目模板删除提示 -->
+    <div class="showbox">
+        <div  class="showcontent">
+            <div class="showtit">
+                <p>确认删除</p>
+                <p>确认删除该项模板?</p>
+            </div>   
+            <div class="showselect">
+                <span class="no">取消</span>
+                <span class="yes">确认</span>
+            </div>
+        </div>
+    </div>
+    <!-- 说明提示 -->
+    <div class="DescriptionBox">
+        <p>可以设置多个项目模板，装内助会定期推送优秀装修公司的好模板给合作公司。你只需要改一下名字就可以直接使用，没用的模板请及时删除。</p>
+        <p>在模板中，设置每个节点的“计划在第几天完成”和“负责角色”，给项目排期的时候，系统将会自动填写计划完成时间，以及从项目成员中匹配负责人。</p>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script>
+    $(function () {
+        var userId =localStorage.getItem('key');
+        var organizationId=localStorage.getItem('orgkey');
+        var ver=localStorage.getItem('version');
+        var getInfo=window.location.href.split('=')[1];
+        $('.back').click(function(){
+            window.location.href="companyset.html"
+        });
+        $('.backOf').click(function(){
+            $('.modify').css('display','none');
+        })
+        $('.templategoback').click(function(){
+            console.log("sss");
+            $('.addtemplate').css('display','none');
+        });
+        $('.goback').click(function(){
+               $('.newcreate').css('display','none');
+        });
+        var index=null;
+        switch(getInfo){
+            case '0':
+                $('.Uploadphoto').css('display','block');
+                $('.title').html('设置公司名称');
+                $('.info0').css('display','block');
+                $('.myover').css('display','block');
+                $.ajax({   //获取当前公司名称
+                    "url":"http://app.zhuangneizhu.com/set/gainCompanyName.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        $('.info0').val(data.data.organizationName);
+                    }
+                }).done(function(){ 
+                    $('.myover').on('click',function(){ 
+                        $.ajax({   //设置公司名称
+                            "url":"http://app.zhuangneizhu.com/set/setCompanyName.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                organizationName:$('.info0').val(),
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                window.location.href="companyset.html";
+                            }
+                        });
+                    })
+                });
+                $.ajax({
+                    url:'http://app.zhuangneizhu.com/set/gainCompanyLogo.do',
+                    type:'POST',
+                    data:{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    success:function(data){  
+                        var img=JSON.parse(data).data;
+                        $(".Uploadphoto div").empty();
+                        if(img==''){
+                            var html=`
+                                <div style="width: 100%;height:3.5rem;background-color:#f6f8ff;position: relative;">
+                                    <form id="upload" enctype="multipart/form-data" style="width:2.1rem;height: 2.1rem;display: block;border: 1px dashed #000;margin-left: 2.7rem;margin-top: 0.5rem;background-color: #fff;">
+                                        <img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/photo/DATE2019-01-18DATE/a67293cd-8576-4f8e-b4bc-2fbae56b9e2c.png" style="width: 1.5rem;height: 1.5rem;position: absolute;left: 3rem;top: 0.05rem;display: block;">
+                                        <span style="color: #5677fc;font-size: 0.25rem;position: absolute;bottom: 1.5rem;left: 3rem;">上传公司logo</span>
+                                        <input type='file' name="files" multiple="multiple" style="width: 2rem;height: 2rem;outline:none;display: block;position: absolute;left: 2.75rem;top: 0.05rem;font-size:0;opacity: 0;" >
+                                    </form>
+                                    <p style="color:red;display:block;width:6.9rem;padding:0 0.3rem">注：</br>
+                                        1、上传公司logo后，转发的项目链接，将显示公司logo。</br>
+                                        2、公司logo，建议使用方形图片，规格500*500像素以上。
+                                    </p>
+                                </div>
+                            `
+                        }else{
+                            var html=`
+                                <div style="width: 100%;height: 3.5rem;background-color:#f6f8ff;position: relative;">
+                                    <form id="upload" enctype="multipart/form-data" style="width:2.1rem;height: 2.1rem;display: block;border: 1px dashed #000;margin-left: 2.7rem;margin-top: 0.5rem;background-color: #fff;">
+                                        <img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${img}" style="width: 1.5rem;height: 1.5rem;position: absolute;left: 3rem;top: 0.05rem;display: block;">
+                                        <span style="color: #5677fc;font-size: 0.25rem;position: absolute;bottom: 1.5rem;left: 3rem;">上传公司logo</span>
+                                        <input type='file' name="files" multiple="multiple" style="width: 2rem;height: 2rem;outline:none;display: block;position: absolute;left: 2.75rem;top: 0.05rem;font-size:0;opacity: 0;" >
+                                    </form>
+                                    <p style="color:red;display:block;width:6.9rem;padding:0 0.3rem">注：</br>
+                                        1、上传公司logo后，转发的项目链接，将显示公司logo。</br>
+                                        2、公司logo，建议使用方形图片，规格500*500像素以上。
+                                    </p>
+                                </div>
+                            `
+                        }
+                                
+                        $(".Uploadphoto div").append(html);
+                    }
+                }).done(function(){
+                    $("input[type='file']").change(function(){  
+                            var file = this.files[0];
+                            var formdata= new FormData($("#upload")[0]);
+                    $.ajax({
+                            url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                            data:formdata,
+                            type:'post',
+                            cache: false,        // 不缓存
+                            processData: false,   // 告诉jQuery不要去处理发送的数据
+                            contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                            dataType:"json",
+                            success:function(data){
+                                var photo=data
+                                $(".Uploadphoto div").empty();
+                                var html=`
+                                    <div style="width: 100%;height: 2.5rem;background-color:#f6f8ff;position: relative;">
+                                        <form id="upload" enctype="multipart/form-data" style="width:2.1rem;height: 2.1rem;display: block;border: 1px dashed #000;margin-left: 2.7rem;margin-top: 0.5rem;background-color: #fff;">
+                                            <img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${photo}" style="width: 1.5rem;height: 1.5rem;position: absolute;left: 3rem;top: 0.05rem;display: block;">
+                                            <span style="color: #5677fc;font-size: 0.25rem;position: absolute;bottom: 0.5rem;left: 3rem;">上传公司logo</span>
+                                            <input type='file' name="files" multiple="multiple" style="width: 2rem;height: 2rem;outline:none;display: block;position: absolute;left: 2.75rem;top: 0.05rem;font-size:0;opacity: 0;" >
+                                        </form>
+                                        <p style="color:red;display:block;width:6.9rem;padding:0 0.3rem">注：</br>
+                                            1、上传公司logo后，转发的项目链接，将显示公司logo。</br>
+                                            2、公司logo，建议使用方形图片，规格500*500像素以上。
+                                        </p>
+                                    </div>
+                                  `
+                                $(".Uploadphoto div").append(html);
+                                $.ajax({   //设置设置公司LOGO
+                                    "url":"http://app.zhuangneizhu.com/set/updateCompanyLogo.do",
+                                    "type":"post",
+                                    "anyns":true,
+                                    "data":{
+                                        logo:photo,
+                                        userId:userId,
+                                        organizationId:organizationId,
+                                        version:ver
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                    }
+                                });
+                            }
+                        })   
+                    }); 
+
+                })
+                break;
+            case '1':
+                $('.title').html('设置成员角色');
+                $('.myedit').css('display','block');
+                $('.mylist').css('display','block');
+                $('.fot-btn').css('display','block');
+                $('.fot-btn').click(function(){  //新建成员角色
+                    $('.newcreate').css('display','block');
+                    $('.newtitle').html('添加成员角色') 
+                })
+                $.ajax({   //获取成员角色列表
+                    "url":"http://app.zhuangneizhu.com/set/gainEmployeeType.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                       list=data.data
+                        $.each(list,function(index,item){
+                            var html= '<div class="mater-box">'+item.roleName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                            $('.mylist').append(html)
+                        })
+                    }
+                }).done(function(){
+                console.log(list)
+                function getlist(){ //封装获取成员角色列表
+                    $.ajax({   
+                        "url":"http://app.zhuangneizhu.com/set/gainEmployeeType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                            userId:userId,
+                            organizationId:organizationId,
+                            version:ver
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            list=data.data
+                            $.each(list,function(index,item){
+                                var html= '<div class="mater-box">'+item.roleName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                                $('.mylist').append(html)
+                            });
+                            $('.mysure').css('display','block');
+                            $('.mater-up').css('display','block');
+                        }
+                    })
+                }
+                //排序
+                $('.mylist').on('click','.mater-box .mater-up .meter-upR .sort',function(){
+                    $.ajax({  //设置公司成员角色置顶
+                        "url":"http://app.zhuangneizhu.com/v2/set/setOrganizationRolePrev.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                            currentId:list[$(this).parent().parent().parent().index()].organizationRoleId,
+                            beforeId:list[$(this).parent().parent().parent().index()-1].organizationRoleId,
+                            organizationId:organizationId,
+                            userId:userId,
+                            version:ver
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            if(data.code=='10000'){
+                                $('.mylist').empty();
+                                getlist();
+                            }                           
+                        }
+                    });                    
+                })
+
+                //删除
+                $('.mylist').on('click','.mater-box .mater-up .meter-upR .del',function(){
+                    console.log($(this).parent().parent().parent().index())
+                    var organizationRoleId=list[$(this).parent().parent().parent().index()].organizationRoleId
+                    $.ajax({   //删除组织员工角色
+                        "url":"http://app.zhuangneizhu.com/set/delEmployeeType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                            organizationRoleId:organizationRoleId,
+                            userId:userId,
+                            organizationId:organizationId,
+                            version:ver
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            if(data.code=='10000'){
+                                $('.mylist').empty();
+                                getlist(); 
+                            }
+                        }
+                    });
+                })
+                //修改
+                $('.mylist').on('click','.mater-box .mater-up .meter-upR .xg',function(){
+                    $('.fot-btn').css('display','none')
+                    $('.modify').css('display','block');
+                    var roleName=list[$(this).parent().parent().parent().index()].roleName;
+                    var organizationRoleId=list[$(this).parent().parent().parent().index()].organizationRoleId;
+                    $('.xgtitle').html('修改角色名称');
+                    $('.modify input').val(roleName);
+                    $('.xgsure').on('click',function(){
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/editEmployeeType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver,
+                                roleName:$('.modify input').val(),
+                                organizationRoleId:organizationRoleId
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    window.location.reload();
+                                }
+                            }
+                        }); 
+                    })
+                }) 
+                }) 
+                //新建成员角色提交按钮
+                $('.main-cai-btn').on('click',function(){
+                    $.ajax({   
+                        "url":"http://app.zhuangneizhu.com/set/addEmployeeType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                            userId:userId,
+                            organizationId:organizationId,
+                            version:ver,
+                            roleName:$('.main-cai-input input').val()
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            if(data.code=='10000'){
+                                window.location.href='setpage.html?index='+getInfo;
+                            }
+                        }
+                    }); 
+                })
+                //编辑|完成按钮
+                $('.myedit').on('click',function(){
+                    $('.mysure').css('display','block');
+                    $('.mater-up').css('display','block');
+                })
+                $('.mysure').on('click',function(){
+                    $('.mysure').css('display','none');
+                    $('.mater-up').css('display','none');
+                })
+                break;
+            case '2':
+                $('.title').html('设置装修类型');
+                $('.myedit').css('display','block');
+                $('.mylist').css('display','block');
+                $('.addstyle-btn').css('display','block');
+                $('.addstyle-btn').click(function(){  //新建成员角色
+                    $('.newcreate').css('display','block');
+                    $('.newtitle').html('添加装修类型') 
+                })
+
+                $.ajax({   //获取装修类型列表
+                    "url":"http://app.zhuangneizhu.com/set/gainDecorateType.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                       list=data.data;
+                        $.each(list,function(index,item){
+                            var html= '<div class="mater-box">'+item.organizationDecorationTypeName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></div></div></div>';
+                            $('.mylist').append(html)
+                        })
+                    }
+                }).done(function(){
+                    console.log(list)
+                function getlist(){
+                        $.ajax({   //获取装修类型列表
+                            "url":"http://app.zhuangneizhu.com/set/gainDecorateType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                               list=data.data;
+                                $.each(list,function(index,item){
+                                    var html= 
+                                     '<div class="mater-box">'+item.organizationDecorationTypeName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+
+                                    $('.mylist').append(html)
+                                })
+                            }
+                        })
+                }
+                //删除
+                $('.mylist').on('click','.mater-box .mater-up .meter-upR .del',function(){
+                    console.log($(this).parent().parent().parent().index())
+                    var organizationDecorationTypeId=list[$(this).parent().parent().parent().index()].organizationDecorationTypeId
+                    $.ajax({   //删除装修类型
+                        "url":"http://app.zhuangneizhu.com/set/delDecorateType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                            organizationDecorateId:organizationDecorationTypeId,
+                            userId:userId,
+                            organizationId:organizationId,
+                            version:ver
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            if(data.code=='10000'){
+                                $('.mylist').empty();
+                                getlist(); 
+                            }
+                        }
+                    });
+                })
+                // //修改
+                $('.mylist').on('click','.mater-box .mater-up .meter-upR .xg',function(){
+                    $('.fot-btn').css('display','none')
+                    $('.modify').css('display','block');
+                    var organizationDecorationTypeName=list[$(this).parent().parent().parent().index()].organizationDecorationTypeName;
+                    var organizationDecorationTypeId=list[$(this).parent().parent().parent().index()].organizationDecorationTypeId;
+                    $('.xgtitle').html('修改装修类型名称');
+                    $('.modify input').val(organizationDecorationTypeName);
+                    $('.xgsure').on('click',function(){
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/editDecorateType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver,
+                                decorateName:$('.modify input').val(),
+                                organizationDecorateId:organizationDecorationTypeId
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data)
+                                if(data.code=='10000'){
+                                    window.location.reload();
+                                }
+                            }
+                        }); 
+                    })
+                }) 
+                })
+                //新建装修类型按钮
+                $('.main-cai-btn').on('click',function(){
+                    $.ajax({   
+                        "url":"http://app.zhuangneizhu.com/set/addDecorateType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                            userId:userId,
+                            organizationId:organizationId,
+                            version:ver,
+                            decorateName:$('.main-cai-input input').val()
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            if(data.code=='10000'){
+                                window.location.href='setpage.html?index='+getInfo;
+                            }
+                        }
+                    }); 
+                })
+                //编辑|完成按钮
+                $('.myedit').on('click',function(){
+                    $('.mysure').css('display','block');
+                    $('.mater-up').css('display','block');
+                })
+                $('.mysure').on('click',function(){
+                    $('.mysure').css('display','none');
+                    $('.mater-up').css('display','none');
+                })
+                break;
+            case '3':
+                $('.title').html('设置款项构成');
+                $('.mylist').css('display','block');
+                $('.myedit').css('display','block');
+                //编辑|完成按钮
+                $('.myedit').on('click',function(){
+                    $('.mysure').css('display','block');
+                    $('.mater-up').css('display','block');
+                })
+                $('.mysure').on('click',function(){
+                    $('.mysure').css('display','none');
+                    $('.mater-up').css('display','none');
+                })
+                $('.fot-btn').css('display','block');
+                $('.fot-btn').click(function(){  //添加款项构成
+                    $('.newcreate').css('display','block');
+                    $('.newtitle').html('添加款项构成') 
+                })
+                //款项构成列表展示
+                $.ajax({   
+                    "url":"http://app.zhuangneizhu.com/set/gainContractType.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        
+                        list=data.data;
+                        console.log(list)
+                        $.each(list,function(index,item){
+                            var html= '<div class="mater-box">'+item.organizationContractName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                            $('.mylist').append(html)
+                        })
+                    }
+                }).done(function(){
+                    function getlist(){ //封装款项构成列表
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/gainContractType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                
+                                list=data.data;
+                                console.log(list)
+                                $.each(list,function(index,item){
+                                    var html= '<div class="mater-box">'+item.organizationContractName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                                    $('.mylist').append(html)
+                                })
+                                $('.mysure').css('display','block');
+                                $('.mater-up').css('display','block'); 
+                            }
+                        })
+                    };
+                     //排序
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .sort',function(){
+                        $.ajax({  
+                            "url":"http://app.zhuangneizhu.com/v2/set/setOrganizationContractPrev.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                currentId:list[$(this).parent().parent().parent().index()].organizationContractId,
+                                beforeId:list[$(this).parent().parent().parent().index()-1].organizationContractId,
+                                organizationId:organizationId,
+                                userId:userId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                    getlist();
+                                }                           
+                            }
+                        });                    
+                    })
+
+                    //删除
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .del',function(){
+                        // console.log($(this).parent().parent().parent().index())
+                        var organizationContractId=list[$(this).parent().parent().parent().index()].organizationContractId
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/delContractType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                organizationContractId:organizationContractId,
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                getlist(); 
+                                }
+                            }
+                        });
+                    })
+                    
+                    //修改
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .xg',function(){
+                        $('.modify').css('display','block');
+                        $('.fot-btn').css('display','none')
+                        var organizationContractName=list[$(this).parent().parent().parent().index()].organizationContractName;
+                        var organizationContractId=list[$(this).parent().parent().parent().index()].organizationContractId;
+                        $('.xgtitle').html('修改角色名称');
+                        $('.modify input').val(organizationContractName);
+                        $('.xgsure').on('click',function(){
+                            $.ajax({   
+                                "url":"http://app.zhuangneizhu.com/set/editContractType.do",
+                                "type":"post",
+                                "anyns":true,
+                                "data":{
+                                    userId:userId,
+                                    organizationId:organizationId,
+                                    version:ver,
+                                    organizationContractName:$('.modify input').val(),
+                                    organizationContractId:organizationContractId
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    if(data.code=='10000'){
+                                        window.location.reload();
+                                    }
+                                }
+                            }); 
+                        })
+                    });
+                    //新建
+                    $('.main-cai-btn').on('click',function(){
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/addContractType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver,
+                                name:$('.main-cai-input input').val()
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    window.location.href='setpage.html?index='+getInfo;
+                                }
+                            }
+                        }); 
+                    })
+                });               
+                break;
+            case '4':
+                $('.title').html('设置收款状态');
+                $('.mylist').css('display','block');
+                $('.myedit').css('display','block');
+                //编辑|完成按钮
+                $('.myedit').on('click',function(){
+                    $('.mysure').css('display','block');
+                    $('.mater-up').css('display','block');
+                })
+                $('.mysure').on('click',function(){
+                    $('.mysure').css('display','none');
+                    $('.mater-up').css('display','none');
+                })
+                $('.fot-btn').css('display','block');
+                $('.fot-btn').click(function(){  
+                    $('.newcreate').css('display','block');
+                    $('.newtitle').html('添加收款状态名称') 
+                })
+                //收款状态列表展示
+                $.ajax({   
+                    "url":"http://app.zhuangneizhu.com/set/gainFundType.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        
+                        list=data.data;
+                        console.log(list)
+                        $.each(list,function(index,item){
+                            var html= '<div class="mater-box">'+item.organizationFundName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                            $('.mylist').append(html)
+                        })
+                    }
+                }).done(function(){
+                    function getlist(){ //封装款项构成列表
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/gainFundType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                
+                                list=data.data;
+                                console.log(list)
+                                $.each(list,function(index,item){
+                                    var html= '<div class="mater-box">'+item.organizationFundName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                                    $('.mylist').append(html)
+                                })
+                                $('.mysure').css('display','block');
+                                $('.mater-up').css('display','block'); 
+                            }
+                        })
+                    };
+                     //排序
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .sort',function(){
+                        $.ajax({  
+                            "url":"http://app.zhuangneizhu.com/v2/set/setOrganizationFundPrev.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                currentId:list[$(this).parent().parent().parent().index()].organizationFundId,
+                                beforeId:list[$(this).parent().parent().parent().index()-1].organizationFundId,
+                                organizationId:organizationId,
+                                userId:userId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                    getlist();
+                                }                           
+                            }
+                        });                    
+                    })
+
+                    //删除
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .del',function(){
+                        // console.log($(this).parent().parent().parent().index())
+                        var organizationFundId=list[$(this).parent().parent().parent().index()].organizationFundId
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/delFundType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                organizationFundId:organizationFundId,
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                    getlist(); 
+                                }
+                            }
+                        });
+                    })
+                    
+                    //修改
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .xg',function(){
+                        $('.modify').css('display','block');
+                        $('.fot-btn').css('display','none')
+                        var organizationFundName=list[$(this).parent().parent().parent().index()].organizationFundName;
+                        var organizationFundId=list[$(this).parent().parent().parent().index()].organizationFundId;
+                        $('.xgtitle').html('修改角色名称');
+                        $('.modify input').val(organizationFundName);
+                        $('.xgsure').on('click',function(){
+                            $.ajax({   
+                                "url":"http://app.zhuangneizhu.com/set/editFundType.do",
+                                "type":"post",
+                                "anyns":true,
+                                "data":{
+                                    userId:userId,
+                                    organizationId:organizationId,
+                                    version:ver,
+                                    organizationFundName:$('.modify input').val(),
+                                    organizationFundId:organizationFundId
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    if(data.code=='10000'){
+                                        window.location.reload();
+                                    }
+                                }
+                            }); 
+                        })
+                    });
+                    //新建
+                    $('.main-cai-btn').on('click',function(){
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/addFundType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver,
+                                fundName:$('.main-cai-input input').val()
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    window.location.href='setpage.html?index='+getInfo;
+                                }
+                            }
+                        }); 
+                    })
+                })
+                break;
+            case '5':
+                $('.title').html('设置渠道来源');
+                $('.mylist').css('display','block');
+                $('.myedit').css('display','block');
+                //编辑|完成按钮
+                $('.myedit').on('click',function(){
+                    $('.mysure').css('display','block');
+                    $('.mater-up').css('display','block');
+                })
+                $('.mysure').on('click',function(){
+                    $('.mysure').css('display','none');
+                    $('.mater-up').css('display','none');
+                })
+                $('.fot-btn').css('display','block');
+                $('.fot-btn').click(function(){  
+                    $('.newcreate').css('display','block');
+                    $('.newtitle').html('添加渠道来源名称') 
+                })
+                //渠道来源列表展示
+                $.ajax({   
+                    "url":"http://app.zhuangneizhu.com/set/gainChannelSource.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        
+                        list=data.data;
+                        console.log(list)
+                        $.each(list,function(index,item){
+                            var html= '<div class="mater-box">'+item.channelsourceName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                            $('.mylist').append(html)
+                        })
+                    }
+                }).done(function(){
+                    function getlist(){ //封装
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/gainChannelSource.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                
+                                list=data.data;
+                                console.log(list)
+                                $.each(list,function(index,item){
+                                    var html= '<div class="mater-box">'+item.channelsourceName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                                    $('.mylist').append(html)
+                                })
+                                $('.mysure').css('display','block');
+                                $('.mater-up').css('display','block'); 
+                            }
+                        })
+                    };
+                     //排序
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .sort',function(){
+                        $.ajax({  
+                            "url":"http://app.zhuangneizhu.com/v2/set/setOrganizationChannelSourcePrev.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                currentId:list[$(this).parent().parent().parent().index()].organizationChannelsourceId,
+                                beforeId:list[$(this).parent().parent().parent().index()-1].organizationChannelsourceId,
+                                organizationId:organizationId,
+                                userId:userId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                    getlist();
+                                }                           
+                            }
+                        });                    
+                    })
+
+                    //删除
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .del',function(){
+                        // console.log($(this).parent().parent().parent().index())
+                        var organizationChannelsourceId=list[$(this).parent().parent().parent().index()].organizationChannelsourceId
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/delChannelSource.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                organizationChannelsourceId:organizationChannelsourceId,
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                    getlist(); 
+                                }
+                            }
+                        });
+                    })
+                    
+                    //修改
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .xg',function(){
+                        $('.modify').css('display','block');
+                        $('.fot-btn').css('display','none')
+                        var channelsourceName=list[$(this).parent().parent().parent().index()].channelsourceName;
+                        var organizationChannelsourceId=list[$(this).parent().parent().parent().index()].organizationChannelsourceId;
+                        $('.xgtitle').html('修改角色名称');
+                        $('.modify input').val(channelsourceName);
+                        $('.xgsure').on('click',function(){
+                            $.ajax({   
+                                "url":"http://app.zhuangneizhu.com/set/editChannelSource.do",
+                                "type":"post",
+                                "anyns":true,
+                                "data":{
+                                    userId:userId,
+                                    organizationId:organizationId,
+                                    version:ver,
+                                    channelsourceName:$('.modify input').val(),
+                                    organizationChannelsourceId:organizationChannelsourceId
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    if(data.code=='10000'){
+                                        window.location.reload();
+                                    }
+                                }
+                            }); 
+                        })
+                    });
+                    //新建
+                    $('.main-cai-btn').on('click',function(){
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/set/addChannelSource.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver,
+                                name:$('.main-cai-input input').val()
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    window.location.href='setpage.html?index='+getInfo;
+                                }
+                            }
+                        }); 
+                    })
+                })
+                break;
+            case '8':
+                $(".fot-btn").html("新建项目模板");
+                $('.title').html('设置项目模板');
+                $('.mylist').css('display','block');
+                $('.myedit').css('display','block');
+                $('.Description').css('display','block');
+                //编辑|完成按钮
+                $('.myedit').on('click',function(){
+                    $('.mysure').css('display','block');
+                    $('.mater-up').css('display','block');
+                })
+                $('.Description').on('click',function(){
+                    $('.DescriptionBox').toggle();
+                })
+                $('.mysure').on('click',function(){
+                    $('.mysure').css('display','none');
+                    $('.mater-up').css('display','none');
+                })
+                $('.fot-btn').css('display','block');
+                $('.fot-btn').click(function(){  
+                    $('.addtemplate').css('display','block');
+                    $('.newtitle').html('添加项目模板名称') ;
+                })
+                $(".R").click(function(){
+                    $(".selectTemplate").toggle();
+                })
+                $(".main-cai-input").click(function(){
+                    $(".selectTemplate").css("display","none");
+                })
+                $(".inputTit").click(function(){
+                    $(".selectTemplate").css("display","none");
+                })
+                $.ajax({   
+                    "url":"http://app.zhuangneizhu.com/v2/set/getTemplateInfo.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        list=data.data;
+                        console.log(list)
+                        $.each(list,function(index,item){
+                            var html= '<div class="mater-box" >'+'<div class="model">'+item.templateName+'</div>'+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                            $('.mylist').append(html)
+                        })
+                        $.each(list,function(index,item){
+                            var html='<p style="width:7.5rem;height: 0.88rem;line-height: 0.88rem;font-size: 0.3rem;padding-left: 0.2rem;border-bottom: 1px solid #E6E7EC">'+item.templateName+'</p>'
+                            $(".selectTemplate").append(html);
+                        })
+                    }
+                }).done(function(){
+                    function getlist(){ //封装
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/v2/set/getTemplateInfo.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                
+                                list=data.data;
+                                console.log(list)
+                                $.each(list,function(index,item){
+                                    var html= '<div class="mater-box" >'+'<div class="model">'+item.templateName+'</div>'+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span><span class="sort"></span></div></div></div>';
+                                    $('.mylist').append(html)
+                                })
+                                $('.mysure').css('display','block');
+                                $('.mater-up').css('display','block'); 
+                            }
+                        })
+                    };
+                     //进入模板详情
+                     $(".mylist").on('click','.mater-box .model',function(){
+                        var index=$(this).parent().index();
+                        window.location.href="kindeditor/addmodel.html?index="+8+"&myid="+index; 
+                     })
+                     //排序
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .sort',function(){
+                        $.ajax({  
+                            "url":"http://app.zhuangneizhu.com/v2/set/setOrganizationScheduleTemplatePrev.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                currentId:list[$(this).parent().parent().parent().index()].templateId,
+                                beforeId:list[$(this).parent().parent().parent().index()-1].templateId,
+                                organizationId:organizationId,
+                                userId:userId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                    getlist();
+                                }                           
+                            }
+                        });                    
+                    })
+                    //删除
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .del',function(){
+                        $(".showbox").css("display","block");
+                        templateId=list[$(this).parent().parent().parent().index()].templateId;
+                    }) 
+                    $(".no").click(function(){
+                            $(".showbox").css("display","none");
+                    })
+                    $(".yes").click(function(){
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/v2/set/delOrganizationScheduleTemplate.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                templateId:templateId,
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    $('.mylist').empty();
+                                    getlist(); 
+                                }
+                                $(".showbox").css("display","none")
+                            }
+                        });
+                    })
+                    //修改
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .xg',function(){
+                        $('.modify').css('display','block');
+                        $('.fot-btn').css('display','none')
+                        var templateName=list[$(this).parent().parent().parent().index()].templateName;
+                        var templateId=list[$(this).parent().parent().parent().index()].templateId;
+                        $('.xgtitle').html('修改项目模板');
+                        $('.modify input').val(templateName);
+                        $('.xgsure').on('click',function(){
+                            $.ajax({   
+                                "url":"http://app.zhuangneizhu.com/v2/set/editOrganizationScheduleTemplateName.do",
+                                "type":"post",
+                                "anyns":true,
+                                "data":{
+                                    userId:userId,
+                                    organizationId:organizationId,
+                                    version:ver,
+                                    templateName:$('.modify input').val(),
+                                    templateId:templateId
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    if(data.code=='10000'){
+                                        window.location.reload();
+                                    }
+                                }
+                            }); 
+                        })
+                    });
+                    //新建
+                    $(".selectTemplate p").on('click',function(){
+                        index=$(this).index();
+                        var txt=list[index].templateName;
+                        $("#showTemplateName").html("");
+                        $("#showTemplateName").html(txt);
+                        $(".selectTemplate").css("display","none");
+                    })
+                    $('.main-cai-btn').on('click',function(){
+                        console.log(index);
+                        if(index!=null){
+                                $.ajax({   
+                                    "url":"http://app.zhuangneizhu.com/v2/set/addOrganizationScheduleTemplate.do",
+                                    "type":"post",
+                                    "anyns":true,
+                                    "data":{
+                                        userId:userId,
+                                        organizationId:organizationId,
+                                        version:ver,
+                                        templateName:$('.templateName').val(),
+                                        templateId:list[index].templateId,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        console.log(data)
+                                        if(data.code=='10000'){
+                                            window.location.href='setpage.html?index='+getInfo;
+                                        }
+                                    }
+                                }); 
+                        }else{
+                                $.ajax({   
+                                    "url":"http://app.zhuangneizhu.com/v2/set/addOrganizationScheduleTemplate.do",
+                                    "type":"post",
+                                    "anyns":true,
+                                    "data":{
+                                        userId:userId,
+                                        organizationId:organizationId,
+                                        version:ver,
+                                        templateName:$('.templateName').val()
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        console.log(data)
+                                        if(data.code=='10000'){
+                                            window.location.href='setpage.html?index='+getInfo;
+                                        }
+                                    }
+                                }); 
+                        }
+                    })
+                })
+                break;
+            case '6':
+                $('.title').html('设置建材支出分类');
+                $('.mylist').css('display','block');
+                $('.myedit').css('display','block');
+                //编辑|完成按钮
+                $('.myedit').on('click',function(){
+                    $('.mysure').css('display','block');
+                    $('.mater-up').css('display','block');
+                })
+                $('.mysure').on('click',function(){
+                    $('.mysure').css('display','none');
+                    $('.mater-up').css('display','none');
+                })
+                $('.fot-btn').css('display','block');
+                $('.fot-btn').click(function(){  
+                    $('.newcreate').css('display','block');
+                    $('.newtitle').html('添加建材支出分类') 
+                })
+                //建材支出分类来源列表展示
+                $.ajax({   
+                    "url":"http://app.zhuangneizhu.com/v2/set/gainRecordType.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        userId:userId,
+                        organizationId:organizationId,
+                        version:ver
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        
+                        list=data.data;
+                        console.log(list)
+                        $.each(list,function(index,item){
+                            var html= '<div class="mater-box">'+item.typeName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span></div></div></div>';
+                            $('.mylist').append(html)
+                        })
+                    }
+                }).done(function(){
+                    function getlist(){ //封装
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/v2/set/gainRecordType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                list=data.data;
+                                console.log(list)
+                                $.each(list,function(index,item){
+                                    var html= '<div class="mater-box">'+item.typeName+'<div class="mater-up" style="display:none;"><div class="meter-upR" style="width:3rem;padding-right:0.5rem"><span class="xg"></span><span class="del"></span></div></div></div>';
+                                    $('.mylist').append(html)
+                                })
+                                $('.mysure').css('display','block');
+                                $('.mater-up').css('display','block'); 
+                            }
+                        })
+                    };
+                    //删除
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .del',function(){
+                            console.log($(this).parent().parent().parent().index())
+                            var typeId=list[$(this).parent().parent().parent().index()].typeId;
+                            if(list.length>1){
+                                $.ajax({   
+                                        "url":"http://app.zhuangneizhu.com/v2/set/delRecordType.do",
+                                        "type":"post",
+                                        "anyns":true,
+                                        "data":{
+                                            typeId:typeId,
+                                            userId:userId,
+                                            organizationId:organizationId,
+                                            version:ver
+                                        },
+                                        "dataType":"json",
+                                        "success":function(data){
+                                            if(data.code=='10000'){
+                                                $('.mylist').empty();
+                                                getlist(); 
+                                            }  
+                                        }
+                                });
+                            }else{
+                               alert("最少保留一条数据")
+                            }
+                    })
+                    //修改
+                    $('.mylist').on('click','.mater-box .mater-up .meter-upR .xg',function(){
+                        $('.modify').css('display','block');
+                        $('.fot-btn').css('display','none')
+                        var typeName=list[$(this).parent().parent().parent().index()].typeName;
+                        var typeId=list[$(this).parent().parent().parent().index()].typeId;
+                        $('.xgtitle').html('修改支出建材分类');
+                        $('.modify input').val(typeName);
+                        $('.xgsure').on('click',function(){
+                            $.ajax({   
+                                "url":"http://app.zhuangneizhu.com/v2/set/updateRecordType.do",
+                                "type":"post",
+                                "anyns":true,
+                                "data":{
+                                    userId:userId,
+                                    organizationId:organizationId,
+                                    version:ver,
+                                    recordTypeName:$('.modify input').val(),
+                                    typeId:typeId
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                    if(data.code=='10000'){
+                                        window.location.reload();
+                                    }
+                                }
+                            }); 
+                        })
+                    });
+                    //新建
+                    $('.main-cai-btn').on('click',function(){
+                        $.ajax({   
+                            "url":"http://app.zhuangneizhu.com/v2/set/addRecordType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{
+                                userId:userId,
+                                organizationId:organizationId,
+                                version:ver,
+                                recordTypeName:$('.main-cai-input input').val()
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                if(data.code=='10000'){
+                                    window.location.href='setpage.html?index='+getInfo;
+                                }
+                            }
+                        }); 
+                    })
+                })
+            break;
+        }
+})
+</script>
+</html>                

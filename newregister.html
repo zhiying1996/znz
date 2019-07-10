@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<!-- <body class="registerground"> -->
+<div class="wap-wrap" id="demo" style="box-shadow: none;">
+    <div class="registerfather">
+    <div class="logo">
+        <img src="image/logo.png" alt="">
+    </div>
+    <div class="red-text">
+        <span>*注册成功后，你将拥有一个新的完全独立的基础版公司</span>
+        <span>*用手机号登录后，你可以在首页切换不同公司进行独立管理</span>
+        <span>*不同公司的所有数据都是独立的</span>
+    </div>
+    <div class="regBox">
+        <input type="text" style="height: 0.6rem;" placeholder="请填写公司/团队名字（后期可修改）" v-model="name">
+    </div>
+    <div class="regBox">
+            <input id="user" style="height: 0.6rem;"type="text" maxlength="6" placeholder="输入您的姓名" v-model="user" >
+    </div>
+    <div class="regBox" style="height: 0.6rem;color: #666">
+            <select id="cmbProvince" name="cmbProvince"></select>  
+            <select id="cmbCity" name="cmbCity"></select>  
+            <select id="cmbArea" name="cmbArea"></select> 
+    </div>
+    <div class="loginbtn">
+        <div class="loginTop" style="border-bottom: 1px solid #ccc">
+            <input  type="text" maxlength="11" placeholder="手机号码" v-model="phonenumber">
+        </div>
+        <div class="loginbt">
+            <input  style="display: block;width:63%" type="text" maxlength="6" placeholder="验证码" v-model="code">
+            <a style="display: block;width: 35%" @click="sendVerification()" v-if="!sendMsgDisabled">获取验证码</a>
+            <a style="display: block;width: 35%" v-if="sendMsgDisabled">{{time+"S后重新获取"}}</a>
+        </div>
+    </div>
+    <div class="logoSub" style="background-color: #fff;">
+        <input type="submit" value="确认"  @click="di">
+    </div>
+</div>
+</div>
+<!-- </body> -->
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="./js/address.js"></script>
+<script type="text/javascript">
+var ver=localStorage.getItem("version");
+ $(function(){
+ 	var app=new Vue({
+ 		el:"#demo",
+ 		data:{
+ 			city:'',//城市名
+            name:'',//公司名
+            phonenumber:'',
+            code:'',
+            user:'',
+            time: 60, // 发送验证码倒计时
+            sendMsgDisabled: false
+ 		},
+ 		methods:{
+ 			di:function(){
+                let that =this;
+				if(!(/^1[3|4|5|8][0-9]\d{4,8}$/.test(that.phonenumber))){ 
+				  alert("请输入正确的手机号码。"); 
+				  $(".loginTop input").focus(); 
+				  return false; 
+				 }else{
+				$.ajax({
+				    "url":"http://app.zhuangneizhu.com/user/regitsterNew.do",
+				    "type":"post",
+				    "anyns":"true",
+				    "data":{
+				        companyName:that.name,
+				        mobile:that.phonenumber,
+				        code:that.code,
+				        userName:that.user,  
+				        cityCode:that.city,
+				        appType:"znz",
+				        version:ver
+				    },
+				    "dataType":"json", 
+				    "success":function(data){
+				        console.log(data);
+                        if(data.code!=10000){
+                            alert(data.message);
+                        }else{
+                            $.ajax({
+                                "url":"http://app.zhuangneizhu.com/user/login.do",
+                                "type":"post",
+                                "anyns":"true",
+                                "data":{
+                                    companyName:"",
+                                    mobile:that.phonenumber,
+                                    code:that.code,
+                                    type:"android",
+                                    version:ver
+                                },
+                                "dataType":"json",
+                                success:function(data){
+                                    localStorage.setItem('key',data.data.userId);
+                                    localStorage.setItem('orgkey',data.data.organizations[0].organizationId);
+                                    window.location.href="project.html";
+                                }
+                            })              
+                        }
+				    },
+				    "error":function(){
+				        console.log("程序错误")
+				    }
+				  });
+				 }
+            } ,
+            sendVerification:function(){
+                    let me = this;
+                    if (me.phonenumber=='') {
+                        alert("请填写电话号码。")
+                        return
+                    }else {
+                        me.sendMsgDisabled = true;
+                        let interval = window.setInterval(function() {
+                         if ((me.time--) <= 0) {
+                          me.time = 60;
+                          me.sendMsgDisabled = false;
+                          window.clearInterval(interval);
+                         }
+                        }, 1000);
+                    } 
+                $.ajax({
+                        "url":"http://app.zhuangneizhu.com/user/gainCode.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                          mobile:me.phonenumber,
+                          version:ver,
+                          appType:"znz"
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                        }   
+                });
+            }
+		},
+ 	   mounted(){
+            let that=this; 
+ 	   	    // 省市县三级联动
+	 	   	addressInit('cmbProvince', 'cmbCity', 'cmbArea'); 
+			var xian=document.getElementById("cmbArea");
+			xian.onchange=function(){
+        			   var myselect=document.getElementById("cmbCity");
+                    var shiselect=document.getElementById("cmbProvince");
+                    var key=shiselect.selectedIndex;
+                    var text=shiselect.options[key].text;
+        			var index=myselect.selectedIndex;
+        			var mytext=myselect.options[index].text;
+        			if (text=="北京市"||text=="上海市"||text=="天津市"||text=="重庆市") {
+                        that.city=text;
+                        console.log(that.city);
+                    }else{
+                        that.city=mytext;
+                        console.log(that.city);
+                    }
+			}
+        }
+ 	})
+})
+</script>
+</html>

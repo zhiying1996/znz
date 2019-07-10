@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <!-- 头部主体开始 -->
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div @click="back"></div>
+            <span>设置建材库</span>
+            <a href="###" class="blue header-tit-r" @click="_titshow" >
+                <strong v-if="titshow">编辑</strong>
+                <strong v-else>完成</strong>
+            </a>
+        </div>
+        <!-- 建材搜索开始 -->
+        <div style="width: 7.5rem;height: 1rem;background-color:#fff;border-top: 1px solid #f6f8ff;position: absolute;">
+            <img src="image/head01.png" style="width: 0.35rem;height: 0.35rem;display: block;float: left;position: absolute;top: 0.3rem;left: 0.4rem">
+            <input type="" name=""  placeholder="输入建材名称搜索" style="width:6.3rem;display: block;margin:0.2rem auto;line-height:0.6rem;background-color: #f6f8ff;padding-left: 0.7rem;" v-model="caiName" >
+        </div>
+        <!-- 建材搜索结束 -->
+    </div>
+    <!-- 头部主体结束 -->
+    <!-- 内容主体开始 -->
+    <div class="main" style="top: 1.88rem;bottom: 0.88rem;padding-top: 0.2rem;overflow-y: auto;width: 7.5rem;">
+        <div class="mater-box" v-for="(value,index) in json" >
+            <div class="mater-down" @click="_materbox(index,value.organizationMaterialsTypeName,value.organizationMaterialsTypeId)">
+                <span class="mater-L" v-html="value.organizationMaterialsTypeName"></span>
+                <i></i>
+                <span class="mater-R" >{{value.organizationMaterialsTypeBrandNum}}</span>
+            </div>
+            <div class="mater-up" v-show="!titshow">
+                <div class="meter-upR">
+                    <!--修改-->
+                    <span @click="_matermodify(index)"></span>
+                    <!--删除-->
+                    <span @click="_materclose(index,1)"></span>
+                    <!--置顶-->
+                    <span @click="_matertop(index,1)"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 内容主体结束 -->
+    <div class="fot-btn" @click="_caishow">添加建材类型</div>
+    <!-- ------------------------------------------------------------------------------------------------------------------- -->
+    <!-- 添加建材类目开始 -->
+    <div class="main-cai" v-show="caishow" v-cloak>
+        <div class="personnelTit">
+            <div @click="caishow=false"></div>
+            <span>添加建材名称</span>
+        </div>
+        <div class="main-cai-input">
+            <input type="text"  placeholder="请输入建材类型" v-model="titval">
+        </div>
+        <div class="main-cai-btn" style="background-color: #4c94ff;" @click="_caiok">确认</div>
+    </div>
+    <!-- 添加建材类目结束 -->
+    <!--修改建材类名字-->
+    <div class="main-cai" v-show="xiushow" v-cloak>
+        <div class="personnelTit">
+            <div @click="xiushow=false"></div>
+            <span>修改建材类型</span>
+        </div>
+        <div class="main-cai-input">
+            <input type="text"  placeholder="请输入名字" v-model="xiuval">
+        </div>  
+        <div class="main-cai-btn" style="background-color: #4c94ff;" @click="_xiuok">确认</div>
+    </div>
+    <!--修改建材类名字结束-->
+    <!--建材品牌主体-->
+    <div class="main-cai" v-show="brandshow" v-cloak>
+        <div class="personnelTit">
+            <div @click="_brandclose"></div>
+            <span>{{brandtit}}</span>
+            <a href="###" class="blue header-tit-r" @click="_titshow">
+                <strong v-if="titshow">编辑</strong>
+                <strong v-else>完成</strong>
+            </a>
+        </div>
+        <div class="brandBox" style="overflow-x: hidden;width: 7.8rem;bottom:0.8rem;">
+            <h3>
+                <span style="flex: 2;text-align: left">具体品牌</span>
+            </h3>
+            <div  id="brand-R">
+                <div class="mater-box" v-for="(value,index) in brandarr" v-cloak >
+                    <div class="mater-down" @click="item(value.brandId,value.brandName,index)">
+                        <span class="mater-L" v-html="value.brandName" ></span>
+                    </div>
+                    <div class="mater-up" v-show="!titshow">
+                        <div class="meter-upR">
+                            <!--修改-->
+                            <span @click="_matermodify01(index,1)"></span>
+                            <!--删除-->
+                            <span @click="_materclose(index,2)"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fot-btn" @click="_brandshow">添加建材品牌</div>
+    </div>
+    <!--建材品牌主体结束  -->
+    <!--品牌添加窗开始-->
+    <div class="main-cai" style="overflow-y: auto;" v-show="addbrandshow" v-cloak>
+        <div class="personnelTit">
+            <div @click="addbrandshow=false"></div>
+            <span>添加建材品牌</span>
+        </div>
+        <div class="brand02Box">
+            <h3><input type="text" placeholder="添加建材品牌" v-model="addbrandname" style="font-size: 0.28rem"></h3>
+        </div>
+        <div class="mat-btn" @click="_addBrandbtn">保存</div> 
+    </div>
+    <!--品牌添加结束-->
+    <!--品牌修改开始-->
+    <div class="main-cai" style="overflow-y: auto;" v-show="changebrandshow" v-cloak>
+        <div class="personnelTit">
+            <div @click="changebrandshow=false"></div>
+            <span>修改建材品牌</span>
+        </div>
+        <div class="brand02Box">
+            <h3><input type="text"  v-model="changebrandname" style="font-size: 0.28rem"></h3>
+        </div> 
+        <div class="mat-btn" @click="changeBrandbtn">保存</div> 
+    </div>
+    <!--品牌修改结束-->
+    <!--型号主体开始 -->
+    <div class="main-cai" v-show="itemshow" v-cloak>
+        <div class="personnelTit">
+            <div @click="itemshow=false"></div>
+            <span>{{modeltit}}</span>
+            <a href="###" class="blue header-tit-r" @click="_titshow">
+                <strong v-if="titshow">编辑</strong>
+                <strong v-else>完成</strong>
+            </a>
+        </div>
+        <div class="brandBox" style="overflow-x: hidden;width: 7.8rem">
+            <h3>
+                <span style="flex: 1;text-align: left">图片</span>
+                <span style="flex: 1;text-align: center;">具体型号</span>
+                <span style="flex: 1">供应价(元)</span>
+                <span style="flex: 1">报价单位</span>
+            </h3>
+            <div  id="brand-R">
+            <div class="mater-box" v-for="(value,index) in modelarr"  v-cloak >
+                <div class="mater-down" style="justify-content: space-around;" >
+                    <img style="width: 0.8rem;height: 0.75rem;padding-top: 0.06rem;" :src="'http://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value.photo">
+                    <span class="mater-R" style="width: 1.8rem;text-align: right;font-size: 0.25rem;color:#000;" v-html="value.supplyUnit"></span>
+                    <span class="mater-R" style="width:1rem;text-align: center;color:#000;" v-html="value.supplyPrice"></span>
+                    <span class="mater-R" style="width:2.8rem;text-align:center;font-size: 0.25rem;color:#000;" v-html="value.buildingName"></span>
+                </div> 
+                <div class="mater-up" v-show="!titshow">
+                    <div class="meter-upR">
+                        <!--修改-->
+                        <span @click="_matermodify01(index,2,value.buildingName,value.supplyPrice,value.supplyUnit,value.buildingId,value.photo,value.customCode,value.remark,value.salePrice,value.detailsPhoto)"></span>
+                        <!--删除-->
+                        <span @click="_materclose(index,3)"></span>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="fot-btn" @click="addstyle">添加建材型号</div>
+        </div> 
+    </div>
+    <!--型号主体结束 -->
+    <!--型号添加开始-->
+    <div class="main-cai" style="overflow-y: auto;padding-bottom: 0.88rem; width: 7.5rem" v-show="addmodelbox" v-cloak>
+        <div class="personnelTit">
+            <div @click="addmodelbox=false"></div>
+            <span>添加建材型号</span>
+        </div>
+        <div style="width: 100%;height: 2.5rem;background-color:#f6f8ff;position: relative;">
+            <form id="from" enctype="multipart/form-data" style="width:2.1rem;height: 2.1rem;display: block;margin-left: 2.7rem;margin-top: 0.25rem;background-color: #fff;">
+                <img :src="'http://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+sr" style="width: 2rem;height: 2rem;position: absolute;left: 2.75rem;top: 0.05rem;display: block;">
+                <input type='file' name="files" multiple="multiple" style="width: 2rem;height: 2rem;outline:none;display: block;position: absolute;left: 2.75rem;top: 0.05rem;font-size:0;opacity: 0;" >
+            </form>
+             <span style="color: #5677fc;font-size: 0.25rem;position: absolute;bottom: 0;left: 3rem;">上传建材图片</span>
+        </div>
+        <div class="brand02Box">
+            <h3>
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材型号:</span>
+                <input type="text" placeholder="添加建材型号"  v-model="addModelname" style="font-size: 0.26rem;position: absolute;left:1.5rem;color: #000;" >
+            </h3>
+            <h3 @click="selectModel">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材品牌:</span>
+                <span style="font-size: 0.28rem; position: absolute;left:1.5rem;">{{selectModelName}}</span>
+                <i style="position: absolute;right: 0.3rem"></i>
+            </h3>
+            <div style="width: 7.5rem;height:auto;position:absolute;background-color: #fff;overflow-x:hidden;z-index: 1000;" v-show="selectModelBox">
+                <span v-for="(item,index) in brandarr" style="width: 100%;height:0.8rem;display: block;font-size: 0.28rem;line-height: 0.8rem;padding-left: 0.3rem;border-bottom: 1px solid #E6E7EC;" @click="catchModelId(item.brandName,item.brandId)">{{item.brandName}}</span>
+            </div>
+            <h3 @click="selBrand">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材分类:</span>
+                <span style="font-size: 0.28rem; position: absolute;left:1.5rem;">{{selBrandName}}</span>
+                <i style="position: absolute;right: 0.3rem"></i>
+                <i></i>
+            </h3>
+            <div style="width: 7.5rem;height:auto;position:absolute;background-color: #fff;overflow-x:hidden;z-index: 1000;" v-show="selbrandbox">
+                <span v-for="(item,index) in json" style="width: 100%;height:0.8rem;display: block;font-size: 0.28rem;line-height: 0.8rem;padding-left: 0.3rem;border-bottom: 1px solid #E6E7EC;" @click="catchbrandId(item.organizationMaterialsTypeName,item.organizationMaterialsTypeId)">{{item.organizationMaterialsTypeName}}</span>
+            </div>
+            <h3>
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">供应价:</span>
+                <input type="text" placeholder="请输入供应价"  v-model="addModelmony" style="font-size: 0.28rem;position: absolute;left:1.3rem;">
+                <span style="font-size: 0.28rem;position: absolute;right: 0.3rem">元</span>
+            </h3>
+            <h3>
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">零售价:</span>
+                <input type="text" placeholder="选填"  v-model="moreaddModelmony" style="font-size: 0.28rem;position: absolute;left:1.3rem;">
+                <span style="font-size: 0.28rem;position: absolute;right: 0.3rem">元</span>
+            </h3>
+            <h3 @click="selSI">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材单位:</span>
+                <span style="font-size: 0.28rem;position: absolute;left:1.5rem;">{{SiName}}</span>
+                <i style="position: absolute;right: 0.3rem"></i>
+                <i></i>
+            </h3>
+            <div style="width:7.5rem;height:auto;position:absolute;background-color: #fff;overflow-x:hidden;z-index: 1000;"  v-show="SIbox">
+                <span v-for="item in SI" style="width:100%;height:0.8rem;display: block;font-size: 0.28rem;line-height: 0.8rem;padding-left: 0.3rem;border-bottom: 1px solid #E6E7EC;" @click="catchSI(item)">{{item}}</span>
+            </div>
+            <div style="width:7.5rem;border-bottom: 1px solid #E6E7EC;background-color: #fff;height: auto;">
+                <form id="fromphoto" enctype="multipart/form-data" style="width:6.9;height:0.5rem;display: flex;justify-content: space-between;line-height: 0.5rem;font-size: 0.28rem; position: relative;padding: 0 0.3rem;">
+                        <span>详情图片</span>
+                        <input type="file"  name="files" multiple="multiple"  style="display: block;position: absolute;opacity: 0;width:0.5rem;height: 0.5rem;right:0.7rem">
+                        <span style="color:rgb(86, 119, 252);">编辑</span>  
+                </form>
+                <div style="width:7.5rem;height:auto;display: flex;flex-wrap: wrap;overflow-x: hidden;">
+                    <div class="eng-img" v-for="val in addmoreimg">
+                       <img :src="'http://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+val">
+                       <p>2019.1.23</p>
+                    </div>
+                </div>
+            </div>
+            <h3 style="width: 7.5rem;height:auto;display: block;height:3rem;font-size: 0.28rem;padding: 0 0.3rem;">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;line-height: 0.88rem;color: #808083">备注 : </span>
+                <textarea  style="position: absolute;left:1.5rem;width:6rem;height:2.9rem;border: none;outline:none;font-size: 0.27rem;padding: 0;line-height: 0.88rem;" v-model="remark"></textarea>
+            </h3>   
+        </div>
+        <div class="mat-btn" style="margin: 0.3rem;" @click="_addModelbtn">保存</div> 
+    </div>
+    <!--型号添加结束-->
+    <!--型号修改开始 -->
+    <div class="main-cai" style="overflow-y: auto;width: 7.8rem;overflow-x: hidden;" v-show="changemodelbox" v-cloak>
+        <div class="personnelTit">
+            <div @click="changemodelbox=false"></div>
+            <span>修改建材型号</span>
+        </div>
+        <div style="width: 100%;height: 2.5rem;background-color:#f6f8ff;position: relative;">
+            <form id="frombox" enctype="multipart/form-data" style="width:2.1rem;height: 2.1rem;display: block;margin-left: 2.7rem;margin-top: 0.25rem;background-color: #fff;">
+                <img :src="'http://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+changesr" style="width: 2rem;height: 2rem;position: absolute;left:2.75rem;top: 0.05rem;display: block;">
+                <input type='file' name="files" multiple="multiple" style="width: 2rem;height: 2rem;outline:none;display: block;position: absolute;left: 2.75rem;top: 0.05rem;font-size:0;opacity: 0;" >
+            </form>
+             <span style="color: #5677fc;font-size: 0.25rem;position: absolute;bottom: 0;left: 3rem;">上传建材图片</span>
+        </div>
+        <div class="brand02Box" style="margin-top: 0;">   
+            <h3>
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材型号:</span>
+                <input type="text" placeholder="建材型号"  v-model="addModelname" style="font-size: 0.28rem;position: absolute;left:1.5rem;" >
+            </h3>
+            <h3 @click="selectModel">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材品牌:</span>
+                <span style="font-size: 0.28rem; position: absolute;left:1.5rem;">{{selectModelName}}</span>
+                <i style="position: absolute;right: 0.3rem"></i>
+            </h3>
+            <div style="width: 7.5rem;height:auto;position:absolute;background-color: #fff;overflow-x:hidden;z-index: 1000;" v-show="selectModelBox">
+                <span v-for="(item,index) in brandarr" style="width: 100%;height:0.8rem;display: block;font-size: 0.28rem;line-height: 0.8rem;padding-left: 0.3rem;border-bottom: 1px solid #E6E7EC;" @click="catchModelId(item.brandName,item.brandId)">{{item.brandName}}</span>
+            </div>
+            <h3 @click="selBrand">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材分类:</span>
+                <span style="font-size: 0.28rem; position: absolute;left:1.5rem;">{{selBrandName}}</span>
+                <i style="position: absolute;right: 0.3rem"></i>
+            </h3>
+            <div style="width: 7.5rem;height:auto;position:absolute;background-color: #fff;overflow-x:hidden;z-index: 1000;" v-show="selbrandbox">
+                <span v-for="(item,index) in json" style="width: 100%;height:0.8rem;display: block;font-size: 0.28rem;line-height: 0.8rem;padding-left: 0.3rem;border-bottom: 1px solid #E6E7EC;" @click="catchbrandId(item.organizationMaterialsTypeName,item.organizationMaterialsTypeId)">{{item.organizationMaterialsTypeName}}</span>
+            </div>
+            <h3>
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">供应价:</span>
+                <input type="text" placeholder="请输入供应价"  v-model="addModelmony" style="font-size: 0.28rem;position: absolute;left:1.5rem;">
+                <span style="font-size: 0.28rem;position: absolute;right: 0.3rem">元</span>
+            </h3>
+            <h3>
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">零售价:</span>
+                <input type="text" placeholder="选填"  v-model="moreaddModelmony" style="font-size: 0.28rem;position: absolute;left:1.5rem;">
+                <span style="font-size: 0.28rem;position: absolute;right: 0.3rem">元</span>
+            </h3>
+            <h3 @click="selSI">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;color: #808083;">建材单位:</span>
+                <span style="font-size: 0.28rem;position: absolute;left:1.5rem;">{{SiName}}</span>
+                <i style="position: absolute;right: 0.3rem"></i>
+            </h3>
+            <div style="width: 7.5rem;height:auto;position:absolute;background-color: #fff;overflow-x:hidden;z-index: 1000;"  v-show="SIbox">
+                <span v-for="item in SI" style="width: 100%;height:0.8rem;display: block;font-size: 0.28rem;line-height: 0.8rem;padding-left: 0.3rem;border-bottom: 1px solid #E6E7EC;" @click="catchSI(item)">{{item}}</span>
+            </div>
+            <div style="width:7.5rem;border-bottom: 1px solid #E6E7EC;background-color: #fff;height: auto;">
+                <form id="fromboxphoto" enctype="multipart/form-data" style="width:6.9;height:0.5rem;display: flex;justify-content: space-between;line-height: 0.5rem;font-size: 0.28rem; position: relative;padding: 0 0.3rem;">
+                        <span>详情图片</span>
+                        <input type="file"  name="files" multiple="multiple"  style="display: block;position: absolute;opacity: 0;width:0.5rem;height: 0.5rem;right:0.7rem">
+                        <span style="color:rgb(86, 119, 252);">编辑</span>  
+                </form>
+                <div style="width:7.5rem;height:auto;display: flex;flex-wrap: wrap;overflow-x: hidden;">
+                    <div class="eng-img"  v-for="val in changmoreimg">
+                       <img :src="'http://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+val">
+                       <p>2019.1.23</p>
+                    </div>
+                </div>
+            </div>
+            <h3 style="width: 7.5rem;height:auto;display: block;height:3rem;font-size: 0.28rem;padding: 0 0.3rem;">
+                <span style="position: absolute;left:0.3rem;font-size: 0.28rem;line-height: 0.88rem;color: #808083">备注 : </span>
+                <textarea  style="position: absolute;left:1.5rem;width:6rem;height:2.9rem;border: none;outline:none;font-size: 0.27rem;padding: 0;line-height: 0.88rem;" v-model="remark"></textarea>
+            </h3>
+        </div>
+        <div class="mat-btn" style="margin: 0.3rem;" @click="_changeModelbtn">保存</div> 
+    </div>
+    <!--型号修改结束 -->
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var userId =localStorage.getItem('key');
+var org=localStorage.getItem('orgkey');
+var ver=localStorage.getItem('version');
+$(function(){
+    var app=new Vue({
+        el:"#demo",
+        data:{
+            loding:true,
+            titshow:true,
+            caishow:false,
+            xiushow:false,
+            brandshow:false,//建材品牌主体
+            addbrandshow:false,//添加品牌主体
+            changebrandshow:false,//修改品牌主体
+            selbrandbox:false,//类型下拉框显示判断
+            SIbox:false,//单位下拉框显示判断
+            itemshow:false,//型号显示
+            addmodelbox:false,//添加型号
+            selectModelBox:false,//品牌显示判断 
+            changemodelbox:false,//型号修改显示
+            titval:'',//新增建材类目input
+            xiuindex:'',//修改按钮index
+            xiuval:'',//修改建材类目input
+            LeiId:'',//建材类目id
+            brandtit:'',//品牌头部
+            brandarr:[],//品牌数组
+            modeltit:'',//类型头部
+            json:[],
+            brandLei:[],//建材类目集合
+            modelarr:[],//建材型号集合
+            SI:[],//报价单位集合
+            addbrandname:'',//添加品牌名称
+            addModelmony:'',//添加/修改品牌类型零售价格
+            moreaddModelmony:'',//添加/修改品牌类型供应价格
+            addModelname:'',//添加/修改品牌类型名称
+            changeModelBuildingId:'',//修改类型需要的类型id
+            materialsTypeId:'',
+            modelNeedBrandid:'',
+            codes:'',
+            remark:'',//备注
+            SiName:"请选择报价单位",//添加/修改需要的单位
+            selectModelName:"",
+            selBrandName:'',
+            needid:'',//
+            changebrandname:'',//
+            changebrandid:'',//
+            changModelNeedIndex:"",//修改品牌类型，类型初始的时品牌的index
+            caiName:'',//模糊搜索建材
+
+            addmoreimg:[],//添加多张图片
+            changmoreimg:[],//修改多张图片
+            sr:"image/2019/01/02/3001fa8d-aa39-462e-a8a4-9c5572545dd0.png",//获取图片路径 
+            changesr:[],//获取单张修改图片路径 
+        },
+        beforeCreate:function(){
+            var that=this;
+            $.ajax({   //获取公司建材类目
+                    url:"http://app.zhuangneizhu.com/set/gainMaterialsType.do",
+                    type:"POST",
+                    data:{
+                            userId:userId,
+                            organizationId:org,
+                            version:ver,
+                        },
+                    "dataType":"json",
+                    "success":function(data){
+                        that.loding=false;
+                        for (var i = 0; i < data.data.length; i++) {
+                             that.brandLei.push(data.data[i].organizationMaterialsTypeName);
+                        }
+                        that.json=data.data;
+                        console.log(data);
+                    },
+                    "error":function(){
+                        console.log("错误");
+                    }
+            })
+            $.ajax({   //获取建材单位列表
+                    url:"http://app.zhuangneizhu.com/v2/set/gainMaterialsBrandUnit.do",
+                    type:"POST",
+                    data:{   
+                            userId:userId,
+                            version:ver,
+                            organizationId:org
+                        },
+                    "dataType":"json",
+                    "success":function(data){
+                     // that.str=data.data;
+                     var dan=data.data.split(",");
+                    for (var i = 0; i < dan.length; i++) {
+                            that.SI.push(dan[i]);                   
+                        }
+                    },
+                    "error":function(){
+                        console.log("错误");
+                    }
+            });
+        },
+        watch:{
+            caiName:function(val){
+                var that=this;
+                $.ajax({   //获取公司建材类目
+                        url:"http://app.zhuangneizhu.com/set/gainMaterialsType.do",
+                        type:"POST",
+                        data:{
+                                userId:userId,
+                                organizationId:org,
+                                version:ver,
+                                qr:that.caiName,
+                            },
+                        "dataType":"json",
+                        "success":function(data){
+                            for (var i = 0; i < data.data.length; i++) {
+                                that.brandLei.push(data.data[i].organizationMaterialsTypeName);
+                            }
+                            that.json=data.data;
+                            console.log(data);
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                });
+            }
+        },
+        methods:{
+            back:function(){
+               window.location.href="personal.html"
+            },
+            _titshow:function(){
+                this.titshow=!this.titshow;
+            },
+            _caishow:function(){
+                this.caishow=!this.caishow;
+            },
+            _caiok:function(){//添加建材类目确定按钮
+                var that=this;
+                $.ajax({   //添加项目建材类型
+                    url:"http://app.zhuangneizhu.com/set/addMaterialsType.do",
+                    type:"POST",
+                    data:{   
+                            organizationId:org,
+                            materialsName:that.titval,
+                            userId:userId,
+                            version:ver,
+                        },
+                    "dataType":"json",
+                    "success":function(data){
+                      window.location.href="material.html";
+                    },
+                    "error":function(){
+                      console.log("错误");
+                    }
+                });
+            },
+            _matermodify:function(index) {//公司建材类别名字修改按钮
+                var that = this;
+                that.xiushow=true;
+                that.xiuindex= index;
+                that.xiuval = that._data.json[index].organizationMaterialsTypeName;
+                that.LeiId = that._data.json[index].organizationMaterialsTypeId;    
+            },
+            _xiuok:function(){//公司建材类别名字修改确定按钮
+                var that = this;
+                // let k = that._data.titval;
+                var key=that.xiuindex;
+                that.json[key].organizationMaterialsTypeName=that.xiuval;
+                // that._data.xiushow=false;
+                $.ajax({   //修改建材类型名称
+                    url:"http://app.zhuangneizhu.com/set/editMaterialsType.do",
+                    type:"POST",
+                    data:{   
+                            organizationMaterialsTypeId:that.LeiId,
+                            materialsTypeName:that.xiuval,
+                            userId:userId,
+                            version:ver,
+                            organizationId:org
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                           if(data.code==10000){
+                              that.xiushow=false;
+                            }
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                });
+            },
+            _materclose:function (index,key) {//公司建材类别删除按钮
+                var that = this;
+                if(confirm("确认删除吗")){
+                    if(key==1){
+                        var  delid=that.json[index].organizationMaterialsTypeId;
+                        that.json.splice(index,1);
+                        $.ajax({   //删除公司建材类目
+                            url:"http://app.zhuangneizhu.com/set/delMaterialsType.do",
+                            type:"POST",
+                            data:{   
+                                    organizationMaterialsTypeId:delid,
+                                    userId:userId,
+                                    version:ver,
+                                    organizationId:org
+                                },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                        });
+                    }else if(key==2){
+                    let id=that.brandarr[index].brandId;
+                    console.log(id);
+                    that.brandarr.splice(index,1)
+                    $.ajax({   //删除项目品牌
+                            url:"http://app.zhuangneizhu.com/set/delMaterialsBrand.do",
+                            type:"POST",
+                            data:{   
+                                    materialsTypeId:that.needid,
+                                    userId:userId,
+                                    version:ver,
+                                    organizationId:org,
+                                    organizationMaterialsBrandId:id,
+                                },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                    });
+                    }else if(key==3){
+                        var id=that.modelarr[index].buildingId
+                        that.modelarr.splice(index,1)
+                        $.ajax({   //删除型号
+                                url:"http://app.zhuangneizhu.com/v3/set/delMaterialsBuilding.do",
+                                type:"POST",
+                                data:{   
+                                        userId:userId,
+                                        version:ver,
+                                        organizationId:org,
+                                        buildingId:id,
+                                    },
+                                "dataType":"json",
+                                "success":function(data){
+                                    console.log(data);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                        });
+                    }
+                }
+            },
+            _matertop:function (index,key) {//公司建材类型置顶按钮
+                var that= this;
+                console.log(index)
+                if(key==1){
+                    var id=that.json[index].organizationMaterialsTypeId;
+                    var nweid=that.json[index-1].organizationMaterialsTypeId;
+                    var tempOption = that.json[index - 1];
+                    that.$set(that.json, index - 1, that.json[index]);
+                    that.$set(that.json, index, tempOption)
+                    $.ajax({   //项目建材库置顶
+                            url:"http://app.zhuangneizhu.com/v2/set/setOrganizationMaterialsPrev.do",
+                            type:"POST",
+                            data:{   
+                                    currentId:nweid,
+                                    beforeId:id,
+                                    userId:userId,
+                                    version:ver,
+                                    organizationId:org
+                                },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                    });
+                }else if(key==2){
+                    //没有找到品牌置顶的接口
+                }
+            },
+            _materbox:function (index,name,id) {//公司建材类别点击事件
+                var that=this;
+                that.needid=id;
+                that.brandshow=true;
+
+                that.materialsTypeId=id;
+                that.brandtit=name;
+                that.selBrandName=name;
+                $.ajax({   //获取建材品牌列表
+                    url:"http://app.zhuangneizhu.com/v3/set/gainNMaterialsBrand.do",
+                    type:"POST",
+                    data:{
+                        userId:userId,
+                        organizationId:org,
+                        version:ver,
+                        materialsTypeId:id,
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        that.brandarr=data.data;
+                        console.log(data);
+                    },
+                    "error":function(){
+                        console.log("错误");
+                    }
+                });
+            },
+            _brandclose:function () {//品牌弹窗隐藏按钮
+                let that = this ;
+                that._data.brandshow=false;
+            },
+            _brandshow:function () {  //添加建材品牌显示
+                let that=this;
+                that._data.addbrandshow=true;
+            },
+            selectModel:function(){ //品牌下拉
+              this.selectModelBox=!this.selectModelBox;
+            },
+            selBrand:function(){  //类型下拉
+               this.selbrandbox=!this.selbrandbox;
+            },
+            selSI:function(){   //单位下拉
+                this.SIbox=!this.SIbox;
+            },
+            catchSI:function(item){
+                this.SiName=item;
+                this.SIbox=!this.SIbox;
+            },
+            catchbrandId:function(item,itemid){
+                this.materialsTypeId=itemid;
+                this.selBrandName=item;
+                this.selbrandbox=!this.selbrandbox;
+            },
+            catchModelId:function(item,itemid){
+                this.modelNeedBrandid=itemid;
+                this.selectModelName=item;
+                this.selectModelBox=!this.selectModelBox;
+            },
+            _addBrandbtn:function(){//添加建材品牌
+                var that = this;
+                    $.ajax({   //添加建材品牌
+                        url:"http://app.zhuangneizhu.com/v3/set/addNMaterialsBrand.do",
+                        type:"POST",
+                        data:{   
+                                materialsTypeId:that.needid,
+                                brandName:that.addbrandname,
+                                userId:userId,
+                                version:ver,
+                                organizationId:org,
+                            },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            window.location.href="material.html";
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    }); 
+            },
+            _matermodify01:function (index,key,name,price,unit,buildingid,photo,code,remark,salePrice,detailsPhoto) { //修改建材品牌
+                if(key==1){
+                    this.changebrandshow=!this.changebrandshow;
+                    var that=this;
+                    that.changebrandname=that.brandarr[index].brandName;
+                    that.changebrandid=that.brandarr[index].brandId;
+                }else if(key==2){
+                    var that=this;
+                    that.changemodelbox=true;
+                    that.addModelname=name;
+                    that.addModelmony=price;
+                    that.moreaddModelmony=salePrice;
+                    that.changmoreimg=[];
+                    if(detailsPhoto.split(",")!=''){
+                        that.changmoreimg=detailsPhoto.split(",");
+                    }
+                    that.SiName=unit;
+                    that.changeModelBuildingId=buildingid;
+                    that.selectModelName=that.brandarr[that.changModelNeedIndex].brandName;
+                    that.modelNeedBrandid=that.brandarr[that.changModelNeedIndex].brandId;
+                    if(photo!=''){
+                        that.changesr=photo;
+                    }
+                    that.codes=code;
+                    that.remark=remark;
+                }
+            },
+            changeBrandbtn:function(){
+                var that=this;
+                    $.ajax({   //修改建材品牌
+                        url:"http://app.zhuangneizhu.com/v3/set/editNMaterialsBrand.do",
+                        type:"POST",
+                        data:{  
+                                materialsTypeId:that.needid,
+                                brandId:that.changebrandid,
+                                brandName:that.changebrandname,
+                                userId:userId,
+                                version:ver,
+                                organizationId:org,
+                            },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            window.location.href="material.html"; 
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }       
+                    });  
+            },
+            item:function(id,name,index){ //建材品牌点击事件
+                var brandid=id;
+                this.changModelNeedIndex=index;
+                this.modeltit=name;
+                this.selectModelName=name;
+                this.modelNeedBrandid=id;
+                this.itemshow=true;
+                var that=this;
+                $.ajax({   //获取建材型号列表,
+                    url:"http://app.zhuangneizhu.com/v3/set/gainMaterialsBuilding.do",
+                    type:"POST",
+                    data:{
+                        userId:userId,
+                        organizationId:org,
+                        version:ver,
+                        materialsBrandId:brandid,
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                       that.modelarr=[];
+                        for(i in data.data){
+                            if(data.data[i].photo==""){
+                                data.data[i].photo="photo/DATE2019-01-29DATE/9b90858a-1a55-4b5e-996a-fdc9d11ee001.ico";
+                            }
+                            that.modelarr=data.data;
+                        }
+                        console.log(data);
+                    },
+                    "error":function(){
+                        console.log("错误");
+                    }
+                });
+            },
+            addstyle:function(){
+                this.sr="image/2019/01/02/3001fa8d-aa39-462e-a8a4-9c5572545dd0.png";
+                this.addModelname="";
+                this.addModelmony="";
+                this.codes="";
+                this.remark="";
+                this.SiName="", 
+                this.addmodelbox=true;
+            },
+            _addModelbtn:function(){ //添加型号确认
+                var that = this;
+                if(that.sr=="image/2019/01/02/3001fa8d-aa39-462e-a8a4-9c5572545dd0.png"){
+                    $.ajax({   //添加建材型号
+                        url:"http://app.zhuangneizhu.com/v3/set/addBuildingNum.do",
+                        type:"POST",
+                        data:{  
+                                materialsTypeId:that.materialsTypeId,
+                                materialsBrandId:that.modelNeedBrandid,
+                                buildingName:that.addModelname,
+                                userId:userId,
+                                version:ver,
+                                organizationId:org,
+                                price:that.addModelmony,
+                                priceUnit:that.SiName,
+                                customCode:that.codes,
+                                photo:'',
+                                remark:that.remark,
+                                salePrice:that.moreaddModelmony,
+                                detailsPhoto:that.addmoreimg.join(",")
+                            },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            $.ajax({   //获取建材型号列表,
+                                url:"http://app.zhuangneizhu.com/v3/set/gainMaterialsBuilding.do",
+                                type:"POST",
+                                data:{
+                                    userId:userId,
+                                    organizationId:org,
+                                    version:ver,
+                                    materialsBrandId:that.modelNeedBrandid,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    that.modelarr=[];
+                                    for(i in data.data){
+                                        if(data.data[i].photo==""){
+                                            data.data[i].photo="photo/DATE2019-01-29DATE/9b90858a-1a55-4b5e-996a-fdc9d11ee001.ico";
+                                        }
+                                        that.modelarr=data.data;
+                                        that.addmodelbox=false;
+                                    }
+                                    that.modelarr=data.data;
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                            
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    }); 
+                }else{
+                    $.ajax({   //添加建材型号
+                        url:"http://app.zhuangneizhu.com/v3/set/addBuildingNum.do",
+                        type:"POST",
+                        data:{  
+                                materialsTypeId:that.materialsTypeId,
+                                materialsBrandId:that.modelNeedBrandid,
+                                buildingName:that.addModelname,
+                                userId:userId,
+                                version:ver,
+                                organizationId:org,
+                                price:that.addModelmony,
+                                priceUnit:that.SiName,
+                                customCode:that.codes,
+                                photo:that.sr.join(","),
+                                remark:that.remark,
+                                salePrice:that.moreaddModelmony,
+                                detailsPhoto:that.addmoreimg.join(",")
+                            },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            $.ajax({   //获取建材型号列表,
+                                url:"http://app.zhuangneizhu.com/v3/set/gainMaterialsBuilding.do",
+                                type:"POST",
+                                data:{
+                                    userId:userId,
+                                    organizationId:org,
+                                    version:ver,
+                                    materialsBrandId:that.modelNeedBrandid,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    that.modelarr=[];
+                                    for(i in data.data){
+                                        if(data.data[i].photo==""){
+                                            data.data[i].photo="photo/DATE2019-01-29DATE/9b90858a-1a55-4b5e-996a-fdc9d11ee001.ico";
+                                        }
+                                        that.modelarr=data.data;
+                                    }
+                                    that.modelarr=data.data;
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                            that.addmodelbox=false;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    }); 
+                }
+            },
+            _changeModelbtn:function(){ //修改建材型号确认
+                var that = this;
+                if(typeof(that.changesr)=="string"){
+                    $.ajax({   //修改建材型号
+                        url:"http://app.zhuangneizhu.com/v3/set/editMaterialsBuilding.do",
+                        type:"POST",
+                        data:{  
+                                buildingId:that.changeModelBuildingId,
+                                materialsBrandId:that.modelNeedBrandid,
+                                buildingName:that.addModelname,
+                                userId:userId,
+                                version:ver,
+                                organizationId:org,
+                                supplyPrice:that.addModelmony,
+                                supplyUnit:that.SiName,
+                                customCode:that.codes,
+                                photo:that.changesr,
+                                remark:that.remark,
+                                detailsPhoto:that.changmoreimg.join(",")
+                            },
+                            "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            $.ajax({   //获取建材型号列表,
+                                url:"http://app.zhuangneizhu.com/v3/set/gainMaterialsBuilding.do",
+                                type:"POST",
+                                data:{
+                                    userId:userId,
+                                    organizationId:org,
+                                    version:ver,
+                                    materialsBrandId:that.modelNeedBrandid,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    that.modelarr=data.data;
+                                    console.log(data);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                            that.changemodelbox=false
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                    }); 
+                }else{
+                    $.ajax({   //修改建材型号
+                        url:"http://app.zhuangneizhu.com/v3/set/editMaterialsBuilding.do",
+                        type:"POST",
+                        data:{  
+                                buildingId:that.changeModelBuildingId,
+                                materialsBrandId:that.modelNeedBrandid,
+                                buildingName:that.addModelname,
+                                userId:userId,
+                                version:ver,
+                                organizationId:org,
+                                supplyPrice:that.addModelmony,
+                                supplyUnit:that.SiName,
+                                customCode:that.codes,
+                                photo:that.changesr.join(","),
+                                remark:that.remark,
+                                detailsPhoto:that.changmoreimg.join(",")
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            $.ajax({   //获取建材型号列表,
+                                url:"http://app.zhuangneizhu.com/v3/set/gainMaterialsBuilding.do",
+                                type:"POST",
+                                data:{
+                                    userId:userId,
+                                    organizationId:org,
+                                    version:ver,
+                                    materialsBrandId:that.modelNeedBrandid,
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    that.modelarr=data.data;
+                                    console.log(data);
+                                },
+                                "error":function(){
+                                    console.log("错误");
+                                }
+                            });
+                            that.changemodelbox=false
+                            },
+                            "error":function(){
+                                console.log("错误");
+                            }
+                    }); 
+                } 
+            },
+        },
+        mounted(){
+            var that = this;
+            //添加建材型号（1张照片）
+            $("input[type='file']").change(function(){  
+                var file = this.files[0];
+                var formdata= new FormData($("#from")[0]);
+                $.ajax({ 
+                    url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                    data:formdata,
+                    type:'post',
+                    cache: false,        // 不缓存
+                    processData: false,   // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    dataType:"json",
+                    success:function(data){
+                        that.sr=[];
+                        var img=data
+                        that.sr.unshift(img);
+                    }
+                })
+            });
+            //添加建材型号（多张照片）
+            $("input[type='file']").change(function(){  
+                var file = this.files[0];
+                var formdata= new FormData($("#fromphoto")[0]);
+                $.ajax({ 
+                    url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                    data:formdata,
+                    type:'post',
+                    cache: false,        // 不缓存
+                    processData: false,   // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    dataType:"json",
+                    success:function(data){
+                            var photo=data.split(",");
+                            that.addmoreimg=[];
+                            for (var i = photo.length - 1; i >= 0; i--) {
+                                     that.addmoreimg.unshift(photo[i]);
+                            }
+                            // that.lu.unshift(data)
+                            // for (var i = that.lu.length - 1; i >= 0; i--) {
+                            //          var a=that.lu[i];
+                            //          if(a.substring(0, 1)=="p"){
+                            //               that.time=a.substring(10, 20);
+                            //          }else if(a.substring(0, 1)=="i"){
+                            //                that.time=a.substring(6, 16);
+                            //          }
+                            // }
+                    }
+                })
+            });
+            //修改建材型号（1张照片）
+            $("input[type='file']").change(function(){  
+                var file = this.files[0];
+                var formdata= new FormData($("#frombox")[0]);
+                $.ajax({
+                    url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                    data:formdata,
+                    type:'post',
+                    cache: false,        // 不缓存
+                    processData: false,   // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    dataType:"json",
+                    success:function(data){
+                        that.changesr=[];
+                        var img='http://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+data
+                        that.changesr.unshift(img);
+                    }
+                })
+            });
+            //添加建材型号（多张照片）
+            $("input[type='file']").change(function(){  
+                var file = this.files[0];
+                var formdata= new FormData($("#fromboxphoto")[0]);
+                $.ajax({ 
+                    url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                    data:formdata,
+                    type:'post',
+                    cache: false,        // 不缓存
+                    processData: false,   // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    dataType:"json",
+                    success:function(data){
+                            var photo=data.split(",");
+                            that.changemoreimg=[];
+                            for (var i = photo.length - 1; i>= 0; i--) {
+                                     that.changmoreimg.unshift(photo[i]);
+                            }
+                            // that.lu.unshift(data)
+                            // for (var i = that.lu.length - 1; i >= 0; i--) {
+                            //          var a=that.lu[i];
+                            //          if(a.substring(0, 1)=="p"){
+                            //               that.time=a.substring(10, 20);
+                            //          }else if(a.substring(0, 1)=="i"){
+                            //                that.time=a.substring(6, 16);
+                            //          }
+                            // }
+                    }
+                })
+            });
+        }
+    })
+})
+</script>
+</html>
+

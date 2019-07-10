@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <!-- <link href="image/titlogo.ico" rel="SHORTCUT ICON"> -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" type="text/css" href="../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../css/loding.css">
+    <script type="text/javascript" src="../js/JR.js"></script>
+</head>
+<style type="text/css">
+    .defaultRoleNameBox i{display: block;width: 0.14rem;height: 0.58rem;background-repeat: no-repeat;background-image: url(../image/perR.png);background-size: 0.14rem 0.24rem;background-position-y: 0.17rem;position: absolute;right:0.5rem;margin-top:0.18rem}
+    .finsh{margin-top:1rem;width: 6.5rem;height: 0.88rem;border-radius: 0.1rem;font-size: 0.28rem;text-align: center;line-height: 0.88rem;color: #fff;background-color: #4c94ff;margin-left:0.5rem;}
+    .showinformation{
+    font-size: 0.25rem;width:2.7rem;overflow: hidden;text-overflow: ellipsis;white-space:nowrap;text-align: right;display: block;position: absolute;right: 0.5rem;color: #909090;
+    }
+    .timebox{background-color: rgba(0,0,0,0.3);width:7.5rem;height: 100%;position:absolute;z-index:10000}
+    .timepath{position: absolute;left: 50%;top:50%;transform: translate(-50%,-50%);width: 5rem;height: 3rem;background-color: #fff;border-radius: 0.3rem;}
+    .timepath p{color:#2C2D2E;font-size: 0.3rem;text-align: center;padding-top: 0.3rem}
+    .timeoperating{width:3rem;margin-top: 0.3rem;margin-bottom: 0.3rem;height: auto;left:1rem;position: absolute;display: flex;justify-content:space-around;}
+    .timeoperating span{display: block;width: 0.8rem;height: 0.8rem;float: left;background-color: #F6F8FF;font-size:0.5rem;line-height: 0.8rem;text-align: center;border-radius: 0.1rem}
+    .timeoperating input{display: block;width: 0.8rem;height: 0.8rem;float: left;background-color: #F6F8FF;font-size:0.4rem;line-height:0.8rem;text-align: center;border-radius: 0.1rem}
+    .unit{display: block;float: left;width: 0.8rem;height: 0.8rem;line-height: 0.8rem;text-align:center;font-size: 0.4rem;color: #2C2D2E;position:absolute;right: 0.3rem;margin-top:0.3rem}
+    .timefinsh{width: 5rem;height: 0.8rem;position: absolute;bottom: 0;border-top: 1px solid #000;color:#5677FC;text-align: center;line-height: 0.8rem;font-size: 0.3rem}
+    .w-e-panel-container{width:7.5rem;margin-left: -250px;}
+</style>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <!--头部开始 -->
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div @click="back"></div>
+            <span >{{modeName}}</span>
+            <a href="###" class="blue header-tit-r" @click="_titshow">
+                <strong v-if="titshow">编辑</strong>
+                <strong v-else>完成</strong>
+            </a>
+        </div>
+    </div>
+    <!-- 头部结束 -->
+    <!-- 删除，置顶，修改项目模板开始 -->
+    <div class="main" style="top: 0.88rem;bottom: 0.88rem;padding-top: 0.2rem;overflow-y: auto;overflow-x: hidden;width: 7.8rem" v-show="box1">
+        <div v-for="(value,index) in json"  v-cloak>
+            <div class="mater-box" style="line-height: 0.44rem"> 
+                <div class="mater-down" @click="showtxt(index)">
+                    <span style="position: absolute;left: 0;font-size:0.25rem;color: #909090;top:0.22rem; ">{{index+1}}</span>
+                    <span class="mater-L" v-if="value.organizationScheduleName.length>12" style="width: 3.5rem;margin-left: 0.3rem">{{value.organizationScheduleName}}</span>
+                    <span class="mater-L" v-else style="width: 3.5rem;line-height: 0.88rem;margin-left: 0.3rem">{{value.organizationScheduleName}}</span>
+                    <span  class="showinformation"v-if="value.chargeRoles!=''" style="line-height: 0.88rem">({{value.completedDays}}天,{{value.chargeRoles}})</span>
+                    <span class="showinformation" style="line-height: 0.88rem" v-else>({{value.completedDays}}天,无)</span>
+                    <span class="myper-R"></span>
+                </div>
+                <div class="mater-up" v-show="!titshow">
+                    <div class="meter-upR">
+                        <!--修改-->
+                        <span @click="_matermodify(index)"></span>
+                        <!--删除-->
+                        <span @click="_materclose(index,1)"></span>
+                        <!--置顶-->
+                        <span @click="_matertop(index,1)" style="background-image: url(../image/mat05.png)"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="show" style="width:6.9rem;padding-left: 0.3rem;padding-right: 0.3rem;height:auto;display: none;"></div>
+        </div>
+    </div> 
+    <div v-show="box2" style="width: 100%;height: 100%;background-color:#f6f8ff"></div>
+    <div class="fot-btn" @click="_caishow">添加项目进度</div>
+    <!-- 删除，置顶，修改项目模板结束 -->
+    <!--添加项目模板开始-->
+    <div class="main-cai" v-show="caishow" v-cloak>
+        <div class="personnelTit">
+            <div @click="caishow=false,timeShow=false"></div>
+            <span>{{caitit}}</span>
+        </div>
+        <div style="position: absolute;">
+            <div style="height: 0.88rem;width:6.9rem;padding-right: 0.3rem;padding-left: 0.3rem;line-height: 0.88rem;background-color: #fff">
+                <input type="text" style="width: 100%;height: 100%;font-size: 0.28rem" placeholder="请输入名字" v-model="name"   @blur="_caiinput" maxlength="20">
+            </div>
+            <div class="inforBox" style="margin-top: 0.03rem" >
+                 <div class="eng-box" @click="chenageTimeShow">
+                     <p style="font-size: 0.27rem; color: rgb(0, 0, 0);">第几天完成该进度</p>
+                     <span style="position: absolute;right: 0.8rem" >第{{getday}}天</span>
+                     <span class="myper-R" ></span>
+                 </div>
+            </div>
+            <div class="defaultRoleNameBox" style="width:6.9rem;height:auto;padding-left: 0.3rem;padding-right:0.3rem;background-color: #fff;overflow:hidden" @click="rolname">
+                <span style="line-height: 0.88rem;font-size: 0.27rem;color: rgb(0, 0, 0);float: left;">默认负责角色</span>
+                <div class="defaultRoleNameBox-R" style="height:auto;width:4.5rem;margin-left:1.9rem;" >
+                    <span v-for="(item,index) in uid" style="line-height: 0.88rem;font-size: 0.25rem;float: right;">{{item}}&nbsp</span>
+                </div>
+                <i></i>
+            </div>
+            <div class="finsh" @click="_caiok">确认</div>
+        </div>
+        <!-- 选择时间遮罩层以及内容开始 -->
+        <div  class="timebox" v-show="timeShow" @click="timeShow=false">
+            <div class="timepath" >
+                <p>第几天完成该进度</p>
+                <span class="unit" style="left: 0.3rem;">第</span>
+                <div class="timeoperating">
+                    <span @click="deleatTime">-</span>
+                    <input type="number" min="0" max="10" v-model="getday" @click="day"></input>
+                    <span @click="addDay">+</span>
+                </div> 
+                <span class="unit">天</span>
+                <div class="timefinsh" @click="timeShow=false">确定</div>
+            </div>
+        </div>
+        <!-- 选择时间遮罩层以及内容结束 -->
+    </div>
+    <!-- 添加项目模板结束 -->
+    <!--开始修改项目模板中的具体某项-->
+    <div class="main-cai" v-show="xiushow" style="overflow-y:auto;overflow-x:hidden; " v-cloak>
+        <div class="personnelTit">
+            <div @click="xiushow=false,timeShow=false"></div>
+            <span v-html="xiutit"></span>
+        </div>
+        <div style="position: absolute;">
+            <div style="height: 0.88rem;width:6.9rem;padding-right: 0.3rem;padding-left: 0.3rem;line-height: 0.88rem;background-color: #fff">
+                <input type="text" style="width: 100%;height: 100%;font-size: 0.28rem" placeholder="请输入名字" v-model="xiuname"   @blur="_caiinput" maxlength="20">
+            </div>
+            <div class="inforBox" style="margin-top: 0.03rem" >
+                 <div class="eng-box" @click="chenageTimeShow">
+                     <p style="font-size: 0.27rem; color: rgb(0, 0, 0);">第几天完成该进度</p>
+                     <span style="position: absolute;right: 0.8rem">第{{getday}}天</span>
+                     <span class="myper-R" ></span>
+                 </div>
+            </div>
+            <div class="defaultRoleNameBox" style="width:6.9rem;height:auto;padding-left: 0.3rem;padding-right:0.3rem;background-color: #fff;overflow:hidden" @click="rolname">
+                <span style="line-height: 0.88rem;font-size: 0.27rem;color: rgb(0, 0, 0);float: left;">默认负责角色</span>
+                <div class="defaultRoleNameBox-R" style="height:auto;width:4.5rem;margin-left:1.9rem;" >
+                    <span v-for="(item,index) in uid" style="line-height: 0.88rem;font-size: 0.25rem;float: right;">{{item}}&nbsp</span>
+                </div>
+                <i></i>
+            </div>
+            <span style="font-size: 0.27rem;line-height: 0.5rem;color: red;margin-left: 0.2rem;">修改此进度标准</span>
+            <div id="editor" style="width: 7.5rem;height: 5rem;"></div>
+            <div class="finsh" @click="_xiuok">确认</div>
+        </div>
+        <!-- 选择时间遮罩层以及内容开始 -->
+        <div  class="timebox" v-show="timeShow" @click="timeShow=false" >
+            <div class="timepath">
+                <p>第几天完成该进度</p>
+                <span class="unit" style="left: 0.3rem;">第</span>
+                <div class="timeoperating">
+                    <span @click="deleatTime">-</span>
+                    <input type="number" min="0" max="10" v-model="getday" @click="day"></input>
+                    <span @click="addDay">+</span>
+                </div> 
+                <span class="unit">天</span>
+                <div class="timefinsh" @click="timeShow=false">确定</div>
+            </div>
+        </div>
+        <!-- 选择时间遮罩层以及内容结束 -->
+    </div>
+    <!--结束修改项目模板中的具体某项-->
+    <!-- 选择角色开始 -->
+    <div class="main-cai" v-show="showSelectBox">
+        <div class="personnelTit" style="height: 0.8rem">
+            <div @click="rolnameBack"></div>
+            <span>默认负责角色</span>
+            <span @click="rolenameSubmit" style="position: absolute;right: 0.3rem;color:#5677FC">提交</span>
+        </div> 
+        <div class="main" style="top:0.8rem;bottom: 0.88rem;padding: 0.2rem 0;overflow-y: auto;">
+            <div class="adj-box" v-for="(value,index) in roleNameJson" @click="_adjbox(index)" v-show="show">
+                <div class="adj-L">
+                    <img src="../image/adj01.png" alt="" v-if="value.isCheck">
+                    <img src="../image/adj02.png" alt="" v-else>
+                </div>
+                <div class="adj-R">
+                    <span v-html="value.roleName"></span>
+                </div>
+            </div>
+        </div>
+        <div class="staff-Fot">
+            <div class="adj-fot" @click="_adjok(state01)" v-show="allselect">
+                <div class="adj-L">
+                    <img src="../image/adj01.png" alt="" v-if="state01">
+                    <img src="../image/adj02.png" alt="" v-else>
+                </div>
+                <span>全选</span>
+            </div>
+        </div>
+    </div>
+    <!-- 选择角色结束 -->
+</div>
+</body>
+<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="wangEditor.min.js"></script>
+<script src="../js/vue.js"></script>
+<script>
+var url = window.location.search;
+var request = new Object();
+if (url.indexOf("?") != -1) {  
+    var str = url.substr(1);
+    var strs = str.split("&"); 
+    for (var i = 0; i < strs.length; i++) {
+      request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+     }
+}
+var index=request["index"];
+var myid=request["myid"];
+var ver=localStorage.getItem('version');
+var userId =localStorage.getItem('key');
+var org=localStorage.getItem('orgkey'); 
+    $(function () {
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                ScheduleId:'',
+                loding:true,
+                timeShow:false,//选择时间部分显示隐藏的依据
+                getday:0,//初始化天数
+                getRoleName:'',//初始化角色
+                txt:'',//进度标准
+                json: [], //后台过来的数据已经排列好
+                idarr:[],
+                name:'',//新建进度名称
+                xiuname:'',//修改进度名称
+                key:'',
+                modeName:'',//模板名称
+                box1:true,
+                box2:false,
+                titshow:true,
+                caitit:'添加进度名称',
+                caishow:false,
+                caibtnshow:false,
+                xiutit:'',
+                xiushow:false,
+                xiuindex:'',//品牌删除对应建材类别index
+                uid:[],
+                roleNameJson:[],
+                state01:false,//判断是否全选
+                show:true,
+                allselect:true,
+                showSelectBox:false,
+                startxt:'',
+                endtxt:''
+            },
+            beforeCreate:function(){  
+                var that=this;
+                $.ajax({//获取项目进度模板
+                        url:"http://app.zhuangneizhu.com/v2/set/getTemplateInfo.do",
+                        type:"post",
+                        data:{
+                            userId:userId,
+                            organizationId:org,
+                            version:ver
+                        },
+                        dataType:"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.idarr=data.data;
+                            that.modeName=data.data[myid].templateName
+                            that.key=myid;
+                            var idarr=data.data;
+                            $.ajax({    //获取公司进度模板内容
+                                url:"http://app.zhuangneizhu.com/set/gainScheduleType.do",
+                                type:"post",
+                                data:{
+                                 templateId:idarr[myid].templateId,
+                                 userId:userId,
+                                 organizationId:org,
+                                 version:ver
+                                },
+                                dataType:"json",
+                                "success":function(data){
+                                    that.loding=false;
+                                    console.log(data);
+                                    if (data.code!=10000) {
+                                        that.box1=false;
+                                        that.box2=true;
+                                    }else{
+                                        that.json=data.data;
+                                    }                          
+                                },
+                                "error":function(){
+                                    console.log("error");
+                                }
+                            })
+                        },
+                        "error":function(){
+                            console.log("error");
+                        }
+                });
+            },
+            methods:{
+                back:function(){
+                    window.location.href="../setpage.html?index="+index;
+                },
+                showtxt:function(i){
+                    var that=this;
+                      $(".show").eq(i).toggle(); 
+                      $(".myper-R").eq(i).toggle();
+                      var html=that.json[i].organizationScheduleText;
+                      $(".show").eq(i).html(html);
+                },
+                _xiuok:function () {//修改项目进度确认按钮
+                    var that = this;
+                    var k = that._data.titval;
+                    var key=that._data.xiuindex;
+                    console.log(key);
+                    $.ajax({ //修改项目进度类型
+                        "url":"http://app.zhuangneizhu.com/set/editScheduleType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{ 
+                            organizationScheduleId:that.json[key].organizationScheduleId,
+                            organizationScheduleName:that.xiuname,
+                            templateId:that.idarr[that.key].templateId,
+                            organizationId:org,
+                            userId:userId,
+                            version:ver,
+                            scheduleText:that.endtxt,
+                            completedDays:that.getday,
+                            chargeRoles:that.uid.join(",")
+                            },
+                            "dataType":"json", 
+                            "success":function(data){
+                                window.location.href="addmodel.html?index="+index+"&myid="+myid; 
+                            },
+                            "error":function(){
+                                console.log("程序错误");
+                            }
+                    });
+                },
+                _matermodify:function (index) {//修改按钮
+                    var that=this;
+                    that.ScheduleId=index;
+                    that.startxt=that.json[index].organizationScheduleText;
+                    that.getday=that.json[index].completedDays;
+                    that.getRoleName=that.json[index].chargeRoles;
+                    that.contentIndex=index
+                    that._data.xiutit='修改进度';
+                    that._data.xiuindex= index;
+                    that._data.xiuname = that.json[index].organizationScheduleName;
+                    that._data.xiushow=true;
+                    var id=that.json[index].organizationScheduleId;
+                    that.uid=[];
+var E = window.wangEditor
+var editor = new E('#editor')
+editor.customConfig.menus = [
+    'head',  // 标题
+    'bold',  // 粗体
+    'fontSize',  // 字号
+    'fontName',  // 字体
+    'italic',  // 斜体
+    'underline',  // 下划线
+    'strikeThrough',  // 删除线
+    'foreColor',  // 文字颜色
+    'backColor',  // 背景颜色
+    'link',  // 插入链接
+    'list',  // 列表
+    'justify',  // 对齐方式
+    'quote',  // 引用
+    'image',  // 插入图片
+    'table',  // 表格
+    'undo',  // 撤销
+    'redo'  // 重复
+]
+editor.customConfig.debug = true;
+// 关闭粘贴内容中的样式
+editor.customConfig.pasteFilterStyle = false;
+// 忽略粘贴内容中的图片
+editor.customConfig.pasteIgnoreImg = true;
+// 使用 base64 保存图片
+editor.customConfig.uploadImgShowBase64 = false;
+editor.customConfig.customUploadImg = function (files, insert) {
+    console.log(files)
+    var img;
+    var fd = new FormData();
+    fd.append("files", files[0])
+    var xhr = new XMLHttpRequest();
+    xhr.open('post', 'http://app.zhuangneizhu.com/image/addOssPhoto.do');
+    xhr.send(fd);
+    xhr.onreadystatechange=function(){
+    // 这步为判断服务器是否正确响应
+        if(xhr.readyState == 4 && xhr.status == 200){
+            console.log(xhr.responseText);
+            img='https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+xhr.responseText
+            insert(img)
+        }
+    }
+}
+editor.customConfig.onchange = (html) => {
+        this.endtxt= html
+}
+editor.create();
+editor.txt.html(that.startxt)
+                    $.ajax({   //获取员工角色 
+                        "url":"http://app.zhuangneizhu.com/set/gainEmployeeRole.do",
+                            "type":"post",
+                            data:{
+                               version:ver,
+                               userId:userId,
+                               organizationId:org,
+                               organizationScheduleId:id
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                that.roleNameJson=data.data;
+                                var json=data.data;
+                                for (var i =json.length - 1; i >= 0; i--) {
+                                    if(json[i].isCheck==true){
+                                         that.uid.unshift(json[i].roleName);
+                                    }
+                                };
+                             },
+                            "error":function(){
+                             console.log("输入有误");
+                            }
+                    });
+                },
+                _matertop:function (index,key) {//置顶按钮
+                    var that= this
+                    console.log(index,key);
+                     var befor=that.json[index].organizationScheduleId;
+                     var now=that.json[index-1].organizationScheduleId;
+                    if(key==1){
+                    var k = that._data.json[index];
+                    that._data.json.splice(index, 1);
+                    that._data.json.splice(index-1,0,k);
+                    $.ajax({ //设置公司项目进度置顶
+                        "url":"http://app.zhuangneizhu.com/v2/set/setOrganizationSchedulePrev.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{    //置顶效果。
+                            currentId:now,//当前的
+                            beforeId:befor,//之前的
+                            organizationId:org,
+                            userId:userId,
+                            version:ver
+                            },
+                            "dataType":"json", 
+                            "success":function(data){
+                                console.log(data);
+                            },
+                            "error":function(){
+                                console.log("程序错误");
+                            }
+                    });
+                    }else if(key==2){
+                        var a = that._data.xiuindex;
+                        var k =that._data.json[a].brand[index];
+                        that._data.json[a].brand.splice(index,1);
+                        that._data.json[a].brand.unshift(k);
+                    }
+                },
+                _materclose:function (index,key) {//删除按钮
+                    var that = this;
+                    var k = that._data.xiuindex;
+                    var b=that.json[index].organizationScheduleId;
+                    if(confirm("确认删除吗")){
+                        if(key==1){
+                            that._data.json.splice(index,1)
+                        $.ajax({ //删除公司项目进度
+                            "url":"http://app.zhuangneizhu.com/set/delScheduleType.do",
+                            "type":"post",
+                            "anyns":true,
+                            "data":{    
+                                organizationScheduleId:b,
+                                organizationId:org,
+                                userId:userId,
+                                version:ver
+                                },
+                                "dataType":"json", 
+                                "success":function(data){
+                                    console.log(data);
+                                },
+                                "error":function(){
+                                    console.log("程序错误");
+                                }
+                         });
+                        }else if(key==2){
+                            that._data.json[k].brand.splice(index,1);
+                        }
+                    }
+                    else{
+                        return;
+                    }
+                },
+                _caishow:function () {//新建进度按钮
+                    var that=this;
+                    that._data.caishow=true;
+                    $.ajax({  //获取角色名称
+                        "url":"http://app.zhuangneizhu.com/set/gainEmployeeType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{
+                            userId:userId,
+                            organizationId:org,
+                            version:ver
+                        },
+                        "dataType":"json",
+                        success:function(data){
+                            that.roleNameJson=data.data;
+                            var json=data.data;
+                            for (var i =json.length - 1; i >= 0; i--) {
+                                if(json[i].isCheck==true){
+                                     that.uid.unshift(json[i].roleName);
+                                }
+                            };
+                        }
+                    })
+                    
+                },
+                _titshow:function () {//添加建筑类目弹窗返回按钮
+                    var that=this;
+                    that._data.titshow=!that._data.titshow;
+                    that._data.titval='';
+                },
+                _caiinput:function () {//添加建筑类目确定按钮
+                    var that = this
+                    if(that._data.titval==''){
+                        that._data.caibtnshow=false;
+                    }else {
+                        that._data.caibtnshow = true;
+                    }
+                },
+                _caiok:function () {//添加项目进度条目确定按钮
+                    var that = this
+                    that.loding=true;
+                    var b=that.idarr[that.key].templateId;
+                    $.ajax({ //添加项目进度条目
+                        "url":"http://app.zhuangneizhu.com/set/addScheduleType.do",
+                        "type":"post",
+                        "anyns":true,
+                        "data":{ 
+                            organizationId:org,
+                            scheduleName:that.name, 
+                            userId:userId,
+                            version:ver,
+                            templateId:b,
+                            completedDays:that.getday,
+                            chargeRoles:that.uid.join(",")
+                            },
+                            "dataType":"json", 
+                            "success":function(data){
+                                if (data.code!=10000) {
+                                    alert(data.message);
+                                    that.loding=false;
+                                }else{
+                                    that.loding=false;
+                                    window.location.href="addmodel.html?index="+index+"&myid="+myid;
+                                }
+                            },
+                            "error":function(){
+                                console.log("程序错误");
+                            }
+                    });
+                },
+                chenageTimeShow:function(){
+                    this.timeShow=true;
+                },
+                day:function(){
+                    window.event? window.event.cancelBubble = true : e.stopPropagation();
+                },
+                addDay:function(){
+                    this.getday=Number(this.getday)+1;
+                    window.event? window.event.cancelBubble = true : e.stopPropagation();
+                },
+                deleatTime:function(){
+                    if(this.getday>0){
+                        this.getday=this.getday-1;
+                        window.event? window.event.cancelBubble = true : e.stopPropagation();
+                    }else{
+                        this.getday=0;
+                        window.event? window.event.cancelBubble = true : e.stopPropagation();
+                    }
+                },
+                rolname:function(){
+                    var that=this;
+                    that.showSelectBox=true;                 
+                },
+                rolnameBack:function(){
+                    this.showSelectBox=false;
+                },
+                rolenameSubmit:function(){
+                    this.showSelectBox=false;
+                },
+                _adjbox:function (index) { 
+                    var that=this;
+                    that.uid=[];
+                    that.roleNameJson[index].isCheck=!that.roleNameJson[index].isCheck
+                    var json=that.roleNameJson;
+                    for(var i=0;i<json.length;i++){
+                        if(json[i].isCheck){
+                            that.uid.push(json[i].roleName);
+                        }   
+                    }
+                    console.log(that.uid)
+                    that.state01=false
+                },
+                _adjok:function (e) {
+                    var that = this;
+                    that.uid=[];
+                    that.state01=!e;
+                    if(e){
+                        that.roleNameJson.forEach(function (item) {
+                            item.isCheck=false;
+                         })
+                        for(var i=0;i<that.roleNameJson.length;i++){
+                            if(that.roleNameJson[i].isCheck){
+                                that.uid.push(that.roleNameJson[i].roleName);
+                            }   
+                        }
+                        console.log(that.uid.join(','))
+                    }else {
+                        that.roleNameJson.forEach(function (item) {
+                            item.isCheck=true;
+                         })
+                        for(var i=0;i<that.roleNameJson.length;i++){
+                            if(that.roleNameJson[i].isCheck){
+                                that.uid.push(that.roleNameJson[i].roleName);
+                            }   
+                        }
+                        console.log(that.uid.join(','))
+                    }
+                }
+            }
+        })
+    })
+</script>
+</html>

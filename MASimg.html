@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if (document.getElementById('app').offsetWidth > 1100) {
+                    rootElement.style.fontSize = '60px'
+                } else {
+
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'complete')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="./css/index.css ">
+</head>
+<body>
+<div class="wap-wrap" id='demo' v-cloak>
+    <div class="personnelTit">
+        <div onclick="javascript:window.history.back();return false;"></div>
+        <span style="color: #000;text-align: center;" v-show="indexphoto==0">装修合同</span>
+        <span style="color: #000;text-align: center;" v-show="indexphoto==1">设计图</span>
+        <span style="color: #000;text-align: center;" v-show="indexphoto==2">预算清单</span>
+        <span style="color: #000;text-align: center;" v-show="indexphoto==3">项目材料</span>
+        <span style="color: #000;text-align: center;" v-show="indexphoto==4">项目水电</span>
+        <span style="color: #000;text-align: center;" v-show="indexphoto==5">现场写真</span>
+        <span style="display: inline-block;position: absolute;right: 0.5rem;color: blue;" @click="upload(indexphoto)"><a>说明</a></span>
+    </div>
+    <div v-show="show0" class="owner">
+        <span style="padding:10px">手机拍照上传合同的关键页，再也不怕合同丢失，无纸化办公。</span>
+    </div>
+    <div v-show="show1" class="owner">
+        <span style="padding:10px">手机拍照上传设计图照片后，跑工地再也不用带纸质设计图了，有设计图更新也立马能查阅，无纸化办公。</span>
+    </div>
+    <div v-show="show2" class="owner">
+        <span style="padding:10px">手机拍照上传预算清单照片后，跑工地再也不用带纸质清单了，无纸化办公。</span>
+    </div>
+    <div v-show="show3" class="owner">
+        <span style="padding:10px">手机拍照上传项目材料单照片后，可以随时核对工地材料需求，无纸化办公。</span>
+    </div>
+    <div v-show="show4" class="owner">
+        <span style="padding:10px">手机拍照上传整套水电照片后，再也不用给业主制作水电光盘了，永远不会丢失以后维修用的水电照片。</span>
+    </div>
+    <div v-show="show5" class="owner">
+        <span style="padding:10px">施工完成后的现场写真照片存档，为您永久保存最美现场照片。</span>
+    </div>
+    <div class="main " style="top: 0.88rem;padding-top: 0.2rem;overflow-y: auto;">
+                <div class="inforBox">
+                        <div class="eng-box">
+                            <span>已上传照片</span>
+                        </div>
+                </div>
+                <div  class="myengMain"  style="position: relative">
+                        <div class="eng-img" v-for="(value,index) in sr" v-if="value!=''">
+                           <a v-bind:href="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" target="view_window"><img v-bind:src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value"></a>
+                           <p v-html='time' ></p>
+                        </div>
+                </div>
+    </div>
+</div>
+</body>
+<script src="./js/jquery.min.js"></script>
+<script src="./js/vue.js"></script>
+<script>
+var url = window.location.search;
+        var request = new Object();
+     if (url.indexOf("?") != -1) {  
+         var str = url.substr(1);
+        var strs = str.split("&"); 
+        for (var i = 0; i < strs.length; i++) {
+             request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+         }
+    }
+let photoid=request["photoid"];
+let pd=parseInt(photoid);
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+let  ver=localStorage.getItem('version');
+    $(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                sr:[],//获取图片路径
+                time:'',//图片上传时间
+                indexphoto:'',//判断图片类型的索引
+                show0:false,
+                show1:false,
+                show2:false,
+                show3:false,
+                show4:false,
+                show5:false,
+            },
+            beforeCreate: function() {
+                let that=this;
+                switch(pd){
+                    case 0:
+                    $.ajax({    //获取项目装修合同照片
+                                    "url":"http://app.zhuangneizhu.com/v2/set/gainProjectContractPhoto.do",
+                                    "type":"post",
+                                    data:{
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        console.log(data);
+                                        that.indexphoto=pd;
+                                        that.sr=data.data.contractPhoto.split(",");
+                                        for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                    })
+                    break;
+                    case 1:
+                    $.ajax({    //获取项目设计图图片
+                                    "url":"http://app.zhuangneizhu.com/v2/set/gainProjectDesignPhoto.do",
+                                    "type":"post",
+                                    data:{
+                                       projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        that.indexphoto=pd;
+                                        console.log(data);
+                                        that.sr=data.data.designPhoto.split(",");
+                                        for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                    })
+                    break;
+                    case 2:
+                    $.ajax({    //获取项目预算清单留档照片
+                                    "url":"http://app.zhuangneizhu.com/v2/set/gainProjectBudgetPhoto.do",
+                                    "type":"post",
+                                    data:{
+                                       projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        that.indexphoto=pd;
+                                        console.log(data);
+                                        that.sr=data.data.budgetPhoto.split(",");
+                                        for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                    })
+                    break;
+                    case 3:
+                    $.ajax({    //获取项目材料单照片
+                                    "url":"http://app.zhuangneizhu.com/v2/set/gainProjectMaterialsPhoto.do",
+                                    "type":"post",
+                                    data:{
+                                       projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        that.indexphoto=pd;
+                                        console.log(data);
+                                        that.sr=data.data.materialsPhoto.split(",");
+                                        for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                    })
+                    break;
+                    case 4:
+                    $.ajax({    //获取项目水电留档照片
+                                    "url":"http://app.zhuangneizhu.com/v2/set/gainWaterElectricityPhoto.do",
+                                    "type":"post",
+                                    data:{
+                                       projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                        that.indexphoto=pd;
+                                        console.log(data);
+                                        that.sr=data.data.waterElectricityPhoto.split(",");
+                                        for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                    })
+                    break;
+                    case 5:
+                    $.ajax({    //现场写真照片留档
+                                    "url":"http://app.zhuangneizhu.com/v3/set/gainScenePhoto.do",
+                                    "type":"post",
+                                    data:{
+                                      projectId:pro,
+                                      organizationId:org,
+                                      userId:userId,
+                                      version:ver,
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                     console.log(data);
+                                     that.loding=false;
+                                     that.indexphoto=pd;
+                                     that.sr=data.data.scenePhoto.split(",");
+                                     that.lu=data.data.scenePhoto.split(",");
+                                       for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                    })
+                    break;
+                }
+            },
+            methods:{
+                upload:function(indexphoto){
+                    console.log(indexphoto)
+                    let that=this;
+                    if (indexphoto==0) {
+                        that.show0=!that.show0;
+                    }else if(indexphoto==1){
+                        that.show1=!that.show1;
+                    }else if(indexphoto==2){
+                       that.show2=!that.show2;
+                    }else if(indexphoto==3){
+                        that.show3=!that.show3;
+                    }else if(indexphoto==4){
+                        that.show4=!that.show4;
+                    }else if(indexphoto==5){
+                        that.show5=!that.show5;
+                    }
+                }
+            }
+         })
+    })
+</script>
+</html>

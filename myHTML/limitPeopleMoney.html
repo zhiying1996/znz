@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="../image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <div class="personnelTit">
+        <span onclick="javascript:window.history.back();return false;" style="color:red;font-size: 0.6rem;font-weight:500;float: left;margin-left: 20px;">×</span>
+        <span>人工支出限额</span>
+        <span style="color: green;font-size: 0.5rem;font-weight:500;float: right;margin-right:20px;" @click="over">✓</span>
+    </div>
+    <div class="main " style="top: 0.88rem;padding-top: 0.2rem">
+             <div style="width:7.2rem;height: 0.88rem;border-bottom: 1px solid  #f6f8ff;background-color: #fff;line-height:0.88rem;font-size:0.3rem;padding-left:0.3rem;"  v-for="(val,index) in dataarr">
+                <span v-if="val.limitName=='WATEELECTRICITY支出'" style="display: block;float:left;width: 2rem;height: 0.88rem;color:#808083 ">水电人工支出</span>
+                <span v-if="val.limitName=='MUD支出'" style="display: block;float:left;width: 2rem;height: 0.88rem;color:#808083 ">泥瓦人工支出</span>
+                <span v-if="val.limitName=='WOOD支出'" style="display: block;float:left;width: 2rem;height: 0.88rem;color:#808083 ">木作人工支出</span>
+                <span v-if="val.limitName=='PAINT支出'" style="display: block;float:left;width: 2rem;height: 0.88rem;color:#808083 ">油漆人工支出</span>
+                <input style="height: 0.88rem;line-height: 0.8rem;font-size: 0.3rem;" type="text" name="" placeholder="0"   @change="handlechange(index)" :ref="index" :value="val.limitMoney">
+                <span style="display: block;float: right;padding-right: 0.2rem">元</span>
+            </div>
+    </div>
+</div>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/vue.js"></script>
+<script>            
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+let  ver=localStorage.getItem('version');
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+               dataarr:[],
+               limitArr:[],
+            },
+        beforeCreate:function(){
+            let that=this;
+                $.ajax({     //.获取人工支出限额列表
+                            "url":"http://app.zhuangneizhu.com/v3/project/getWorkerExpenseLimit.do",
+                            "type":"post",
+                            "anyns":true,
+                            data:{ 
+                            projectId:pro,
+                            userId:userId,
+                            organizationId:org,
+                            version:ver
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                            console.log(data);
+                            that.dataarr=data.data;
+                            },
+                            "error":function(){
+                            console.log("输入有误");
+                            }
+                        });
+
+              
+        },
+        methods:{
+             handlechange:function(index){
+                console.log(this.$refs[index][0].value);
+                this.dataarr[index].limitMoney=this.$refs[index][0].value;
+                console.log(index);
+                console.log(this.$refs[index][0].value);
+                var expenseid=this.dataarr[index].expenseTypeId;
+                var changeMoney=this.dataarr[index].limitMoney;
+                var limit=expenseid+":"+changeMoney;
+                console.log(limit);
+                this.limitArr.push(limit)
+            },
+            over:function(){
+                let that=this;
+                var changeLT=that.limitArr.splice(",");
+                  $.ajax({     //设置工人支出限额
+                                        "url":"http://app.zhuangneizhu.com/v3/project/setWorkerExpenseLimit.do",
+                                        "type":"post",
+                                        "anyns":true,
+                                        data:{ 
+                                        workExpenseLimit:changeLT.join(","),
+                                        projectId:pro, 
+                                        userId:userId,
+                                        organizationId:org,
+                                        version:ver,
+                                        },
+                                        "dataType":"json",
+                                        "success":function(data){
+                                            console.log(data); 
+                                            window.location.href="human.html"
+                                        },
+                                        "error":function(){
+                                            console.log("输入有误");
+                                        }
+                        });
+            }
+        }
+    })
+})                     
+</script>
+</html> 

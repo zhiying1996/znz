@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="personnelTit">
+        <div @click="back()"></div>
+        <span>项目成员</span>
+    </div>
+    <div class="main" style="top: 0.88rem;bottom: 0.88rem;overflow-y: auto;width: 7.8rem;">
+      <span v-show="admain" style="height: auto;color: #5677FC;font-size:0.3rem;display: block;float: right;padding-right: 0.3rem;">内控权限</span>
+        <div class="teamber-box" v-for="(it,index) in item" style="position: relative;"> <!-- 获取到data.data -->
+            <span>{{it.name}}</span>    <!-- 获取到data.data 的数组 -->
+            <span>{{it.roleName}}</span>
+            <span class="blue" style="text-align: left;">{{it.mobile}}</span>
+            <!-- <span>{{it.isVisible}}</span> -->
+            <div v-if="admain">
+                <input id="xuan" type="checkbox" v-show="it.isAdmin==false"  style="position: absolute;margin-top:0.3rem;right:0.3rem;width: 15px;height:15px"  @click="change(index)">
+            </div>
+            <div v-else>
+                <input v-show="false" type="checkbox"  style="position: absolute;margin-top:0.3rem;right:0.3rem;width: 15px;height:15px"  @click="change(index)">
+            </div>
+            <div></div>
+            
+        </div>
+    </div>
+    <div class="staff-Fot" @click="_open">调整成员</div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+var  getInfo=window.location.href.split('=')[1];
+var  ver=localStorage.getItem('version')
+    $(function () {
+        var app=new Vue({
+            el: '#demo',
+            data:{
+                loding:true,
+                admain:'',//判断是否是管理员
+                key:'',//内控权限参数
+                item:[],
+                objid:'',
+                k:'',
+            },
+             beforeCreate:function () {
+                    let that=this;
+                    $.ajax({    //判断用户是否管理员
+                        "url":"http://app.zhuangneizhu.com/user/gainIsOrNotAdmin.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.admain=data.data.isAdmin;
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    $.ajax({    //获取项目详细信息
+                        "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                        "type":"post",
+                        data:{
+                          projectId:pro,
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.loding=false;
+                            console.log(data);
+                        $.ajax({   //获取项目成员
+                                "url":"http://app.zhuangneizhu.com/project/gainProjectMember.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    projectId:pro,
+                                    version:ver,
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                     console.log(data);
+                                     that.item=data.data;
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                        })    
+                        }
+                    })
+            },
+            methods:{
+                change:function(index){
+                      let that=this;
+                     console.log($("input[type='checkbox']").is(':checked'));
+                     if ($("input[type='checkbox']").is(':checked')) {
+                        that.key=1;
+                     }else{
+                        that.key=0;
+                     }
+                  $.ajax({  //设置项目成员支出权限    
+                        url:'http://app.zhuangneizhu.com/v2/set/setProjectVisible.do',
+                        "anyns":true,
+                        type:'post',
+                        data:{
+                         userId:userId,
+                         organizationId:org,
+                         version:ver,
+                         projectId:pro,
+                         sUserId:that.item[index].userId,
+                         oper:that.key,//0代表取消；1代表勾选
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            alert("权限修改成功。");
+                        },
+                        "error":function(){
+                            console.log("error");
+                        }
+                    })
+                },
+                _open:function () {
+                    window.location.href="adjusting.html?index="+getInfo;
+                },
+                back:function(){
+                    window.location.href="detailed-two.html?index="+getInfo;
+                },
+            }
+        })
+    })
+</script>
+</html>

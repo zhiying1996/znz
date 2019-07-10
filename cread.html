@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if(document.getElementById('app').offsetWidth>1100){
+                    rootElement.style.fontSize='70px'
+                }else{
+                    console.log(document.getElementById('app').offsetWidth)
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'complete')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="css/index.css ">
+    <script src="js/jquery.min.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" style="display: flex;justify-content: center;align-items: center;box-shadow: none;">
+    <div class="newBox">
+        <div class="newTit">新建业主</div>
+        <div class="regBox" style="width:6rem;height: 60px;margin-bottom: 15px;border: none;">
+            <input style="height:60px;width:6rem;" placeholder="姓名" maxlength="7" id="name" v-model="name"> 
+        </div>
+        <div class="regBox" style="width:6rem;height: 60px;margin-bottom:15px; border: none;">
+            <input style="height: 60px;width:6rem;" placeholder="电话" maxlength="11" id="phone" v-model="mobile">
+        </div>
+        <div>
+            <input type="submit" value="确认"  class="logoSub" @click="add()" style="width: 6rem;background-color: #5677FC;"> 
+        </div>
+        <div>
+            <p style="padding: 0.3rem;font-size: 0.23rem;color: #666">新建业主后，即可向业主分享装修进程，业主可查看项目基本信息，并可转介绍客户。</br>部分敏感信息，例如合同、项目成员、收款状况等信息，不会对外开放，业主需要用手机号登陆app才可查看，请用户放心。（不填写业主手机号码，则业主无法登陆查看）</p>
+        </div>
+        <div class="newFoot">
+            <a href="###" onClick="javascript:window.history.back();return false;"></a>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script>
+    $(function(){
+        $('.mu-close').click(function(){
+            $('.muBox').hide();
+            $('.option-mu').hide();
+        })
+        $('.option-mu ul li').click(function(){
+            let k=$(this).html();
+            let index=$(this).index();
+            $('.regBox>p').text(k);
+            $('.muBox').hide();
+            $('.option-mu').hide();
+            // return $(this).index()
+        })
+        $('.regBox>p').click(function(){
+            $('.muBox').show();
+            $('.option-mu').show();
+        })
+        return
+    })
+</script>
+<script type="text/javascript">
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+ $(function(){
+    var app=new Vue({
+        el:"#demo",
+        data:{
+            name:'',
+            mobile:'',
+            k:1,
+        },
+        methods:{
+            add:function(){
+                let that=this;
+                $.ajax({     //添加项目业主信息
+                        "url":"http://app.zhuangneizhu.com/project/saveProjectMaster.do",
+                        "type":"post",
+                        "anyns":true,
+                        data:{ 
+                            masterName:that.name,
+                            mobile:that.mobile,
+                            projectId:pro,
+                            userId:userId,
+                            organizationId:org,
+                            version:"2.9",
+                            isLogin:that.k, 
+                            appType:"znz"
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data); 
+                            window.location.href="information.html"     
+                        },
+                        "error":function(){
+                            console.log("输入有误");
+                        }
+                    });  
+            }
+        }
+    })
+ })
+</script>
+</html> 
+ 

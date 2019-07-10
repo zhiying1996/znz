@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="../image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="../css/index.css ">
+    <script type="text/javascript" src="../js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id='demo'>
+        <div style="display:none;" id="peopleBox" >
+            <div class="personnelTit" >
+                <div  onclick="relatedback()"></div>
+                <span>项目联系人</span>
+                <span  style="position: absolute;right: 0.3rem;font-size:0.3rem;color:#5677FC" onclick="over()">完成</span>
+            </div>
+            <div class="main " style="top: 0.88rem;padding-top: 0.2rem" >
+                        <div class="eng-box" style="margin-bottom: 20px">
+                            <input type="text" name="" placeholder="输入姓名"   style="font-size:0.3rem" ><!-- v-model="name" -->
+                            <img src="head01.png" style="display: inline-block;float: left;width:0.3rem;height:0.3rem;">
+                        </div> 
+                        <div id="selectPeople"></div>       
+            </div>
+        </div>
+        <div style="display:block" id="contentBox">
+            <div class="personnelTit">
+                <div onclick="back()"></div>
+                <span >添加备忘录</span>
+                <span  style="position: absolute;right: 0.3rem;font-size:0.3rem;color:#5677FC" onclick="send()">发送</span>
+            </div>
+            <div class="main " style="top: 0.88rem;padding-top: 0.2rem" >
+                        <div class="eng-box" style="margin-bottom: 10px;height: 300px;">
+                        <textarea  id="content" rows="10" cols="25" placeholder="请输入内容..." style="display: inline-block;width: 100%;height: 99%;font-size:0.28rem;border:none;"></textarea>
+                        </div>
+                        <div style="position:relative;height: auto" >
+                            <img src="@.png" style="display:block;margin-left:30px;margin-bottom:3px ; float: left;" onclick="people()">
+                            <div style="position:absolute;margin-left: 80px" id="nameBox"></div> 
+                        </div>
+                        <div class="inforBox">
+                          <div class="eng-box">
+                              <span>上传照片</span>
+                              <a id="upload">上传</a>
+                          </div>
+                        </div>
+                        <div  class="myengMain"  style="position: relative;"></div>
+                        <div class="member-downcai" style="display: none">
+                              <form id="from" enctype="multipart/form-data">
+                                  <h3>
+                                      本地上传
+                                      <input type="file"  name="files" multiple="multiple" class="img-file">
+                                  </h3>
+                              </form>
+                              <h3 style="margin-top: 0.1rem" id="cancel">取消</h3>
+                         </div>
+            </div>
+        </div>
+</div>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script>  
+var id=window.location.href.split("=")[1];
+console.log(id);
+var data2= localStorage.getItem('key');
+var userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+var pro=localStorage.getItem('pro');
+var ver=localStorage.getItem('version')
+var sr=[];
+var peopleArry=[];
+var peopleUid=[];
+var peopleName=[];
+$.ajax({  //获取项目成员
+        "url":"http://app.zhuangneizhu.com/project/gainProjectMember.do",
+        "type":"post",
+        data:{
+              projectId:pro,
+              organizationId:org,
+              userId:userId,
+              version:ver,
+        },
+        "dataType":"json",
+        "success":function(data){
+            console.log(data.data)
+            peopleArry=data.data
+        },
+        "error":function(){
+            console.log("错误");
+        }
+}).done(function(){
+    $.each(peopleArry,function(index,item){
+      var txt=`
+      <div class="eng-box">
+        <p style="font-size:0.3rem;padding-left:20px;line-height: 30px;">${item.name}</p>
+        <div class="adj-L" onclick="getPeopleUid(${index})"><img src="../image/adj02.png" ></div>
+      </div>`
+      $("#selectPeople").append(txt);
+    });
+});
+//获取提醒人id
+function getPeopleUid(index){
+  peopleArry[index].isCheck=!peopleArry[index].isCheck
+   console.log(index);
+   peopleUid=[];
+   peopleName=[];
+   for(var i=0;i<peopleArry.length;i++){
+        if(peopleArry[i].isCheck){
+            peopleUid.push(peopleArry[i].userId);
+            peopleName.push(peopleArry[i].name);
+            $(".adj-L").eq(index).find("img").attr("src","../image/adj01.png")
+          }else{
+            // $(".adj-L").eq(index).find("img").attr("src","../image/adj02.png")此处只能选择，取消操作无法实现
+          }
+   }  
+};
+function people(){
+  $("#peopleBox").css("display","block");
+  $("#contentBox").css("display","none"); 
+};
+function over(){
+  $("#peopleBox").css("display","none");
+  $("#contentBox").css("display","block");
+   $.each(peopleName,function(index,item){
+    var nameTxt=
+              `<span style="font-size:0.25rem;height: auto;width:100px;text-align: left;">@${item}</span>`
+    $("#nameBox").append(nameTxt);
+    })
+}
+function relatedback(){
+  $("#peopleBox").css("display","none");
+  $("#contentBox").css("display","block");
+}
+function back(){
+  window.location.href="../memorandum.html";
+};
+function send(){
+      var contentTxt = $("#content").val(); 
+      $.ajax({         //添加留言板
+              "url":"http://app.zhuangneizhu.com/project/addProjectBoard.do",
+              "type":"post",
+              data:{
+                projectId:pro,
+                organizationId:org,
+                userId:userId,
+                notifyUserIds:peopleUid.join(","),//@某人的id
+                content:contentTxt,
+                replyId:id,//回复某人的id
+                version:ver,
+              },
+              "dataType":"json",
+              "success":function(data){
+                  console.log(data);
+                  var id=data.data.boardId;
+          $.ajax({           //添加留言板照片
+              "url":"http://app.zhuangneizhu.com/project/addProjectBoardOssAttachment.do",
+              "type":"post",
+              data:{
+                photo:sr.join(","),
+                id:id,
+                version:ver,
+                projectId:pro,
+                organizationId:org,
+                userId:userId,
+              },
+              "dataType":'json',
+              "success":function(data){
+                  console.log(data);
+              window.location.href="../memorandum.html" 
+              },
+              "error":function(){
+              console.log("error");
+              }
+          })
+              },
+              "error":function(){
+                  console.log("错误");
+              }
+       });
+}
+$("#upload").click(function(){
+    $(".member-downcai").css("display","block")
+});
+$("#cancel").click(function(){
+    $(".member-downcai").css("display","none")
+});
+$("input[type='file']").change(function(){   
+   var file = this.files[0];
+   var img={name:'',time:''};
+   var formdata= new FormData($("#from")[0]);
+    $(".eng-img").remove();
+    $.ajax({
+        url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+        data:formdata,
+        type:'post',
+        cache: false,        // 不缓存
+        processData: false,   // 告诉jQuery不要去处理发送的数据
+        contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+        dataType:"json",
+        success:function(data){
+        photo=data.split(",")
+          for (var i = photo.length - 1; i >= 0; i--) {
+                   sr.unshift(photo[i]);
+          };
+            $.each(sr,function(index,item){
+              console.log(index,item);
+                var txt="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item;
+                var imgtxt="<div class='eng-img' title="+index+"><a href="+txt+"><img src="+txt+"></a><span style='width: 20px;height: 20px;background-color: rgba(0,0,0,0.4);display: inline-block;position: absolute;right:0;top: 0'><a style='color: #fff;font-size: 15px;text-align: center;padding-bottom: 15px;padding-left: 8px;'>×</a></span></div>";
+                $(".myengMain").append(imgtxt);
+            });
+        }
+    })
+    // .done(function(){
+    //     $('.myengMain').on('click','.eng-img span',function(e){
+    //        var i=$(this).parent().attr('title')
+    //        console.log(i)
+    //        // $(this).parent().fadeOut(500);
+    //        // console.log(sr) 
+    //        //  sr=sr.splice(i,1);
+
+    //     });
+    //     $('.photodeleat').on('click',function(){
+    //         console.log(sr)
+    //     });
+    // })
+});
+$('.myengMain').on('click','.eng-img span',function(e){
+           var i=$(this).parent().attr('title')
+           console.log(i)
+           $(this).parent().fadeOut(500);
+           console.log(sr) 
+           sr.splice(i,1,null);
+});
+</script>
+</html>

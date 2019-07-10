@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助业主透明浏览模式</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="personnelTit">
+        <div onclick="javascript:history.back(-1);"></div><!--  -->
+        <span id="name"></span>
+    </div>
+    <div class="main" style="top: 0.88rem;padding-top: 0.2rem">
+        <div class="inforBox">
+            <div class="inforText">
+                <div class="infor-box">
+                    <span></span>
+                    <span id="money"></span>
+                </div>
+        </div>
+    </div>
+<div class="main " style="top: 0.88rem;padding-top: 0.2rem">
+                <div class="inforBox">
+                        <div class="eng-box">
+                            <span>以上传照片</span>
+                        </div>
+                </div>
+                <div  class="myengMain"  style="position: relative">
+                </div>
+</div>
+</div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+ var url = window.location.search;
+             var request = new Object();
+             if (url.indexOf("?") != -1) {  
+                 var str = url.substr(1);
+                var strs = str.split("&"); 
+                for (var i = 0; i < strs.length; i++) {
+                     request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+                 }
+            }
+var myid=request["myid"];
+var  data2= localStorage.getItem('key');
+var  userId=Number(data2);
+var  org=localStorage.getItem('orgkey'); 
+var  pro=localStorage.getItem('pro');
+                    $.ajax({   //获取项目合同款项明细
+                                "url":"http://app.zhuangneizhu.com/v2/set/gainProjectContract.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    projectId:pro,
+                                    version:"2.9",
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                     console.log(data);
+                                     $("#name").html(data.data.vos[myid].projectContractName);
+                                     $('.infor-box span').html(data.data.vos[myid].projectContractName);
+                                     $("#money").html(data.data.vos[myid].money);
+                                     var massage=data.data.vos[myid].photo;
+                                     var photo=massage.split(",");
+                                     console.log(massage,photo);
+                                     $.each(photo,function(index,item){
+                                        console.log(item);
+                                        if (item!="") {
+                                            var time=item.substr(item.indexOf("20"),10);
+                                            var value=item;
+                                         var html='<div class="eng-img"><a href='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+value+' target="view_window"><img src='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+'></a><p>'+time+'</p></div>'
+                                               $(".myengMain").append(html);
+                                        }else{
+                                            return;
+                                        }
+                                        
+                                     })
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                        })
+</script>
+</html>

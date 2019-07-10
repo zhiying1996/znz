@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="personnelTit">
+        <div @click="back"></div>
+        <span>{{name}}</span>
+        <span style="display: inline-block; float: right; margin-right: 30px; color: blue;" @click="addphoto">完成</span>
+    </div>
+    <div class="main" style="top: 0.88rem;padding-top: 0.2rem;overflow-y: auto;overflow-x: hidden;">
+        <div class="inforBox">
+            <div class="inforText">
+                <div class="infor-box" @click="link()">
+                    <span>{{name}}</span>
+                    <span>{{money}}</span>
+                </div>
+        </div>
+    </div>
+
+<div class="main " style="top: 0.88rem;padding-top: 0.2rem;padding-bottom: 0.5rem;">
+                <div class="inforBox">
+                        <div class="eng-box">
+                            <span>上传照片</span>
+                            <a href="###" @click='mainmu=true'>上传</a>
+                        </div>
+                </div>
+                <div  class="myengMain"  style="position: relative">
+                        <div class="eng-img" v-for="(value,index) in sr" v-if="value!=''">
+                       
+                           <a :href="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" target="view_window"><img v-bind:src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" ></a>
+                           <p v-html='time'></p>
+                           <span style="width: 20px;height: 20px;background-color: rgba(0,0,0,0.4);display: inline-block;position: absolute;right:0;top: 0" @click="deleat(index)" >
+                                <a style="color: #fff;font-size: 15px;text-align: center;padding-bottom: 15px;padding-left: 8px;">x</a>
+                            </span>
+                        
+                        </div>
+                </div>
+<!--下拉弹窗-->
+        <div class="member-down"  v-show="mainmu"  v-cloak>
+        <form id="from" enctype="multipart/form-data">
+            <h3>
+                本地上传
+                <input type="file"  name="files" multiple="multiple" class="img-file">
+            </h3>
+        </form>
+            <h3>拍照上传</h3>
+            <!--拍照上传自己去调ios或者安卓的摄像头设备存储-->
+            <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+        </div>
+<!--弹窗幕-->
+      <div class="main-mu" v-show="mainmu" @click="mainmu=false"></div>
+</div>
+</div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+ var url = window.location.search;
+             var request = new Object();
+             if (url.indexOf("?") != -1) {  
+                 var str = url.substr(1);
+                var strs = str.split("&"); 
+                for (var i = 0; i < strs.length; i++) {
+                     request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+                 }
+            }
+             let myid=request["myid"];
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+let  ver=localStorage.getItem('version');              
+$(function(){
+var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                lu:[],//提交图片路径
+                sr:[],//获取图片路径 
+                time:'',//图片时间
+                id:'',//图片上传用到的id
+
+                name:'',
+                money:'',
+                
+                 mainmu:false,//下拉框和下拉框幕显示隐藏的判断值
+                image:[],
+                img:{
+                    src:'',
+                    time:''
+                }
+            },
+            beforeCreate:function(){
+                let that=this;        
+                     $.ajax({   //获取项目合同款项明细
+                                "url":"http://app.zhuangneizhu.com/v2/set/gainProjectContract.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    projectId:pro,
+                                    version:ver,
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                    that.loding=false;
+                                     console.log(data);
+                                     that.name=data.data.vos[myid].projectContractName;
+                                     that.money=data.data.vos[myid].money;
+                                     that.id=data.data.vos[myid].projectContractId;
+                                     that.sr=data.data.vos[myid].photo.split(",");
+                                     that.lu=data.data.vos[myid].photo.split(",");
+                                     for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                        })
+            },
+            methods:{
+                link:function(){
+                     window.location.href="./myHTML/HTjiage.html?myid="+myid;
+                },
+                back:function(){
+                     window.location.href="original.html?index="+myid;
+                },
+                deleat:function(index){
+                        let that=this
+                        that.sr.splice(index,1,'');
+                        console.log(that.sr);
+                        that.lu=that.sr;
+               },
+               addphoto:function(){
+                let that=this;
+                    $.ajax({   //添加项目合同照片
+                                "url":"http://app.zhuangneizhu.com/project/addProjectContractOssPhoto.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    id:that.id,
+                                    photo:that.lu.join(","),
+                                    projectId:pro,
+                                    version:ver,
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                     console.log(data);
+                                     window.location.href="original.html?index="+myid;
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                        })
+
+               }
+            },
+            mounted(){
+                var that = this;
+                $("input[type='file']").change(function(){   
+                   var file = this.files[0];
+                   let  img={name:'',time:''};
+                     var formdata= new FormData($("#from")[0]);
+                    console.log(formdata)
+                    $.ajax({
+                        url:"http://app.zhuangneizhu.com/image/addOssPhoto.do",
+                        data:formdata,
+                        type:'post',
+                         cache: false,        // 不缓存
+                        processData: false,   // 告诉jQuery不要去处理发送的数据
+                        contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                        dataType:"json",
+                        success:function(data){
+                          var photo=data.split(",")
+                          for (var i = photo.length - 1; i >= 0; i--) {
+                                   console.log(photo[i]);
+                                   that.sr.unshift(photo[i]);
+                          }
+                          that.lu.unshift(data)
+                           for (var i = that.lu.length - 1; i >= 0; i--) {
+                                            let a=that.lu[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                }
+                        }
+                    })
+                })
+            }
+        })
+})
+
+           
+
+</script>
+</html>

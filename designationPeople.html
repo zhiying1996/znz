@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="personnelTit">
+        <div onclick="javascript:window.history.back();return false;"></div>
+        <span>调整成员</span>
+    </div>
+    <div class="main" style="top: 0.88rem;bottom: 0.88rem;padding: 0.2rem 0;overflow-y: auto;">
+        <div class="adj-box" v-for="(value,index) in json" @click="_adjbox(index)">
+            <div class="adj-L">
+                <img src="image/adj02.png" alt="" v-if="value.isCheck">
+                <img src="image/adj01.png" alt="" v-else>
+            </div>
+            <div class="adj-R">
+                <span v-html="value.organizationUserName"></span>
+                <span v-html="value.roleName"></span>
+                <span v-html="value.mobile"></span>
+            </div>
+        </div>
+    </div>
+    <div class="staff-Fot">
+        <button style="width: 6rem;height:0.7rem;background-color:#5677FC ;color: #fff;font-size: 0.3rem;border: none;border-radius: 0.1rem;" @click="ok">提交</button>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var myindex=window.location.href.split("=")[1];
+var data2= localStorage.getItem('key');
+var userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+var pro=localStorage.getItem('pro');
+    $(function () {
+        var app=new Vue({
+            el:'#demo',
+            data:{
+                json:[],
+                needindex:'',
+                myid:'',//订单编号
+                project:'',//项目详情
+            },
+            beforeCreate:function(){
+                var that=this
+                $.ajax({    //获取公司联系人列表
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainOrganizationUser.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:"2.9",
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            var arr=data.data;
+                            arr.forEach( function(item) {
+                                item.isCheck=true;
+                                that.json=data.data;
+                            });
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                $.ajax({    //获取待审核收款列表(可以合同收款确认上边的下拉菜单选择)
+                    "url":"http://app.zhuangneizhu.com/third/gainOrganizationCustomerList.do",
+                    "type":"post",
+                    data:{
+                            userId:userId,
+                            organizationId:org,
+                            version:"3.0",
+                            orderStatus:1,
+                            appType:"znz"
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        that.myid=data.data[myindex].id;
+                    }
+                })
+            },
+            methods:{
+                _adjbox:function (index) {
+                    var that = this;
+                    console.log(index);
+                    that.needindex=index;
+                    that.json[index].isCheck=!that.json[index].isCheck;
+                    console.log(that.json[index].isCheck);
+               },
+                ok:function(){
+                        var that=this;
+                        var need=that.needindex;
+                        console.log(that.json[need].userId);
+                        $.ajax({
+                                "url":"http://app.zhuangneizhu.com/third/setOrganizationCustomerFloweUser.do",
+                                "type":"post",
+                                data:{
+                                  userId:userId,
+                                  organizationId:org,
+                                  version:"3.0",
+                                  id:that.myid,
+                                  suserId:that.json[need].userId,//指派员工id
+                                },
+                                "success":function(data){
+                                    console.log(data);
+                                }
+                        })      
+                }
+            }
+        })
+    })
+</script>
+</html>
+$(function () {
+        var app=new Vue({
+            el:'#demo',
+            data:{
+                uid:[],
+                json:[],
+                project:'',//项目详情
+            },
+            beforeCreate:function(){
+                    let that=this
+                $.ajax({   //调整项目成员
+                    "url":"http://app.zhuangneizhu.com/project/editProjectMember.do",
+                            "type":"post",
+                             data:{
+                               projectId:pro,
+                               version:'2.9',
+                               userId:userId,
+                               organizationId:org
+                                    },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.json=data.data;
+                            for (var i = that.json.length - 1; i >= 0; i--) {
+                                if(that.json[i].isCheck==true){
+                                    that.uid.push(that.json[i].organizationUserId);
+                                }
+                            }  
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+            },
+            methods:{
+                back:function(){
+                   window.location.href="teamber.html?index="+myid;
+                },
+                _adjbox:function (index) {
+                    let that = this;
+                    that._data.json[index].isCheck=!that._data.json[index].isCheck;
+                    if (that.json[index].isCheck==true) {
+                            $.ajax({   //调整项目成员
+                                    "url":"http://app.zhuangneizhu.com/project/editProjectMember.do",
+                                    "type":"post",
+                                    "anyns":true,
+                                     data:{
+                                        projectId:pro,
+                                        version:'2.9',
+                                        userId:userId,
+                                        organizationId:org
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                    that.uid.push(data.data[index].organizationUserId);
+                                    // console.log(that.uid)
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                                });
+                    }else{
+                        // console.log(that.uid)
+                        that.uid.pop(index);
+                    }
+                    that._data.state01=false;
+               },
+                _adjok:function (e) {
+                    let that = this;
+                    // console.log(e)
+                    let k = that._data.json;
+                    that._data.state01=!e;
+                    if(e==true){
+                        console.log(e);
+                         k.forEach(function (item) {
+                            item.isCheck=false;
+                         })
+                         that.uid.splice(0,that.uid.length);
+                         // console.log(that.uid)
+                    }else {
+                        // console.log(e)
+                        k.forEach(function (item) {
+                            item.isCheck=true;
+                            that.uid.push(item.organizationUserId);
+                            // console.log(that.uid)
+                        })
+                       
+                    }
+                },
+                ok:function(){
+                        let that=this;
+                        console.log(that.uid)
+                             $.ajax({   //添加项目成员
+                                    "url":"http://app.zhuangneizhu.com/project/addProjectMember.do",
+                                    "type":"post",
+                                    "anyns":true,
+                                     data:{
+                                        projectId:pro,
+                                        organizationUserIds:that.uid.join(","),
+                                        version:'2.9',
+                                        userId:userId,
+                                        organizationId:org
+                                    },
+                                    "dataType":"json",
+                                    "success":function(data){
+                                    console.log(data);
+                                    window.location.href="teamber.html?index="+myid
+                                    },
+                                    "error":function(){
+                                        console.log("错误");
+                                    }
+                             }) 
+                          
+                }
+            }
+        })
+    })

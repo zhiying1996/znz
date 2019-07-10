@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if(document.getElementById('app').offsetWidth>1100){
+                    rootElement.style.fontSize='60px'
+                }else{
+                    console.log(document.getElementById('app').offsetWidth)
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'complete')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="css/index.css ">
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="header"  style="height: 1.76rem">
+        <div class="header-tit"  v-cloak>
+            <a class="returnBox" @click="back"></a>
+            合同收款确认
+             <a  class="header-tit-R"></a>
+        </div>
+        <div class="head-search">
+            <div class="header-ul" v-cloak>
+                <div v-for="(value,index) in titul" :class="{on:value.on}" @click="titjump(index)"><span>{{value.name}}</span></div>
+            </div>
+            <div class="header-mu" v-show="titmuon" v-cloak>
+                <div v-for="(value,index) in titmu" @click="lijump(value.name,index)">
+                    <span>{{value.name}}</span>
+                    <span>{{value.roleName}}</span>
+                    <i v-show="value.state"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main" style="overflow-y: auto;">
+        <div class="contract-box" v-for="(value,index) in content"  v-cloak>
+            <h3 style="font-weight: 500">{{value.projectName}}</h3>
+            <h4>
+                <span>{{value.fundTypeName}}</span>
+                <span>{{value.fundTypeExplain}}:{{value.money}}元</span>
+            </h4>
+            <h4>
+                <span >{{times}}</span>
+
+                <span class="red" v-if="value.auditStatusExplain=='待审核'">{{value.auditStatusExplain}}</span>
+                <span v-else>{{value.auditStatusExplain}}</span>
+            </h4>
+            <a  @click="audit(index)">
+                <span>查看详情</span>
+                <i></i>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key')
+let  userId=Number(data2)
+let  org=localStorage.getItem('orgkey');
+let  ver=localStorage.getItem('version');
+    $(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                content:'',
+                status:'',
+                type:'',
+
+                jump:'',
+                titul:[
+                    {
+                        name:'按审核状态',
+                        key:[
+                            {
+                                name:'全部',
+                                state:true,
+                                work:''
+                            },
+                            {
+                                name:'待审核',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'审核通过',
+                                state:false,
+                                work:''
+                            },
+                            {
+                                name:'审核未通过',
+                                state:false,
+                                work:''
+                            }
+                        ],
+                        on:false
+                    },
+                    {
+                        name:'按收款状态',
+                        key:[ {
+                                name:'全部',
+                                state:false,
+                                work:''
+                            },
+                             {
+                                name:'已收款',
+                                state:false,
+                                work:''
+                            },
+                             {
+                                name:'应收款',
+                                state:false,
+                                work:''
+                            }
+                        ],
+                        on:false
+                    },
+                ],
+                titjump:'',
+                titmu:[
+                    {
+                        name:'',
+                        state:false,
+                        work:''
+                    }
+                ],
+                titmuon:false,
+                lijump:'',
+                muBox:''
+            },
+            beforeCreate:function(){
+                let that=this;
+                $.ajax({    //获取待审核收款列表(可以合同收款确认上边的下拉菜单选择)
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainContractFundAudit.do",
+                        "type":"post",
+                        data:{
+                            userId:userId,
+                            organizationId:org,
+                            version:ver,
+                             pageNum:1,
+                             pageSize:20,
+                             // fundType:2,
+                             // auditStatus:2,
+                             //  // projectName
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.content=data.data;
+                        for (var i = that.content.length - 1; i >= 0; i--) {
+                            let time=that.content[i].operTime;
+                            var date = new Date(time);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                            Y = date.getFullYear() + '-';
+                            M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+                            D = date.getDate() + ' ';
+                            h = date.getHours() + ':';
+                            m = date.getMinutes() + ':';
+                            s = date.getSeconds();
+                            that.times=Y+M+D+h+m+s;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+            },
+            mounted(){
+                let that=this;
+                    that.titjump = function(index){
+                    console.log(index);
+                    that.import=index;//判断点击的是哪个下拉列表的索引
+                    let k=that._data.titul;
+                    console.log(k);
+                    that._data.titmuon=true;
+                    if(k[index].on==true){
+                        k[index].on=!k[index].on;
+                        that._data.titmuon=false;
+                        return
+                    }
+                    that._data.titmu=k[index].key
+                      k.forEach(function(item){
+                        console.log(item);
+                           item.on=false;
+                     })
+                    that._data.titmuon=true;
+                    k[index].on=!k[index].on;
+
+                }
+                that.lijump=function(name,index){
+                    // console.log(index)
+                    if(that.import==0){
+                        that.status=index;
+                        that.titul[0].name=name;
+                        // console.log(that.status)
+                    }else if (that.import==1) {
+                        that.titul[1].name=name
+                        that.type=index;
+                        // console.log(that.type);
+                    }
+                    $.ajax({    //获取项目列表
+                        "url":"http://app.zhuangneizhu.com/v2/set/gainContractFundAudit.do",
+                        "type":"post",
+                        data:{
+                          userId:userId,
+                          organizationId:org,
+                          pageNum:"1",
+                          pageSize:"20",
+                          version:ver,
+                          appType:"znz",
+                          fundType:that.type, //1.已收款;2,应收款；0代表全部
+                          auditStatus:that.status,//'审核结果(1, "待审核",2, "审核通过",3, "审核不通过"，0，代表全部)'
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                           that.content=data.data;
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    });
+                    let k = that._data.titul;
+                    k.forEach(function(item){
+                        let a=item.key;
+                        // console.log(a);
+                        a.forEach(function(item){
+                            item.state=false;
+                        })
+                    })
+                    that._data.titmu[index].state=true;
+                    //下面两个操作让header-ul里面的div还原,下拉框隐藏和幕隐藏
+                    k.forEach(function(item){
+                        item.on=false;
+                    })
+                    that._data.titmuon=false;
+                    console.log('选择了'+name+'进行排序')
+                }
+                that.muBox=function(){
+                    let k=that._data.titul;
+                    //下面两个操作让header-ul里面的div还原,下拉框隐藏和幕隐藏
+                    k.forEach(function(item){
+                        item.on=false;
+                    })
+                    that._data.titmuon=false;
+                }
+            },
+            methods:{
+                back:function(){
+                    window.location.href="personal.html";
+                },
+                audit:function(index){
+                    let that=this;
+                    let type=that.type;
+                    let status=that.status;
+                    window.location.href="contractdeta.html?index="+index+"&type="+type+"&status="+status;
+                }
+            }
+        })
+    })
+</script>
+</html>

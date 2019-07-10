@@ -1,0 +1,68 @@
+#certify {
+	position: relative;
+	width:100%;
+	margin: 0 auto;
+}
+
+#certify .swiper-container {
+	padding: 0.1rem 0;
+}
+
+#certify  .swiper-slide {
+	width: 3rem;
+	height: 2.04rem;
+	background: #fff;
+	box-shadow: 0 0.08rem 0.3rem #ddd;
+}
+#certify  .swiper-slide img{
+	display:block;
+	width:100%;
+	height:100%;
+}
+
+/* #certify .swiper-pagination {
+	width: 100%;
+	bottom: 0.2rem;
+}
+
+#certify .swiper-pagination-bullets .swiper-pagination-bullet {
+	margin: 0 0.05rem;
+	border: 0.03rem solid #fff;
+	background-color: #d5d5d5;
+	width: 0.1rem;
+	height: 0.1rem;
+	opacity: 1;
+}
+
+#certify .swiper-pagination-bullets .swiper-pagination-bullet-active {
+	border: 0.03rem solid #00aadc;
+	background-color: #fff;
+}
+
+#certify .swiper-button-prev {
+	left: -0.03rem;
+	width: 0.45rem;
+	height: 0.45rem;
+	background: url(img/wm_button_icon.png) no-repeat;
+	background-position: 0 0;
+	background-size: 100%;
+}
+
+#certify .swiper-button-prev:hover {
+	background-position: 0 -0.46rem;
+	background-size: 100%
+}
+
+#certify .swiper-button-next {
+	right: -0.3rem;
+	width: 0.45rem;
+	height: 0.45rem;
+	background: url(img/wm_button_icon.png) no-repeat;
+	background-position: 0 -0.93rem;
+	background-size: 100%;
+}
+
+#certify .swiper-button-next:hover {
+	background-position: 0 1.39rem;
+	background-size: 100%
+} */

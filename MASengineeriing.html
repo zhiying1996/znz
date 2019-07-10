@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if (document.getElementById('app').offsetWidth > 1100) {
+                    rootElement.style.fontSize = '60px'
+                } else {
+
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'complete')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="css/index.css ">
+</head>
+<body>
+<div class="wap-wrap" id="demo" v-cloak>
+    <div class="personnelTit">
+        <div onclick="javascript:window.history.back();return false;"></div><!--  -->
+        <span>{{name}}</span>
+    </div>
+    <div class="main" style="top: 0.88rem;padding-top: 0.2rem">
+        <div class="inforBox">
+            <div class="inforText">
+                <div class="infor-box">
+                    <span>{{name}}</span>
+                    <span>{{money}}</span>
+                </div>
+        </div>
+    </div>
+<!-- 上传照片，认为照片上传需要用到switch -->
+<div class="main " style="top: 0.88rem;padding-top: 0.2rem">
+                <div class="inforBox">
+                        <div class="eng-box">
+                            <span>以上传照片</span>
+                        </div>
+                </div>
+                <div  class="myengMain"  style="position: relative">
+                        <div class="eng-img" v-for="(value,index) in sr" v-if="value!=''">
+                           <a :href="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" target="view_window"><img v-bind:src="'https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/'+value" ></a>
+                           <p v-html='time'></p>
+                        </div>
+                </div>
+</div>
+</div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript">
+ var url = window.location.search;
+             var request = new Object();
+             if (url.indexOf("?") != -1) {  
+                 var str = url.substr(1);
+                var strs = str.split("&"); 
+                for (var i = 0; i < strs.length; i++) {
+                     request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+                 }
+            }
+             let myid=request["myid"];
+             console.log(myid)
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey'); 
+let  pro=localStorage.getItem('pro');            
+$(function(){
+var app = new Vue({
+            el:'#demo',
+            data:{
+                name:'',
+                money:'',
+                
+                sr:[],//获取图片路径
+                time:''//图片上传时间
+            },
+            beforeCreate:function(){
+                let that=this;   
+                     $.ajax({   //获取项目合同款项明细
+                                "url":"http://app.zhuangneizhu.com/v2/set/gainProjectContract.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    projectId:pro,
+                                    version:"2.9",
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                     console.log(data);
+                                     that.name=data.data.vos[myid].projectContractName;
+                                     that.money=data.data.vos[myid].money;
+                                     that.sr=data.data.vos[myid].photo.split(",");
+                                      for (var i = that.sr.length - 1; i >= 0; i--) {
+                                            let a=that.sr[i];
+                                           if(a.substring(0, 1)=="p"){
+                                                that.time=a.substring(10, 20);
+                                           }else if(a.substring(0, 1)=="i"){
+                                                 that.time=a.substring(6, 16);
+                                           }
+                                         }
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                        })
+            },
+    })
+})
+</script>
+</html>

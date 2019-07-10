@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script>
+        !(function () {
+            var K, metaViewport
+            var rootElement = document.documentElement
+            var suitObj = {}
+            var userAgent = window.navigator.userAgent
+            // 是否为ios系统
+            var isIphone = (!!userAgent.match(/android/gi), !!userAgent.match(/iphone/gi))
+            // 是否为OS 9_3
+            var isOS = isIphone && !!userAgent.match(/OS 9_3/)
+            // 像素比
+            var devicePixelRatio = window.devicePixelRatio
+            // isApple
+            var isApple = isIphone && !isOS
+            var isPhone6 = devicePixelRatio >= 3
+            var isPhone5 = devicePixelRatio >= 2
+
+            function L() {
+                var a = rootElement.getBoundingClientRect().width
+                a / dataDpr > 768 && (a = 768 * dataDpr)
+                var d;
+                var u = navigator.userAgent;
+                if (u.indexOf('MX6') >= 0) {
+                    d = (a / 7.5) * 0.6;
+                } else {
+                    d = a / 7.5
+                }
+                rootElement.style.fontSize = d + 'px'
+                suitObj.rem = window.rem = d
+                if(document.getElementById('app').offsetWidth>1100){
+                    rootElement.style.fontSize='60px'
+                }else{
+                    console.log(document.getElementById('app').offsetWidth)
+                    rootElement.style.fontSize = d * a / document.getElementById('app').offsetWidth + 'px'
+                }
+            }
+
+            var x, y
+            if (isPhone5) {
+                x = 2
+            } else {
+                x = 1
+            }
+            if (isPhone6) {
+                y = 3
+            } else {
+                y = x
+            }
+            // 若是apple,data-dpr为devicePixelRatio,否则都为1,缩放比为 "1/像素比"
+            // var dataDpr = isApple ? y : 1
+            var dataDpr = 1
+            var scale = 1 / dataDpr
+
+            // 设置 html 的data-dpr
+            rootElement.setAttribute('data-dpr', dataDpr)
+            metaViewport = document.createElement('meta')
+            metaViewport.setAttribute('name', 'viewport')
+            metaViewport.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no')
+            // 插入meta标签
+            if (document.firstElementChild) {
+                rootElement.firstElementChild.appendChild(metaViewport)
+            } else {
+                var u = document.createElement('div')
+                u.appendChild(metaViewport)
+                document.write(u.innerHTML)
+            }
+            window.addEventListener('resize', function () {
+                clearTimeout(K)
+                K = setTimeout(L, 300)
+            })
+            window.addEventListener('pageshow', function (b) {
+                b.persisted && (clearTimeout(K), K = setTimeout(L, 300))
+            })
+            var isReady = (document.readyState === 'complete')
+            if (isReady) {
+                document.body.style.fontSize = 12 * dataDpr + 'px'
+            } else {
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.style.fontSize = 12 * dataDpr + 'px'
+                })
+            }
+            L()
+            suitObj.dpr = window.dpr = dataDpr
+            suitObj.refreshRem = L
+            suitObj.rem2px = function (d) {
+                var c = parseFloat(d) * this.rem
+                typeof d && d.match(/rem$/) && (c += 'px') === 'string'
+                return c
+            }
+            suitObj.px2rem = function (d) {
+                var c = parseFloat(d) / this.rem
+                typeof d && d.match(/px$/) && (c += 'rem') === 'string'
+                return c
+            }
+        })()
+    </script>
+    <link rel="stylesheet" href="css/swiper-4.2.6.min.css">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/loding.css">
+</head>
+<body>
+<div class="wap-wrap" id="demo" style="overflow: hidden">
+    <!-- 加载开始 -->
+    <div id="loader-wrapper" style="margin: 0,auto;position: absolute;" v-show="loding">
+        <div id="loader"></div>
+        <div class="loader-section"></div>
+    </div>
+    <!-- 加载结束 -->
+    <div class="header">
+        <div class="news-tit"  v-cloak>
+            项目列表
+            <a  class="blue news-tit-r" @click="exit">退出</a>
+        </div>
+        <div class="news-ul" id="contrast">
+            <div class="blue" id="btn2"><span>官方消息</span></div>
+            <div id="btn3"><span>装修知识</span></div>
+        </div>
+    </div>
+    <div class="newsBox" style="width: 7.8rem">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="newsUnit" v-for="(value,index) in data2"  @click="jump1(value.messageId,index)" :data-url="value.url" v-cloak>
+                    <a href="###">
+                        <h3 v-html="value.content"></h3>
+                        <p>
+                            <span>发布时间</span>
+                            <span>{{value.createTime}}</span>
+                        </p>
+                        <img :src="value.photo" alt="">
+                        <div class="News-fot">
+                            查看详情
+                            <span>&gt;</span>
+                        </div>
+                    </a>    
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="newsUnit"  v-for="(value,index) in data3" @click="jump2(value.messageId,index)" :data-url="value.url" v-cloak>
+                    <a href="##">
+                        <h3 v-html="value.content"></h3>
+                        <p>
+                            <span>发布时间 {{value.createTime}}</span>
+                            <span>{{value.operName}}操作</span>
+                        </p>
+                        <img :src="value.photo" alt="">
+                        <h4>{{value.h4}}</h4>
+                        <div class="News-fot">
+                            查看详情
+                            <span>&gt;</span>
+                        </div>
+                    </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--底部-->
+    <div class="appFot">
+        <a href="master.html"><img src="image/fot1-1.jpg" alt=""><span>项目</span></a>
+        <a href="MASnews.html"><img src="image/fot2-2.jpg" alt=""><span>消息</span></a>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/swiper-4.2.6.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  ver=localStorage.getItem('version');
+$(function(){
+        var app = new Vue({
+            el:'#demo',
+            data:{
+                loding:true,
+                data2:'',
+                data3:'',
+
+                i:'',
+                index:'',
+                swiper:"",
+                jump:''
+            },
+            beforeCreate:function(){
+                let that=this;
+                    $.ajax({  //获取官方消息和装修知识
+                        "url":"http://app.zhuangneizhu.com/user/gainOfficialAndArticleMessage.do",
+                        "type":"post",
+                        data:{
+                              pageNum:1,
+                              pageSize:5,
+                              userId:userId,
+                              organizationId:org,
+                              version:ver,
+                              type:1,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            that.loding=false;
+                            console.log(data);
+                            that.data2=data.data.items;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    }),
+                    $.ajax({  //获取官方消息和装修知识
+                        "url":"http://app.zhuangneizhu.com/user/gainOfficialAndArticleMessage.do",
+                        "type":"post",
+                        data:{
+                              pageNum:1,
+                              pageSize:50,
+                              userId:userId,
+                              organizationId:org,
+                              version:ver,
+                              type:2,   
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            that.data3=data.data.items;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+            },
+            mounted(){
+                var that = this;
+                var mySwiper = new Swiper('.swiper-container', {
+                    on: {
+                        slideChangeTransitionStart: function () {
+                            $("#contrast .blue").removeClass('blue');
+                            $("#contrast div").eq(this.activeIndex).addClass('blue');
+                        }
+                    }
+                })
+                $("#contrast div").on('click', function(e) {
+                    e.preventDefault();
+                    $("#contrast .blue").removeClass('blue');
+                    $(this).addClass('blue');
+                    mySwiper.slideTo($(this).index());
+                }),
+                that.jump1=function(event,index){
+                     let that = this;
+                    console.log(event,index);
+                    let id=event;
+                    window.open("http://admin.zhuangneizhu.com/admin/showArticle.do?aid="+id);
+                },
+                 that.jump2=function(event,index){
+                     let that = this;
+                    console.log(event,index);
+                    let id=event;
+                    window.open("http://admin.zhuangneizhu.com/admin/showArticle.do?aid="+id);
+                }
+            },
+            methods:{
+                exit:function(){
+                    $.ajax({    //修改公司联系人
+                        "url":"http://app.zhuangneizhu.com/user/logout.do",
+                        "type":"post",
+                        data:{
+                        userId:userId,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            localStorage.removeItem("key");
+                            localStorage.removeItem("orgkey");
+                            localStorage.removeItem("pro");
+                            localStorage.removeItem("siguid");
+                            localStorage.removeItem("signorg");
+                            window.location.href="index.html";
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    })
+                }
+            }
+        })
+})
+</script>
+<style>
+    .swiper-slide{
+        -webkit-overflow-scrolling: touch;
+        overflow-y:scroll;
+    }
+</style>
+</html>

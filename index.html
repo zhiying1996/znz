@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script type="text/javascript" src="js/JR.js"></script>
+    <link rel="stylesheet" href="css/index.css ">
+</head>
+<body class="logbackground">
+<div class="wap-wrap" id="demo" style="box-shadow: none;">
+    <div class="logfather">
+        <div style="position: absolute;right: 0.5rem;margin-top: 0.3rem">
+           <a href=# rel="sidebar" onclick="javascript:addFavorite2()"> <img src="image/搜藏点击.png" style="display: block;width: 0.4rem;height: 0.4rem;"></a>
+        </div>
+        <div class="logo">
+            <img src="image/logo.png" alt="">
+            <p style="text-align:center;font-size:0.25rem;color: #ccc;">PC版beta1.8</p>
+        </div>
+        <div class="loginbtn">
+            <div class="loginTop" style="border-bottom: 1px solid #ccc">
+                <input  type="text" maxlength="11" placeholder="手机号码" class="phonenumber">
+            </div>
+            <div class="loginbt" >
+                <input style="display: block;width:63%" type="text" maxlength="6" placeholder="验证码" class="code">
+                <a style="display: block;width: 35%" class="getCode">获取验证码</a>
+                <a style="display:none;width: 35%" class="newcode"></a>
+            </div>
+        </div>
+        <div>
+            <input type="submit" value="确认" class="logoSub" style="height:0.7rem">
+            <input type="checkbox" style="margin-left:0.35rem;margin-top:0.15rem" class='checkJude'> <span style="font-size:0.24rem">记住登陆状态</span>
+        </div>
+        <div class="loginfoot">
+            <a href="register.html">注册</a>
+            <a href="https://v.qq.com/x/page/x0701wpru95.html" target="view_window">装内助是什么</a>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+<script type="text/javascript">
+localStorage.setItem('version',"4.8");
+function addFavorite2() {
+        var url = window.location;
+        console.log(url);
+        var title = document.title;
+        console.log(title);
+        var ua = navigator.userAgent.toLowerCase();
+        console.log(ua);
+        if (ua.indexOf("360se") > -1) {
+            alert("由于360浏览器功能限制，请按 Ctrl+D 手动收藏！");
+        }
+        else if (ua.indexOf("msie 8") > -1) {
+           window.external.AddToFavoritesBar(url, title); //IE8
+        }
+        else if (document.all) {
+        try{
+                window.external.addFavorite(url, title);
+                }catch(e){
+                alert('您的浏览器不支持,请按 Ctrl+D 手动收藏!');
+            }
+        }
+        else if (window.sidebar) {
+        window.sidebar.addPanel(title, url, "");
+        }
+        else {
+        alert('您的浏览器不支持,请按 Ctrl+D 手动收藏!');
+        }
+}
+// $.ajax({    //获取当前版本号
+//     "url":"http://app.zhuangneizhu.com/user/gainlatestVersion.do",
+//     "type":"post",
+//     data:{
+//       type:'android',
+//       appType:"znz",  
+//     },
+//     "dataType":"json",
+//     "success":function(data){
+//         localStorage.setItem('version',data.data.version);
+//     },
+//     "error":function(){
+//         console.log("错误")
+//     }
+// })
+if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+    alert("装内助pc版仅支持电脑端打开。在手机端使用，请您下载装内助APP获得更好的使用体验。");
+    window.location.href = "http://dwz.cn/zhuangneizhu";
+} else {
+    $(function(){
+        //封装过期控制代码
+        function set(key,value){
+            var curTime = new Date().getTime();
+            localStorage.setItem(key,JSON.stringify({data:value,time:curTime}));
+        }
+        function get(key,exp){
+            var data = localStorage.getItem(key);
+            var dataObj = JSON.parse(data);
+            if(dataObj){
+                if (new Date().getTime() - dataObj.time>exp) {
+                    console.log('信息已过期');
+                    localStorage.removeItem("isKey");
+                }else{
+                    var dataObjDatatoJson = JSON.parse(dataObj.data)
+                    return dataObjDatatoJson;
+                }
+            }
+        }
+       var isKey=get('isKey',1000*60*60*24*60);
+        if(isKey){
+            window.location.href="project.html";
+        }else{
+            $('.getCode').on('click',function(){
+                if($('.phonenumber').val()!=''){
+                    var time=60;
+                    setInterval(function(){
+                        if((time--)>0){
+                          $('.getCode').css("display","none");
+                          var my=time;
+                          console.log(my);
+                          $('.newcode').html(time+"S后重新发送")
+                          $('.newcode').css("display","block");
+                          if(my==0){
+                           $('.newcode').css("display","none");
+                           $('.getCode').css("display","block");
+                          }
+                       }
+                    },1000);
+                }else{
+                    alert("请输入手机号码。");
+                }
+                
+                $.ajax({
+                    "url":"http://app.zhuangneizhu.com/user/gainCode.do",
+                    "type":"post",
+                    "anyns":true,
+                    "data":{
+                        mobile:$('.phonenumber').val(),
+                        version:"3.7",
+                        appType:"znz"
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);   
+                    }   
+                });
+            })
+            $('.logoSub').on('click',function(){
+                $.ajax({
+                    "url":"http://app.zhuangneizhu.com/user/login.do",
+                    "type":"post",
+                    "anyns":"true",
+                    "data":{
+                        companyName:"",
+                        mobile:$('.phonenumber').val(),
+                        code:$('.code').val(),
+                        type:"android",
+                        version:"3.7"
+                    },
+                    "dataType":"json", 
+                    "success":function(data){
+                        console.log(data)
+                        if(data.message=="验证码不能为空"){
+                            alert("验证码不能为空");
+                        }else if(data.code==10020){
+                            alert("验证码不正確");
+                        }
+                        if(data.code==10000&&data.data.isMaster==false){
+                            localStorage.setItem('key',data.data.userId);
+                            localStorage.setItem('orgkey',data.data.organizations[0].organizationId);
+                            if($('.checkJude').is(':checked')){
+                                set('isKey','true')
+                            }
+                            window.location.href="project.html";
+                        }else if(data.code==10000&&data.data.isMaster==true){
+                            localStorage.setItem('key',data.data.userId);
+                            localStorage.setItem('orgkey',data.data.organizations[0].organizationId);
+                            if($('.checkJude').is(':checked')){
+                                set('isKey','true')
+                            }
+                            window.location.href="master.html";
+                        }
+                    }
+                })
+            })
+
+        }
+ })
+}
+</script>
+</html>

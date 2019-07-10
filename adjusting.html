@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <style type="text/css">
+            html,body{
+                width:100%;
+                height:100%;
+            }
+            body, div, ul, li, h1, h2, h3, h4, h5, h6, p, dl, dt, dd, ol, form, input, textarea, th, td, select {   
+                margin: 0;   
+                padding: 0;   
+            }  
+            body {   
+                font-family: "Microsoft YaHei";
+                background-color:#4c94ff;    
+            } 
+            .sec{
+                width: 7.5rem;
+                height: 100%;
+                overflow-y: auto;
+                border-radius: 0.2rem;
+                position: absolute;
+                left: 50%;
+                transform:translate(-50%);
+                display:flex;
+                flex-direction: column;
+                overflow: hidden;
+                background: #f2f2f2;
+                box-shadow: 0px 5px 20px 5px rgba(4,36,85,0.3);
+            }
+            input, textarea {   
+                outline: none;   
+                box-shadow: none;
+                display: block;
+                border:0;   
+            } 
+             header{
+                height:0.9rem;
+                font-size:0.36rem;
+                color:#6b6b6b;
+                background: #fff;
+                display:flex;
+                align-items:center;
+            }
+             header section{
+                width:33%;
+            }
+             header section:nth-child(1){
+                margin-left:0.38rem;
+                
+            }
+             header section:nth-child(2){
+                text-align:center;
+            }
+             header .btn{
+                text-align:right;
+                color:#394fe6;
+                font-size:0.28rem;
+                margin-right:0.3rem;
+                font-weight: 600;
+            }
+             header .btn2 ,.main2{
+                display:none;
+            }
+            .search{
+                position: relative;
+                margin-top:0.2rem;
+            }
+            .search i{
+                display:block;
+                width:0.4rem;
+                height:0.4rem;
+                background:url('./outlinkHTML/search.png') no-repeat;
+                background-size:contain;
+                position:absolute;
+                left:0.16rem;
+                top:0.24rem;
+            }
+            .search input{
+                width:100%;
+                height:0.86rem;
+                background: #fff;
+                margin:0 auto;
+                padding-left:0.8rem;
+                font-size:0.3rem;
+            }
+            .search span{
+                font-size:0.3rem;
+                position:absolute;
+                right:0.2rem;
+                top:0.24rem;
+                color:#69676c;    
+            }
+            main{
+                width:100%!important;
+                flex:1;
+                background: #fff;
+                margin-top:0.2rem;
+                width:7.8rem;
+                overflow-y:auto;
+
+            }
+            main .content1, main .content2{
+                width:100%;
+                overflow:auto;
+            }
+             .li{
+                display:flex;
+                align-items: center;
+                font-size:0.28rem;
+                height:0.8rem;
+                width:100%;
+                border-bottom:1px solid #e4e4e9;
+            }
+             .li .checkbox{
+                width:16%;
+                padding-left:0.2rem;
+                box-sizing: border-box;
+                color:#595959;
+            }
+             input[type="checkbox"] {
+                -webkit-appearance: none;  /*清除复选框默认样式*/
+                background:url('./outlinkHTML/switch.png') no-repeat;   /*复选框的背景图，就是上图*/
+                background-position: -0.5rem 0;
+                background-size:cover;
+                height: 0.5rem;   /*高度*/
+                vertical-align: middle;
+                width: 0.5rem;
+            }
+             input[type="checkbox"]:checked {
+                background-position: 0 0;
+            }
+             .li .name{
+                width:16%;
+                text-align:center;
+            }
+             .li .roleName{
+                width:32%;
+                text-align:center;
+            }
+             .li .mobile{
+                width:32%;
+                text-align:center;
+            }
+            footer{
+                width:100%;
+                height:0.9rem;
+                border-top:1px solid #eee;
+                font-size:0.28rem;
+                display:flex;
+                align-items:center;
+                background: #fff;
+            }
+            footer input{
+                margin-left:0.2rem;
+                margin-right:0.2rem;  
+            }
+            .box,.alert{
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                left: 0;
+                top: 0;
+                display:none;
+                z-index:1;
+            }
+            .box div,.alert div{
+                display: block;
+                width: 2.2rem;
+                height: 0.8rem;
+                color: #fff;
+                position: absolute;
+                top:50%;
+                left:50%;
+                transform: translate(-50%,-50%);
+                font-size: 0.25rem;
+                background-color:rgba(0,0,0,0.7);
+                text-align: center;
+                line-height: 0.8rem;
+                border-radius: 0.15rem;
+                letter-spacing: 0.03rem;
+            }
+            .alert div{
+                width:3rem;
+            }
+    </style>
+</head>
+<body>
+    <div class="sec">
+        <header>
+            <section class="back">返回</section>
+            <section>调整成员</section>
+            <section class="btn1 btn">完成</section>
+            <section class="btn2 btn">完成</section>
+        </header>
+        <div class="search">
+            <i></i>
+            <input type="text">
+            <span class="cancel">取消</span>
+        </div>
+        <main class="main1">
+            <div class="content1"></div>
+        </main>
+        <main class="main2">
+            <div class="content2"></div>
+        </main>
+        <footer>
+            <input type="checkBox" id="check">
+            <label for="#check">全选</label>
+        </footer>
+    </div>
+    <div  class="box">
+        <div>提交成功</div>
+    </div>
+    <div class="alert">
+        <div class="content">项目成员不能为空</div>
+    </div>
+</body>
+<script src="js/rem.js"></script>
+<script type="text/javascript" src="./outlinkHTML/jQuery v3.1.1.js"></script>
+<script type="text/javascript">
+(function(){
+    $(function () {
+var  userId= localStorage.getItem('key');
+var  organizationId=localStorage.getItem('orgkey');
+var  projectId=localStorage.getItem('pro');
+var  version=localStorage.getItem('version');
+        $(".back").on("click",function(){
+            window.location.href="teamber.html"
+        })
+        function list(){    //列表展示
+            $.ajax({
+                url:"http://app.zhuangneizhu.com/project/editProjectMember.do",
+                type:"post",
+                data:{ 
+                    userId:userId,
+                    organizationId:organizationId,
+                    projectId:projectId,
+                    version:version,
+                },
+                dataType:"json",
+                success:function(data){
+                    message=data.data
+                }
+            })
+            .done(function(){
+                $('main .content1').html('');
+                $.each(message,function(index,item){ 
+                    var html=`
+                    <div class="li">
+                        <div class="checkbox"><input type="checkBox" ${item.isCheck?'checked':''} title=${item.organizationUserId}> </div> 
+                        <div class="name">${item.name}</div>
+                        <div class="roleName">${item.roleName}</div>
+                        <div class="mobile">${item.mobile}</div>
+                    </div>`
+                    $('main .content1').append(html)
+                })   
+                var arr=[];
+                $('.main1 input:checkbox:checked').each(function (index, item) {
+                    arr.push(item.title)
+                });
+                //设置全选和全不选
+                if(arr.length===message.length){
+                    $('input:checkbox').prop("checked", true)
+                }else{
+                    $('footer input').prop("checked", false)
+                }
+            })
+        };
+        list();
+    
+        function btn1(){    //btn提交
+            var arr1=[];
+            $('.main1 input:checkbox:checked').each(function (index, item) {
+                arr1.push(item.title)
+            }); 
+            var my=arr1.toString();
+            $.ajax({   //添加项目成员
+                url:"http://app.zhuangneizhu.com/project/addProjectMember.do",
+                type:"post",
+                dataType:"json",
+                data:{
+                    projectId:projectId,
+                    organizationUserIds:my,
+                    version:version,
+                    userId:userId,
+                    organizationId:organizationId
+                },
+                success:function(res){
+                    if(res.code==10000){
+                        console.log(res);
+                        // list();
+                    }else if(res.code==10010){
+                        list();
+                        $('.alert').fadeIn(400);
+                        setTimeout(function(){
+                            $('.alert').fadeOut(400);
+                        },600);
+                    }else{
+                        return;
+                    }
+                },
+            })
+        };
+    
+        $('.content1').on('click','.li .checkbox input',function(){
+            btn1();
+        })
+    
+        $('.btn1').on('click',function(){
+            var arr1=[];
+            $('.main1 input:checkbox:checked').each(function (index, item) {
+                arr1.push(item.title)
+            }); 
+            var my=arr1.toString()
+            $.ajax({   //添加项目成员
+                url:"http://app.zhuangneizhu.com/project/addProjectMember.do",
+                type:"post",
+                dataType:"json",
+                data:{
+                    projectId:projectId,
+                    organizationUserIds:my,
+                    version:version,
+                    userId:userId,
+                    organizationId:organizationId
+                },
+                success:function(res){
+                    console.log(res)
+                    if(res.code==10000){
+                        list();
+                        $('.box').fadeIn(400);
+                        setTimeout(function(){
+                            $('.box').fadeOut(400);
+                            window.location.href="teamber.html"
+                        },1500);
+
+                    }else if(res.code==10010){
+                        $('.alert').fadeIn(400);
+                        setTimeout(function(){
+                            $('.alert').fadeOut(400);
+                        },1500);
+                        list();
+                    }else{
+                        return;
+                    }
+                },
+            })
+        });
+    
+    
+        $('.search input').on('input',function(){
+            $('.main1').hide();
+            $('.main2').show();
+            $('.btn1').hide();
+            $('.btn2').show();
+            $('footer').hide();
+            
+            if($('.search input').val()===''){
+                location.reload();
+            }
+            
+            $.ajax({ //获取项目列表
+                url:"http://app.zhuangneizhu.com/project/editProjectMember.do",
+                type:"post",
+                dataType:"json",
+                data:{ 
+                    userId:userId,
+                    organizationId:organizationId,
+                    projectId:projectId,
+                    version:version,
+                    qname:$('.search input').val()
+                },
+                success:function(res){
+                    data=res.data; 
+                    if(res.code==10000){
+                        $('.content2').html('');     
+                    }
+                }
+            }).done(function(){
+                $.each(data,function(index,item){
+                    var html=`
+                        <div class="li">
+                            <div class="checkbox"><input type="checkBox" ${item.isCheck?'checked':''} title=${item.organizationUserId}></div>
+                            <div class="name">${item.name}</div>
+                            <div class="roleName">${item.roleName}</div>
+                            <div class="mobile">${item.mobile}</div>
+                        </div>`
+                    $('.content2').append(html)
+                })
+    
+                arr0=[];
+                $('.main2 input:checkbox:checked').each(function (index, item) {
+                    arr0.push(item.title)
+                }); 
+                
+                $('.btn2').on('click',function(){
+                    location.reload();
+                }) 
+            })  
+        })
+        $('.cancel').on('click',function(){
+            location.reload();
+        })
+    
+        $('footer input').on('click',function(){
+            console.log(123)
+            if($(this).prop("checked")){
+                $('input:checkbox').prop("checked", true)
+            }else{
+                $('input:checkbox').prop("checked", false)
+            }
+        })
+        
+        $('.main1').on('click','.content1 .li .checkbox input',function(){
+            var arr=[];
+            $('.main1 input:checkbox:checked').each(function (index, item) {
+                arr.push(item.title)
+            });
+            if(arr.length===message.length){
+                $('input:checkbox').prop("checked", true)
+            }else{
+                $('footer input').prop("checked", false)
+            }
+        }) 
+        
+        $('.content2').on('click','.li .checkbox input',function(){
+            var arr1=[];
+            $('.main1 input:checkbox:checked').each(function (index, item) {
+                arr1.push(item.title)
+            }); 
+            var arr2=[];
+            $('.main2 input:checkbox:checked').each(function (index, item) {
+                arr2.push(item.title);
+            });
+            for(var i=0;i<arr0.length;i++){
+                for(var j=0;j<arr1.length;j++){
+                    if(arr1[j]==arr0[i]){
+                        arr1.splice(j,1)
+                    }
+                }
+            }
+            var my=arr1.concat(arr2).join(',');
+            $.ajax({   //添加项目成员
+                url:"http://app.zhuangneizhu.com/project/addProjectMember.do",
+                type:"post",
+                dataType:"json",
+                data:{
+                    projectId:projectId,
+                    organizationUserIds:my,
+                    version:version,
+                    userId:userId,
+                    organizationId:organizationId
+                },
+                success:function(res){
+                    if(res.code==10000){
+                        list();
+                    }else if(res.code==10010){
+                        $('.alert').fadeIn(400);
+                        setTimeout(function(){
+                            $('.alert').fadeOut(400);
+                        },1500);
+                        list();
+                    }else{
+                        return;
+                    }          
+                },
+            })
+        })
+     });
+})()
+
+
+</script>
+</html>

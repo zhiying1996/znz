@@ -1,0 +1,174 @@
+html,body{
+    width:100%;
+    height:100%;
+}
+body, div, ul, li, h1, h2, h3, h4, h5, h6, p, dl, dt, dd, ol, form, input, textarea, th, td, select {   
+    margin: 0;   
+    padding: 0;   
+}  
+body {   
+    font-family: "Microsoft YaHei";   
+} 
+.sec{
+    display:flex;
+    flex-direction:column;
+    overflow: hidden;
+    background: #f2f2f2;
+    width:100%;
+    height:100%;
+}
+input, textarea {   
+    outline: none;   
+    box-shadow: none;
+    display: block;
+    border:0;   
+} 
+ header{
+    height:0.9rem;
+    font-size:0.36rem;
+    color:#6b6b6b;
+    background: #fff;
+    display:flex;
+    align-items:center;
+}
+ header section{
+    width:33%;
+}
+ header section:nth-child(1){
+    margin-left:0.38rem;
+    
+}
+ header section:nth-child(2){
+    text-align:center;
+}
+ header .btn{
+    text-align:right;
+    color:#394fe6;
+    font-size:0.28rem;
+    margin-right:0.3rem;
+    font-weight: 600;
+}
+ header .btn2 ,.main2{
+    display:none;
+}
+.search{
+    position: relative;
+    margin-top:0.2rem;
+}
+.search i{
+    display:block;
+    width:0.4rem;
+    height:0.4rem;
+    background:url('./search.png') no-repeat;
+    background-size:contain;
+    position:absolute;
+    left:0.16rem;
+    top:0.24rem;
+}
+.search input{
+    width:100%;
+    height:0.86rem;
+    background: #fff;
+    margin:0 auto;
+    padding-left:0.8rem;
+    font-size:0.3rem;
+}
+.search span{
+    font-size:0.3rem;
+    position:absolute;
+    right:0.2rem;
+    top:0.24rem;
+    color:#69676c;    
+}
+main{
+    width:100%!important;
+    flex:1;
+    background: #fff;
+    margin-top:0.2rem;
+    width:7.8rem;
+    overflow-y:auto;
+
+}
+main .content1, main .content2{
+    width:100%;
+    overflow:auto;
+}
+ .li{
+    display:flex;
+    align-items: center;
+    font-size:0.28rem;
+    height:0.8rem;
+    width:100%;
+    border-bottom:1px solid #e4e4e9;
+}
+ .li .checkbox{
+    width:16%;
+    padding-left:0.2rem;
+    box-sizing: border-box;
+    color:#595959;
+}
+ input[type="checkbox"] {
+    -webkit-appearance: none;  /*清除复选框默认样式*/
+    background:url('./switch.png') no-repeat;   /*复选框的背景图，就是上图*/
+    background-position: -0.5rem 0;
+    background-size:cover;
+    height: 0.5rem;   /*高度*/
+    vertical-align: middle;
+    width: 0.5rem;
+}
+ input[type="checkbox"]:checked {
+    background-position: 0 0;
+}
+ .li .name{
+    width:16%;
+    text-align:center;
+}
+ .li .roleName{
+    width:32%;
+    text-align:center;
+}
+ .li .mobile{
+    width:32%;
+    text-align:center;
+}
+footer{
+    width:100%;
+    height:0.9rem;
+    border-top:1px solid #eee;
+    font-size:0.28rem;
+    display:flex;
+    align-items:center;
+    background: #fff;
+}
+footer input{
+    margin-left:0.2rem;
+    margin-right:0.2rem;  
+}
+.box,.alert{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display:none;
+    z-index:1;
+}
+.box div,.alert div{
+    display: block;
+    width: 2.2rem;
+    height: 0.8rem;
+    color: #fff;
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    font-size: 0.25rem;
+    background-color:rgba(0,0,0,0.7);
+    text-align: center;
+    line-height: 0.8rem;
+    border-radius: 0.15rem;
+    letter-spacing: 0.03rem;
+}
+.alert div{
+    width:3rem;
+}

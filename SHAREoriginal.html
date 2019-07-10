@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助业主透明浏览模式</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap" id="demo">
+    <div class="personnelTit">
+        <div  onclick="javascript:history.back(-1);"></div>
+        <span>原始合同金额和构成</span>
+    </div>
+    <div class="main" style="top: 0.88rem;overflow-y: auto;">
+        <div class="inforBox">
+            <h3>
+                <span class="blue" style="display: block;float: right;" id="mony">总金额：{{money}}元</span>
+            </h3>
+            <div style="width: 100%;padding:0,0.3rem,0,0.3rem;font-size: 0.27rem;display: flex;justify-content:space-around;"> 
+                <span style="width: 27%;">款项构成</span>
+                <span style="width: 27%;">金额</span>
+                <span style="width: 27%;">操作人</span>
+            </div>
+                
+            <div class="inforText" >
+                <div class="orig-box" id="box" style="flex-direction: column;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/vue.js"></script>
+<script>
+var  data2= localStorage.getItem('key');
+var  userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+var  pro=localStorage.getItem('pro');
+var myid=window.location.href.split('=')[1];
+ $.ajax({   //获取项目合同款项明细
+                                "url":"http://app.zhuangneizhu.com/v2/set/gainProjectContract.do",
+                                "type":"post",
+                                "anyns":true,
+                                 data:{
+                                    projectId:pro,
+                                    version:"2.9",
+                                    userId:userId,
+                                    organizationId:org
+                                },
+                                "dataType":"json",
+                                "success":function(data){
+                                     console.log(data);
+                                     $('#mony').html('总金额'+data.data.contractTotal+'元');
+                                       var massage=data.data.vos;
+                                    $.each(massage,function(index,item){
+                                    if(item.userName!=''){
+                                        item.state =item.userName
+                                    }else{
+                                        item.state ='无操作人'
+                                    }
+                                     var html='<div style="display: flex;height:0.9rem;justify-Content:space-between;"><span style="width:30%;">'+item.projectContractName+'</span>'+
+                                      '<span style="width:30%;">'+item.money+'</span>'+'<span style="width:30%;">'+item.state+'</spanp></div>';
+                                         $("#box").append(html);
+                                    });
+                                     $("#box").on("click","div", function(){
+                                        window.location.href="SHAREengineeriing.html?myid="+$(this).index();
+                                    });
+                             },
+                             "error":function(){
+                             console.log("错误");
+                             }
+                    })
+</script>
+</html>

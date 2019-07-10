@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css ">
+    <link rel="stylesheet" type="text/css" href="css/honeySwitch.css">
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap">
+    <div class="head-min" style="height: 0.88rem;">
+        <div class="personnelTit">
+            <div id="back"></div>
+            <span>是否允许业主查看签到记录</span>
+        </div>
+    </div>
+    <div class="main" style="top: 0.88rem;width: 7.5rem">
+        <div style="width: 7.5rem;height:0.6rem;background-color: #fff;margin-top: 0.2rem;line-height: 0.6rem;font-size: 0.3rem;color: #4c94ff;padding-left: 0.2rem">
+            是否允许业主查看签到记录开关
+            <span id="onoff" class="switch-off" style="display:block;float: right;margin-right: 0.2rem"></span>
+        </div>
+        <div style="color: red;padding-left: 0.2rem;padding-right: 0.2rem;font-size: 0.3rem">
+        注：</br>
+        该功能用于控制是否允许业主查看工地的签到记录。</br>
+        打开（默认）：业主在透明浏览工地和登陆app浏览工地时，可以查看“工地签到”记录。</br>
+        关闭：业主无法查看“工地签到”记录。
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/honeySwitch.js"></script>
+<script type="text/javascript">
+var data2 =localStorage.getItem('key');
+var userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+$("#back").on("click",function(){
+    window.location.href="companyset.html" 
+})
+//获取是否允许业主查看签到记录的开关
+$.ajax({    
+            "url":"http://app.zhuangneizhu.com/v3/set/getIsShowSignInSocket.do",
+            "type":"post",
+            data:{
+            userId:userId,
+            organizationId:org,
+            version:"4.7",    
+            },
+            "dataType":"json",
+            "success":function(data){
+                console.log(data);
+                if(data.data){
+                    honeySwitch.showOn("#onoff")
+                }
+             },
+            "error":function(){
+             console.log("输入有误");
+            }
+})
+//设置项目完工检查开关
+$(function() {
+    switchEvent("#onoff", function() {
+        $.ajax({   
+            "url":"http://app.zhuangneizhu.com/v3/set/switchIsShowSignInSocket.do",
+            "type":"post",
+            data:{
+            userId:userId,
+            organizationId:org,
+            version:"4.8",   
+            },
+            "dataType":"json",
+            "success":function(data){
+                console.log(data);
+             },
+            "error":function(){
+             console.log("输入有误");
+            }
+        })
+    }, function() {
+        $.ajax({
+            "url":"http://app.zhuangneizhu.com/v3/set/switchIsShowSignInSocket.do",
+            "type":"post",
+            data:{
+            userId:userId,
+            organizationId:org,
+            version:"4.8",    
+            },
+            "dataType":"json",
+            "success":function(data){
+                console.log(data);
+             },
+            "error":function(){
+             console.log("输入有误");
+            }
+        })
+    });
+});
+</script>
+</html>

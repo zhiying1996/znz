@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>装内助透明浏览模式</title>
+    <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Pragma" content="no-cache">  <!-- 是用于设定禁止浏览器从本地机的缓存中调阅页面内容，设定后一旦离开网页就无法从Cache中再调出 -->
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <script src="rem.js"></script>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+<div class="pic">
+    <div class="header">
+        <div class="left"><img src="./img/return1.png" alt=""></div>
+        <div class="title">设计图</div>
+        <div class="right">说明</div>
+    </div>  
+    <div class="line"></div>
+    <div class="pic-list">
+        <h3>
+            <img src="./img/pic-list.png" alt="">
+            <span>已上传照片</span>
+        </h3>
+        <div class="myphoto">
+
+        </div>
+    </div>  
+</div>
+</body>
+
+<script src="jquery-3.3.1.min.js"></script>
+
+<script>
+    $('.header .left').on('click',function(){
+        window.history.go(-1);
+    })
+
+    var url = window.location.search;
+    var request = new Object();
+    if (url.indexOf("?") != -1) {  
+        var str = url.substr(1);
+        var strs = str.split("&"); 
+        for (var i = 0; i < strs.length; i++) {
+            request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+        }
+    }
+    var index=request["index"];
+    var  projectId= sessionStorage.getItem('projectId');
+    var  userId=sessionStorage.getItem('userId');
+    var  organizationId=sessionStorage.getItem('organizationId');
+    switch (index) {
+    case "2":
+        $.ajax({    //获取项目设计图片
+            url:"http://app.zhuangneizhu.com/v2/set/gainProjectDesignPhoto.do",
+            type:"post",
+            data:{
+              projectId:projectId,
+              organizationId:organizationId,
+              userId:userId,
+              version:"3.0",
+            },
+            dataType:"json",
+            success:function(data){
+                console.log(data)
+                message=data.data.designPhoto;
+            }
+        }).done(function(){
+            console.log(message)
+            if(message==null){
+
+            }else{
+                var photo=message.split(",");
+                $.each(photo,function(index,item){
+                    if(item!=''){
+                        var reg1=/2017/;
+                        var reg2=/2018/;
+                        var reg3=/2019/;
+                        var reg4=/2020/;
+                        var reg5=/2021/;
+                        if(reg1.test(item)){
+                            var time=item.substr(item.indexOf("2017"),10);
+                        }
+                        if(reg2.test(item)){
+                            var time=item.substr(item.indexOf("2018"),10);
+                        }
+                        if(reg3.test(item)){
+                            var time=item.substr(item.indexOf("2019"),10);
+                        }
+                        if(reg4.test(item)){
+                            var time=item.substr(item.indexOf("2020"),10);
+                        }
+                        if(reg5.test(item)){
+                            var time=item.substr(item.indexOf("2021"),10);
+                        }
+           
+                        var html='<div class="img-wrap"><div class="time">'+time+'</div><a href='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+' target="_blank"><img src='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+'></a></div>'
+                        $(".myphoto").append(html);
+                    }  
+                })
+            }
+        })
+        $('.header .right').on('click',function(){
+            alert('手机拍照上传设计图照片后，跑工地再也不用带纸质设计图了，有设计图更新也立马能查阅，无纸化办公。')
+        })
+     break;
+    case "3":
+        $.ajax({   //获取项目水电留档照片
+            url:"http://app.zhuangneizhu.com/v2/set/gainWaterElectricityPhoto.do",
+            type:"post",
+            data:{
+              projectId:projectId,
+              organizationId:organizationId,
+              userId:userId,
+              version:"3.0",
+            },
+           dataType:"json",
+           success:function(data){
+                message=data.data.waterElectricityPhoto;
+            }     
+        }).done(function(){
+            console.log(message)
+            if(message==null){
+
+            }else{
+                var photo=message.split(",");
+                $.each(photo,function(index,item){
+                    var reg1=/2017/;
+                    var reg2=/2018/;
+                    var reg3=/2019/;
+                    var reg4=/2020/;
+                    var reg5=/2021/;
+                    if(reg1.test(item)){
+                        var time=item.substr(item.indexOf("2017"),10);
+                    }
+                    if(reg2.test(item)){
+                        var time=item.substr(item.indexOf("2018"),10);
+                    }
+                    if(reg3.test(item)){
+                        var time=item.substr(item.indexOf("2019"),10);
+                    }
+                    if(reg4.test(item)){
+                        var time=item.substr(item.indexOf("2020"),10);
+                    }
+                    if(reg5.test(item)){
+                        var time=item.substr(item.indexOf("2021"),10);
+                    }
+           
+                    if(item!=''){
+                        var html='<div class="img-wrap"><div class="time">'+time+'</div><a href='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+' target="_blank"><img src='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+'></a></div>'
+                        $(".myphoto").append(html);
+                    }     
+                })
+            }
+        })
+        $('.header .right').on('click',function(){
+            alert('手机拍照上传整套水电照片后，再也不用给业主制作水电光盘了，永远不会丢失以后维修用的水电照片。')
+        })
+    break;
+    case "1":
+        $.ajax({   //获取项目水电留档照片
+            url:"http://app.zhuangneizhu.com/v3/set/gainScenePhoto.do",
+            type:"post",
+            data:{
+              projectId:projectId,
+              organizationId:organizationId,
+              userId:userId,
+              version:"3.0",
+            },
+           dataType:"json",
+           success:function(data){
+                message=data.data.scenePhoto;
+            }     
+        }).done(function(){
+            console.log(message)
+            if(message==null){
+
+            }else{
+                var photo=message.split(",");
+                $.each(photo,function(index,item){
+                    var reg1=/2017/;
+                    var reg2=/2018/;
+                    var reg3=/2019/;
+                    var reg4=/2020/;
+                    var reg5=/2021/;
+                    if(reg1.test(item)){
+                        var time=item.substr(item.indexOf("2017"),10);
+                    }
+                    if(reg2.test(item)){
+                        var time=item.substr(item.indexOf("2018"),10);
+                    }
+                    if(reg3.test(item)){
+                        var time=item.substr(item.indexOf("2019"),10);
+                    }
+                    if(reg4.test(item)){
+                        var time=item.substr(item.indexOf("2020"),10);
+                    }
+                    if(reg5.test(item)){
+                        var time=item.substr(item.indexOf("2021"),10);
+                    }
+           
+                    if(item!=''){
+                        var html='<div class="img-wrap"><div class="time">'+time+'</div><a href='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+' target="_blank"><img src='+"https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/"+item+'></a></div>'
+                        $(".myphoto").append(html);
+                    }     
+                })
+            }
+        })
+        $('.header .right').on('click',function(){
+            alert('手机拍照上传整套水电照片后，再也不用给业主制作水电光盘了，永远不会丢失以后维修用的水电照片。')
+        })
+    break;
+    }
+</script>
+</html>

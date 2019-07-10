@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Pragma" content="no-cache">  <!-- 是用于设定禁止浏览器从本地机的缓存中调阅页面内容，设定后一旦离开网页就无法从Cache中再调出 -->
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <style>
+        .share{
+            width:100%;
+            height:100%;
+            background: #f2f2f2;
+            display: flex;
+            flex-direction: column;
+        }
+        .share nav{
+            padding-top:0.06rem;
+            height:0.84rem;
+            font-size:0.35rem;
+            line-height:0.9rem;
+            background: #5d76f4;
+            color:#fff;
+            text-align: center;    
+        }
+        .share header{
+            box-sizing: border-box;
+            height:1.64rem;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items:center;
+            /* margin-bottom:0.1rem; */
+        }
+        .share header .left{
+            width:4.24rem;
+            margin-left:0.7rem;
+        }
+        .share header .left .top{
+            width:100%;
+            display: flex;
+        }
+        .share header .left .top .title{
+            width:1.3rem;
+            font-size:0.26rem;
+            color:#989898;
+        }
+        .share header .left .top p{
+            width:2.94rem;
+            font-size:0.26rem;
+            color:#333;
+            font-weight: 600;
+        }
+        .share header .left .bottom{
+            width:100%;
+            display: flex;
+            padding-top:0.1rem;
+        }
+        .share header .left .bottom .title{
+            width:1.3rem;
+            font-size:0.26rem;
+            color:#989898;
+        }
+        .share header .left .bottom p{
+            width:2.94rem;
+            font-size:0.26rem;
+            color:#333;
+            font-weight: 600;
+        }
+        .share header .right{
+            width:2rem;
+            height:0.8rem;
+            background: url('./img/lx.gif') no-repeat;
+            background-size:cover;
+            border-radius: 0.18rem;
+            display: flex;
+            align-items: center;
+            margin-right:0.34rem;
+        }
+        /* .share header .right i{
+            width:0.28rem;
+            height:0.28rem;
+            background:url('./img/tel.png');
+            background-size:contain;
+            margin-left:0.25rem;
+        }
+        .share header .right span{
+            line-height: 0.6rem;
+            font-size:0.24rem;
+            color:#fff;
+            margin-left:0.1rem;
+        } */
+        /* .share .swiper {
+            width:100%;
+            height:3rem;
+            background: #fff;
+            overflow: auto;
+        } */
+        .share .tabs{
+            height:0.78rem;
+            background: #fff;
+            display:flex;
+            align-items:center;
+        }
+        .share .tabs .left{
+            flex:1;
+            height:0.5rem;
+            border-right:1px solid #ccc;
+            display:flex;
+            align-items: center;
+        }
+        .share .tabs .right{
+            flex:1;
+            height:0.5rem;
+            display:flex;
+            align-items: center;
+        }
+        .share .tabs .left i,.share .tabs .right i{
+            width:0.32rem;
+            height:0.3rem;
+            background:url('./img/pro.png') no-repeat;
+            background-size: contain;
+            margin-left:0.74rem;
+            margin-right:0.2rem;
+        }
+        .share .tabs .right i{
+            width:0.32rem;
+            height:0.3rem;
+            background:url('./img/mes.png') no-repeat;
+            background-size: contain;
+        }
+        .share .tabs .left p,.share .tabs .right p{
+            padding-top:0.12rem;
+            font-size:0.28rem;
+            color:#5d76f5;
+            line-height:0.62rem;
+            font-weight: 900;
+            box-sizing: border-box;
+        }
+        .share .active{
+            border-bottom:0.05rem solid #5d76f5;
+        }
+        .share .tabs .right p{
+            color:#4d4d4d;
+        }
+        .share .tabs .left span{
+            font-size:0.26rem;
+            color:#ff834d;
+            font-weight: 800;
+            margin-left:0.1rem;
+            margin-top:0.14rem
+        }
+        .share .head{
+            display:flex;
+            font-size:0.22rem;
+            height:0.5rem;
+            align-items: center;
+            color:#999;
+        }
+        .share .head li:nth-of-type(1){
+            width:18.13%;
+        }
+        .share .head li:nth-of-type(2){
+            width:24.06%;
+        }
+        .share .head li:nth-of-type(3){
+            width:16%;
+            margin-left:0.1rem;
+        }
+        .share .head li:nth-of-type(4){
+            width:23.06%;
+        }
+        .share .head li:nth-of-type(6){
+            width:10.5%;
+        }
+        .share .main{
+            flex:1;
+            overflow: auto;
+            height:6rem;
+            width:100%;
+        }
+        .share .main ul{
+            height:1rem;
+            background: #fff;
+            margin-bottom:0.1rem;
+            font-size:0.24rem;
+            display:flex;
+            align-items: center;
+            overflow: auto;
+        }
+        .share .main ul li .container{
+            width:0.72rem;
+            height:0.72rem;
+            border-radius: 0.04rem;
+            margin-left:0.34rem;
+            background: #5d76f4;
+            text-align:center;   
+        }
+        .share .main ul li .container img{
+            width:0.72rem;
+            height:0.72rem;
+            display:block;
+            
+        }
+        .share .main ul li span{
+            font-size:0.5rem;
+            line-height:0.8rem;
+            color:#fff;
+        }
+        .share .main ul li:nth-of-type(1){
+            width:18.13%;
+        }
+        .share .main ul li:nth-of-type(2){
+            width:24.06%;
+        }
+        .share .main ul li:nth-of-type(3){
+            width:16%;
+            margin-left:0.1rem;
+        }
+        .share .main ul li:nth-of-type(4){
+            width:23.06%;
+        }
+        .share .main ul li:nth-of-type(5){
+            width:10.5%;
+        }
+        .share .main ul li:nth-of-type(6){
+            margin-left:0.1rem;
+            width:0.14rem;
+            height:0.23rem;
+            background:url('./img/go.png') no-repeat;
+            background-size:cover;
+        }
+        .share .main ul li:nth-of-type(5) i{
+            width:0.36rem;
+            height:0.36rem;
+        }
+        .share .right-body{
+            display:none;
+        }
+        .share .right-body .message{
+            width:7.18rem;
+            height:2.46rem;
+            background: #fff;
+            margin:0 auto;
+            margin-top:0.1rem;
+            border-radius: 0.06rem;
+        }
+        .share .right-body .message h2{
+            font-size:0.26rem;
+            height:0.64rem;
+            padding-left:0.51rem;
+            padding-top:0.24rem;
+            border-bottom:1px solid #e6e6e6;
+        }
+        .share .right-body .c-main{
+            width:5.7rem;
+            height:1rem;
+            margin:0 auto;
+            margin-top:0.2rem;
+            display:flex;
+            justify-content: space-between;
+        }
+        .share .right-body .c-main .con{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .share .right-body .c-main p{
+            font-size:0.28rem;
+            color:#656565;
+        }
+        .share .right-body .c-main span{
+            font-weight: bold;
+            color:#333;
+            font-size:0.26rem;
+        }
+        .share .right-body .list-img{
+            display:flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top:0.2rem;
+        }
+        .share .right-body .list-img h3{
+            width:2.18rem;
+            height:2.18rem;
+            background: #fff;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.08rem;
+        }
+        .share .right-body .list-img .p-left{
+            display:flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .share .right-body .list-img .p-right img{
+            width:0.16rem;
+        }
+        .share .right-body .list-img i img{
+            width:0.9rem;
+        }
+        .share .right-body .list-img h3 div{
+            font-weight: normal;
+            font-size:0.28rem;
+        }
+        .share .right-body .bottom{
+            font-size:0.28rem;
+            margin:0 0.3rem;
+            margin-top:0.38rem;
+            line-height:0.4rem;
+            color:#666;
+            text-align:center;
+        }
+        .loading{
+            width:100%;height:100%;
+            background:rgba(0,0,0,0.5); 
+            position: absolute;
+            left:0;top:0;right:0;bottom:0;
+            z-index:1000;
+        }
+        .loader{
+            margin-left:48%;
+            margin-top:5.6rem;
+        } 
+        .maskImg{
+            position:absolute;
+            left:0;top:0;right:0;bottom:0;
+            background: rgba(0,0,0,0.8);
+            width:100%;
+            height:100%;
+            z-index:100000000000;
+            display:none;
+           
+        }
+        .maskImg .image{
+            width:100%;
+            height:100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .maskImg .image img{
+            width:100%;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="./loaders.css">
+    <link rel="stylesheet" type="text/css" href="./common.css">
+    <link rel="stylesheet" href="./swiper.min.css">
+    <link rel="stylesheet" href="./certify.css">
+</head>
+<body>
+    <div class="share">
+        <nav>项目详情</nav> 
+        <header>
+            <div class="left">
+                <div class="top">
+                    <div class="title">项目地址：</div>
+                    <p class="projectName"></p>
+                </div>
+                <div class="bottom">
+                    <div class="title">装修公司：</div>
+                    <p class="organizationName"></p>
+                </div>
+            </div>
+            <div class="right">
+                <!-- <i></i>
+                <span>联系咨询</span> -->
+            </div>
+        </header>
+        
+        <div id="certify">
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <!-- <div class="swiper-slide"><img src="img/certify01.png" /></div>-->
+                </div>
+            </div>
+        </div>
+     
+        <div class="tabs">
+            <div class="left">
+                <i></i>
+                <p class="active">项目进度</p>
+                <span class='overAvg'></span>
+            </div>
+            <div class="right">
+                <i></i>
+                <p>项目信息</p>
+            </div>
+        </div>
+        <ul class="head">
+            <li></li>
+            <li>节点</li>
+            <li>操作人</li>
+            <li>计划完成时间</li>
+            <li>状态</li>
+        </ul>
+        <div class="main"></div>
+        <div class="right-body">
+            <div class="message">
+                <h2>基本信息</h2>
+                <div class="c-main">
+                    <div class="c-left con">
+                        <p>装修面积：<span class="area">未填写</span></p>
+                        <p>签约时间：<span class="signedTime">未签约</span></p>
+                    </div>
+                    <div class="c-right con">
+                        <p>装修类型：<span class="decorationType">未填写</span></p>
+                        <p>完工状态：<span class="completeTime">未完工</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="list-img">
+                <h3 class="pic-1">
+                    <div class="p-left"><i><img src="./img/xcxz.png" alt=""></i>现场写真<br>照片留档</div>
+                </h3>
+                <h3 class="pic-2">
+                    <div class="p-left"><i><img src="./img/sjt.png" alt=""></i>设计图<br>照片留档</div>
+                </h3>
+                <h3 class="pic-3">
+                    <div class="p-left"><i><img src="./img/sd.png" alt=""></i>水电<br>照片留档</div>
+                </h3>
+                
+            </div>
+            <div class="bottom">
+                    更多项目信息及云存储资料，需登录装内助app查看。请联系您的装修公司，为您开通装内助账号权限。
+            </div>
+            </div>
+        </div>
+    </div>
+<div class="maskImg">
+    <div class="image"></div>
+</div>
+<!-- css3做的loading加载 -->
+<div class="loading"> 
+    <div class="loader">
+        <div class="loader-inner line-spin-fade-loader">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        </div>
+    </div>
+</div>
+  <span style="display:none">
+    <script src="https://s22.cnzz.com/z_stat.php?id=1275035232&web_id=1275035232" language="JavaScript"></script>
+  </span>
+</body>
+<script src="rem.js"></script>
+<script src="jquery-3.3.1.min.js"></script>
+<script src="./swiper.min.js"></script>
+<script type="text/javascript">
+$(function(){
+    //调转到装介绍页面
+    $('header .right').on('click',function(){
+        window.location.href="consultation.html";
+    })
+
+    //获取地址栏相关参数
+    var url = window.location.search;
+    var request = new Object();
+    if (url.indexOf("?") != -1) {  
+        var str = url.substr(1);
+        var strs = str.split("&"); 
+        for (var i = 0; i < strs.length; i++) {
+            request[strs[i].split("=")[0]] = decodeURI(strs[i].split("=")[1]);
+        }
+    }
+    var  projectId=request["projectid"];
+    var  userId=request["uid"];
+    var  organizationId=request["orgid"];
+    //存储到本地
+    sessionStorage.setItem("projectId",projectId);
+    sessionStorage.setItem("userId",userId);
+    sessionStorage.setItem("organizationId",organizationId);
+
+    if(sessionStorage.getItem('overAvg')){
+        $('.overAvg').html(sessionStorage.getItem('overAvg')+'%')
+    }
+    if(sessionStorage.getItem('projectName')){
+        $('.projectName').html(sessionStorage.getItem('projectName'));
+    }
+    if(sessionStorage.getItem('organizationName')){
+        $('.organizationName').html(sessionStorage.getItem('organizationName'));
+    }
+   $.ajax({  //获取项目进度列表
+        url:"http://app.zhuangneizhu.com/project/gainProjectSchedule.do",
+        type:"post",
+        data:{
+            projectId:projectId,
+            organizationId:organizationId,
+            userId:userId,
+            version:"3.0",
+        },
+        dataType:"json",
+        success:function(data){
+            overAvg=data.data.overAvg;
+            message=data.data.vos;
+            $('.loading').fadeOut(200);
+            sessionStorage.setItem("vos",JSON.stringify(data.data.vos));
+            sessionStorage.setItem('overAvg',overAvg)
+            $('.overAvg').html(overAvg+'%')
+        },
+    })
+    .done(function(){
+        sumArr=[];
+        $.each(message, function(index,item) {
+            if(!item.userName){
+                item.userName='';
+            }
+            if(!item.scheduleTime){
+                item.scheduleTime="未设置"
+            }
+            var html=`
+                <ul>
+                    <li><div class="container"></div></li>
+                    <li>${item.organizationScheduleName}</li>
+                    <li>${item.userName}</li>
+                    <li>${item.scheduleTime}</li>
+                    <li><i></i></li>
+                    <li></li>
+                </ul>`               
+            $('.share .main').append(html); 
+            
+            if(item.isNew&&item.state){
+                $('.share .main ul').eq(index).find('li').css('color','blue');   
+            }
+            if(item.state){
+                $('.share .main ul').eq(index).find('li i').css({'background':'url("./img/over.png") no-repeat',"backgroundSize":"contain"})
+            }else{
+                $('.share .main ul').eq(index).find('li i').css({'background':'url("./img/noover.png") no-repeat',"backgroundSize":"contain"})
+            }
+           
+            if(item.photo){
+                sumArr.push(item.photo.split(',').reverse().join(','))
+                var myImg=`<img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item.photo.split(',')[0]}">`;
+                 $('.share .main ul').eq(index).find('li .container').append(myImg)
+            }else{
+                var arr=item.organizationScheduleName.split('');
+                var reg = new RegExp("[\\u4E00-\\u9FFF]+");
+                for(var i=0;i<arr.length;i++){
+                    if(reg.test(arr[i])){
+                        str=arr[i];
+                        break;
+                    }
+                }
+                span='<span>'+str+'</span>'
+                $('.share .main ul').eq(index).find('li .container').append(span)
+            }  
+        });
+        var imgArr=sumArr.join(',').split(',');
+        if(imgArr.length<5){
+            $('#certify').hide();
+        }else{
+            var img20=imgArr.slice(-20).reverse();
+            var swiperImg=img20.map(function(item,index){
+                return `<div class="swiper-slide"><img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${item}" title="${index}"/></div>`
+            })
+            $('.swiper-wrapper').append(swiperImg.join(''))
+                certifySwiper = new Swiper('#certify .swiper-container', {
+                watchSlidesProgress: true,
+                slidesPerView: 'auto',
+                centeredSlides: true,
+                loop: true,
+                loopedSlides: 10,
+                autoplay: true,
+                on: {
+                    progress: function(progress) {
+                        for (i = 0; i < this.slides.length; i++) {
+                            var slide = this.slides.eq(i);
+                            var slideProgress = this.slides[i].progress;
+                            modify = 1;
+                            if (Math.abs(slideProgress) > 1) {
+                                modify = (Math.abs(slideProgress) - 1) * 0.2 + 1;
+                            }
+                            translate = slideProgress * modify * 65 + 'px';
+                            scale = 1 - Math.abs(slideProgress) / 5;
+                            zIndex = 999 - Math.abs(Math.round(10 * slideProgress));
+                            slide.transform('translateX(' + translate + ') scale(' + scale + ')');
+                            slide.css('zIndex', zIndex);
+                            slide.css('opacity', 1);
+                            if (Math.abs(slideProgress) > 3) {
+                                slide.css('opacity', 0);
+                            }
+                        }
+                    },
+                    setTransition: function(transition) {
+                        for (var i = 0; i < this.slides.length; i++) {
+                            var slide = this.slides.eq(i)
+                            slide.transition(transition);
+                        }
+                    }
+                }
+            })   
+        }
+        $('.swiper-wrapper').on('click','.swiper-slide img',function(){
+            console.log($(this).attr('title'))
+        var pic=`<img src="https://zhuangneizhu.oss-cn-hangzhou.aliyuncs.com/${img20[$(this).attr('title')]}"/>`
+        $('.maskImg .image').html('');
+        $('.maskImg').show();
+        $('.maskImg .image').append(pic)
+        })
+        $('.maskImg').on('click',function(){
+            $(this).hide()
+        })
+    });
+
+    
+    $('.tabs .left').on('click',function(){
+        $('.head').show();
+        $('.main').show();
+        $('.right-body').hide();
+       
+        $('.tabs .right p').attr('class','');
+        $('.tabs .left p').addClass('active');
+        sessionStorage.setItem('myindex',"1");
+    })
+    $('.tabs .right').on('click',function(){
+        $('.head').hide();
+        $('.main').hide();
+        $('.right-body').show();
+        $('.tabs .left p').attr('class','');
+        $('.tabs .right p').addClass('active');
+        sessionStorage.setItem('myindex',"2")
+    })
+    if(sessionStorage.getItem('myindex')=="2"){
+        $('.loading').css('display','none')
+        $('.head').hide();
+        $('.main').hide();
+        $('.right-body').show();
+        $('.tabs .left p').attr('class','');
+        $('.tabs .right p').addClass('active');
+    }
+
+    $(".pic-1").on('click',function(){
+        window.location.href="pic.html?index="+1;
+    })
+    $(".pic-2").on('click',function(){
+        window.location.href="pic.html?index="+2;
+    })
+    $(".pic-3").on('click',function(){
+        window.location.href="pic.html?index="+3;
+    })
+    $.ajax({    //初始化项目基本信息页（含业主）
+        url:"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+        type:"post",
+        data:{
+            projectId:projectId,
+            organizationId:organizationId,
+            userId:userId,
+            version:"3.0",
+        },
+        dataType:"json",
+        success:function(data){
+            message=data.data; 
+            projectName=data.data.projectName;                
+        }
+    }).done(function(){
+        $('.projectName').html(message.projectName);
+        sessionStorage.setItem('projectName',message.projectName)
+       
+        if(message.area!=null){
+            $('.area').html(message.area+'㎡');
+        }
+        if(message.decorationType!=null){
+            $('.decorationType').html(message.decorationType);
+        }
+        if(message.completeTime!=''){
+            $('.completeTime').html('已完工');
+        }
+        if(message.signedTime!=''){
+            $('.signedTime').html(message.signedTime);
+        }
+
+    //     console.log(projectName)
+        $.ajax({    //获取公司名称
+            "url":"http://app.zhuangneizhu.com/set/gainCompanyName.do",
+            "type":"post",
+            data:{
+                userId:userId,
+                organizationId:organizationId,
+                version:"3.0",
+            },
+            "dataType":"json",
+            "success":function(data){
+                $('.organizationName').html(data.data.organizationName);
+                sessionStorage.setItem('organizationName',data.data.organizationName)
+                $('title').html(data.data.organizationName+'-'+projectName+'施工进度')
+            }
+        });
+    })
+    $('.share .main ').on('click','ul',function(){
+        window.location.href='detail.html?index='+$(this).index();    
+    })
+
+})
+</script>
+</html>

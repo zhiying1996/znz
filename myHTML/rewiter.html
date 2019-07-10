@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>新建业主—装内助SaaS系统PC版</title>
+    <link href="../image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="../css/index.css ">
+    <script type="text/javascript" src="../js/JR.js"></script>
+</head>
+<body>
+<div id="dmo" class="wap-wrap" style="display: flex;justify-content: center;align-items: center;box-shadow: none;">
+    <div class="newBox">
+        <div class="newTit">新建业主</div>
+        <div class="regBox" style="width: 100%;height:1rem;margin-bottom:0.25rem;">
+            <input  style="height:1rem; border:none; font-size: 0.28rem;" placeholder="姓名" v-model="name">
+        </div>
+        <div class="regBox" style="width: 100%;height: 60px;margin-bottom:15px;">
+            <input   style="height:1rem;border:none;font-size: 0.28rem;" placeholder="电话" v-model="phone">
+        </div>
+        <div>
+            <input type="submit" value="确认修改"  class="logoSub" @click="rewite()" style="margin-bottom: 10px;width: 6rem;font-size: 0.3rem;">
+            <input type="submit" value="确认删除"  class="logoSub" @click="det()" style="width: 6rem;font-size: 0.3rem;">  
+        </div>
+        <div>
+          <p style="padding: 0.3rem;font-size: 0.23rem;color: #666">新建业主后，即可向业主分享装修进程，业主可查看项目基本信息，并可转介绍客户。</br>部分敏感信息，例如合同、项目成员、收款状况等信息，不会对外开放，业主需要用手机号登陆app才可查看，请用户放心。（不填写业主手机号码，则业主无法登陆查看）</p>
+        </div>
+        <div class="newFoot">
+            <a href="###" onClick="javascript:window.history.back();return false;"></a>
+        </div>
+    </div>
+</div>
+</body>
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/vue.js"></script>
+<script>
+let myid=window.location.href.split('=')[1];
+console.log(myid);
+let  data2= localStorage.getItem('key');
+let  userId=Number(data2);
+let  org=localStorage.getItem('orgkey');
+let  pro=localStorage.getItem('pro');
+$(function(){
+    var app=new Vue({
+                el:'#dmo',
+                data:{
+                    name:'',
+                    phone:'',
+                    masterId:'',
+                },
+         beforeCreate:function(){
+                    let that=this;
+                        $.ajax({           //初始化项目基本信息页（含业主）
+                        "url":"http://app.zhuangneizhu.com/project/showProjectDetail.do",
+                        "type":"post",
+                        data:{
+                            projectId:pro,
+                          organizationId:org,
+                          userId:userId,
+                          version:"2.9",
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            let mastername=data.data.masters[myid].masterName;
+                            console.log(mastername);
+                            let masterpnon=data.data.masters[myid].mobile;
+                            console.log(masterpnon);
+                            let masterId=data.data.masters[myid].masterId;
+                            that.masterId=masterId;
+                            that.name=mastername;
+                            that.phone=masterpnon;
+                        },
+                        "error":function(){
+                            console.log("错误");
+                        }
+                    });
+                },
+                methods:{
+                    rewite:function(){
+                        let that=this;
+                             $.ajax({     //修改项目业主信息
+                            "url":"http://app.zhuangneizhu.com/project/editProjectMaster.do",
+                            "type":"post",
+                            "anyns":true,
+                            data:{ 
+                                  masterId:that.masterId,
+                                  masterName:that.name,
+                                  projectId:pro,
+                                   mobile:that.phone,
+                                   userId:userId,
+                                   organizationId:org,
+                                  version:"2.9",
+                                  appType:'znz',
+                                   isLogin:'1'
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                                window.location.href="../information.html";
+                            },
+                            "error":function(){
+                                console.log("输入有误");
+                            }
+                        });
+                             
+                    },
+                    det:function(){
+                        let that=this;
+                         $.ajax({     //删除项目业主信息
+                            "url":"http://app.zhuangneizhu.com/project/delProjectMaster.do",
+                            "type":"post",
+                            "anyns":true,
+                            data:{ 
+                                  masterId:that.masterId,
+                                  projectId:pro,
+                                   userId:userId,
+                                   organizationId:org,
+                                  version:"2.9",
+                            },
+                            "dataType":"json",
+                            "success":function(data){
+                                console.log(data);
+                            },
+                            "error":function(){
+                                console.log("输入有误");
+                            }
+                        });
+                          window.location.href="../information.html";
+                    }
+                }
+      });
+})
+</script>
+</html> 

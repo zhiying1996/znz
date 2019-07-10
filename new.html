@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" id="app">
+<head>
+    <meta charset="UTF-8">
+    <title>装内助SaaS系统PC移植版</title>
+    <link href="image/titlogo.ico" rel="SHORTCUT ICON">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="blank"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/JR.js"></script>
+</head>
+<body>
+<div class="wap-wrap"  id="demo" style="display: flex;justify-content: center;align-items: center;box-shadow: none;" v-cloak>
+    <div class="newBox" style="box-shadow: 0px 5px 20px 5px rgba(4,36,85,0.3);">
+        <div class="newTit">新建项目</div>
+        <div class="regBox">
+            <textarea placeholder="请输入项目地址" v-model="pojname" style="color: #000;"></textarea>
+        </div>
+        <div class="red-text" style="text-align: center;margin: 0.3rem auto">
+            <span>*以地址作为项目唯一名称，仅创建者后期可修改</span>
+        </div>
+        <div class="inforText">
+                <div class="infor-box" @click="_memberdown(0,'channel')">
+                    <span>{{personnel.channel}}</span>
+                    <span class="per-R"></span>
+                </div>
+        </div>
+       <div class="member-down" v-show="mainmu"  style="width: 6.8rem;" v-cloak>
+            <h3>{{memberdownbox.name}}</h3>
+            <div class="member-downBox">
+                <div v-for="(value,index) in memberdownbox.key" @click="_downBox(value,index)" style="color: #000">{{value}}</div>
+            </div>
+            <h3 style="margin-top: 0.1rem" @click="mainmu=false">取消</h3>
+       </div>
+   
+        <div class="main-mu" v-show="mainmu" @click="mainmu=false" style="width: 6.8rem;"></div>
+        <div class="red-text" style="text-align:center">
+            <span>*在"公司设置"处可新增、修改项目进度模版</span>
+        </div>
+        <div>
+            <input type="submit" value="确认"  class="logoSub" @click="ok"> 
+        </div>
+        <div class="newFoot">
+            <a href="###" onClick="javascript:window.history.back();return false;"></a>
+        </div>
+    </div>
+    <div class="newsetname" v-show="setname">
+                        <p>请先填写您的姓名</p>
+                        <input type="text" name="" placeholder="请输入姓名" v-model="addname">
+                        <div class="newsetbutton">
+                            <span @click="close">取消</span>
+                            <span @click="determine">确定</span>
+                        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script>
+var data2 =localStorage.getItem('key');
+var userId=Number(data2);
+var org=localStorage.getItem('orgkey');
+var ver=localStorage.getItem('version');
+$(function(){
+ var app = new Vue({
+            el:'#demo',
+            data:{
+                data:'',//模板数据
+                id:'',//模板类型id
+                addname:'',//添加用户姓名
+                setname:false,
+                pojname:'',
+                    mainmu:false,//下拉框和下拉框幕显示隐藏的判断值
+                    memberdownbox:{name:'',key:[]},//存放下拉框的内容
+                    memberdown:[
+                        {
+                            name:'请选择项目模板',
+                            key:[]
+                        },
+                    ],
+                     personnel:{
+                      channel:'请选择模板',
+                    },//存放需要修改的成员信息
+            },
+            mounted(){
+                let that=this;
+                $.ajax({     //获取项目进度模板
+                    "url":"http://app.zhuangneizhu.com/v2/set/getTemplateInfo.do",
+                    "type":"post",
+                    "anyns":true,
+                    data:{ 
+                        userId:userId,
+                        organizationId:org,
+                        version:ver,
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        that.data=data.data;
+                         for(var i = 0 ;i < data.data.length ; i++){
+                            that.memberdown[0].key.push(data.data[i].templateName);      
+                            };
+                    },
+                    "error":function(){
+                        console.log("输入有误");
+                    }
+                });
+            },
+            methods:{
+                _downBox:function(e,index){    //下拉菜单
+                    let that=this
+                    let fromName=e;
+                    let k =that._data.type;//对应的那个组
+                    console.log(k)
+                    console.log(index);
+//                   let a=that._data.personnel
+                    that._data.personnel[k]=e;
+//                    console.log(e)
+                    that._data.mainmu=false;
+                    that.id=that.data[index].templateId;
+                },
+                _memberdown:function (e,key) {//编辑页面点击   
+                    let that=this;
+                    that._data.mainmu=true;
+                    that._data.memberdownbox=that._data.memberdown[e];
+                    that._data.type=key;
+                },
+                ok:function(){
+                    let that=this;
+                     $.ajax({     //添加新项目
+                    "url":"http://app.zhuangneizhu.com/project/addProject.do",
+                    "type":"post",
+                    "anyns":true,
+                    data:{ 
+                    userId:userId,
+                    organizationId:org,
+                     projectName:that.pojname,
+                     version:ver,
+                     templateId:that.id
+                    },
+                    "dataType":"json",
+                    "success":function(data){
+                        console.log(data);
+                        if (data.message=="projectName不能为空") {
+                            alert("请输入项目地址。");
+                        }else if(data.message=="templateId不能为空"){
+                            alert("请选择装修模板");
+                        }else if(data.message=="请先设置个人姓名"){
+                           that.setname=true;
+                        }else{
+                            window.location.href="project.html";
+                        }
+                    },
+                    "error":function(){
+                        console.log("输入有误");
+                    }
+                });
+                },
+                close:function(){
+                    let that=this;
+                    that.setname=false;
+                },
+                determine:function(){
+                    let that=this;
+                    $.ajax({    //获取项目列表   //包含成员(部门，职位名称等)
+                        "url":"http://app.zhuangneizhu.com/user/gainUserInfo.do",
+                        "type":"post",
+                        data:{
+                          organizationId:org,
+                          userId:userId,
+                          version:ver,
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            let people=data.data;
+                            $.ajax({    //修改公司联系人
+                        "url":"http://app.zhuangneizhu.com/v2/set/editContactsInfo.do",
+                        "type":"post",
+                        data:{
+                        sUserId:people.userId,
+                        userId:userId,
+                        name:that.addname,
+                        mobile:people.mobile,
+                        roleId:people.roleId,
+                        roleName:people.roleName,
+                        organizationId:org,
+                        departId:people.departId,
+                        departName:people.departName,
+                        version:ver,    
+                        isAdmin:people.admin
+                        },
+                        "dataType":"json",
+                        "success":function(data){
+                            console.log(data);
+                            if (code==10000) {
+                                that.setname=false;
+                            }
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                    })
+                         },
+                        "error":function(){
+                         console.log("输入有误");
+                        }
+                     });  
+                }
+            },
+       })
+})  
+</script>
+</html>

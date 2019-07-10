@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="shortcut icon" href="#" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no">
+    <!--ipone手机下的a标签下的手机号码不被显示为拨号链接-->
+    <link rel="stylesheet" href="./css-share/common.css">
+    <script src="./js-share/rem.js"></script>
+</head>
+
+<body>
+    <div class="consultation">
+        <header>
+            <p class="left goback"><img src="./img/return1.png" alt=""></p>
+            <p class="title"></p>
+            <p></p>
+        </header>
+        <div class="main">
+            <div class="content">
+                <div class="top">
+                    <h2>获取报价</h2>
+                    <p>补充您的联系方式，获取您的专属报价</p>
+                </div>
+                <div class="form">
+                    <section>
+                        <label>您的姓名</label>
+                        <input type="text" placeholder="必填" id="in1" maxlength="10">
+                    </section>
+                    <section>
+                        <label>您的号码</label>
+                        <input type="text" placeholder="必填" id="in2" maxlength="11">
+                    </section>
+                    <section>
+                        <label>您的地址</label>
+                        <input type="text" placeholder="必填" id="in3" maxlength="20">
+                    </section>
+                    <section>
+                        <label>房屋面积㎡</label>
+                        <input type="text" placeholder="必填" id="in4" maxlength="4">
+                    </section>
+                    <section>
+                        <label>您的留言</label>
+                        <textarea placeholder="选填" id="in5"></textarea>
+                    </section>
+                    <button class="mysure">提交</button>
+                </div>
+            </div>
+        </div>
+        <span style="display:none">
+            <script src="https://s22.cnzz.com/z_stat.php?id=1275035264&web_id=1275035264"
+                language="JavaScript"></script>
+        </span>
+</body>
+
+<script src="./js-share/jquery v3.1.1.js"></script>
+
+<script type="text/javascript">
+    //获取url中的参数
+    var url = window.location.href;
+    var obj = {};
+    if (url.indexOf('?') != -1) {
+        var str = url.substring(url.indexOf('?') + 1);
+        var arr = str.split('&');
+        for (var i = 0; i < arr.length; i++) {
+            obj[arr[i].split('=')[0]] = decodeURI(arr[i].split('=')[1]);
+        }
+    }
+    var userId = obj.userId;
+    var organizationId = obj.organizationId;
+    var projectId = obj.projectId;
+    $('.goback').on('click', function () {
+        window.history.go(-1);
+    })
+    $.ajax({ //获取公司名称
+        url: "http://app.zhuangneizhu.com/set/gainCompanyName.do",
+        type: "post",
+        data: {
+            userId: userId,
+            organizationId: organizationId,
+            version: "4.0",
+        },
+        dataType: "json",
+        success: function (res) {
+            var companyName = res.data.organizationName;
+            $('.title').html(companyName);
+            $('title').html(companyName);
+        }
+    });
+    $('.mysure').on('click', function () {
+        $(this).attr("disabled", true);
+        var in1 = filter($('#in1').val());
+        var in2 = filter($('#in2').val());
+        var in3 = filter($('#in3').val());
+        var in4 = filter($('#in4').val());
+        var in5 = filter($('#in5').val());
+
+
+        $.ajax({
+            url: "http://app.zhuangneizhu.com/third/addOrganizationCustomer.do",
+            type: "post",
+            data: {
+                customerName: in1,
+                mobile: in2,
+                address: in3,
+                houseArea: in4,
+                message: in5,
+                organizationId: organizationId,
+                sourceProjectId: projectId,
+                sourceUserId: userId,
+                version: '3.4',
+            },
+            success: function (data) {
+                console.log(JSON.parse(data));
+                if (JSON.parse(data).code == 10000) {
+                    alert("您已提交成功。");
+
+                    $(this).attr("disabled", false);
+                    setTimeout(function () {
+                        $(this).attr("disabled", true);
+                    }, 500)
+                    window.history.go(-1);
+                } else {
+                    alert("请将数据填写完整。")
+                }
+            }
+        }).done(res => {
+
+
+        })
+    })
+
+
+
+    function filter(val) {
+        var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+        var result = "";
+        for (var i = 0; i < val.length; i++) {
+            result = result + val.substr(i, 1).replace(pattern, '');
+        }
+        return result;
+    }
+</script>
+
+</html>
